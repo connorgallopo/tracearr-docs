@@ -3,6 +3,7 @@ import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Globe } from "lucide-react";
 import { SiGithub, SiDiscord } from "react-icons/si";
 import "./globals.css";
@@ -177,6 +178,9 @@ export default async function RootLayout({
           {children}
         </Layout>
       </body>
+      {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      )}
     </html>
   );
 }
