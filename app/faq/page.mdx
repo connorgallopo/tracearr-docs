@@ -63,6 +63,7 @@ Tracearr uses client IP addresses reported by your media server to determine geo
 See the [Jellyfin reverse proxy documentation](https://jellyfin.org/docs/general/post-install/networking/reverse-proxy/) for detailed configuration examples for Nginx, Caddy, Apache, Traefik, and more. The reverse proxy concepts apply to all media server types.
 
 **Quick checklist:**
+
 - Reverse proxy sets `X-Forwarded-For` to the client's real IP
 - Media server's "Known Proxies" includes your reverse proxy's IP address
 - For Docker setups, ensure the proxy sees real client IPs (not Docker network IPs)
@@ -85,10 +86,10 @@ By default, Tracearr uses the [MaxMind GeoLite2](https://www.maxmind.com/en/geoi
 
 In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When enabled, Tracearr sends IP addresses to Plex's GeoIP service (`plex.tv/api/v2/geoip`) which may return more accurate results. The local MaxMind database is used as a fallback.
 
-| Option | Privacy | Accuracy |
-|--------|---------|----------|
-| Default (MaxMind) | All data stays local | Good for most cases |
-| Enhanced (Plex API) | IPs sent to plex.tv | Potentially more accurate |
+| Option              | Privacy              | Accuracy                  |
+| ------------------- | -------------------- | ------------------------- |
+| Default (MaxMind)   | All data stays local | Good for most cases       |
+| Enhanced (Plex API) | IPs sent to plex.tv  | Potentially more accurate |
 
 **Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
 

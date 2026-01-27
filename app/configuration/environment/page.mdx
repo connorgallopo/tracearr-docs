@@ -9,19 +9,19 @@ Tracearr uses environment variables for core configuration.
 
 ## Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
+| Variable       | Description                              | Example                                   |
+| -------------- | ---------------------------------------- | ----------------------------------------- |
 | `DATABASE_URL` | PostgreSQL/TimescaleDB connection string | `postgres://user:pass@host:5432/tracearr` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `REDIS_URL`    | Redis connection string                  | `redis://localhost:6379`                  |
 
 ## Optional Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | HTTP server port | `3000` |
-| `NODE_ENV` | Environment mode | `production` |
-| `LOG_LEVEL` | Logging verbosity | `info` |
-| `SESSION_SECRET` | Session encryption key | (generated) |
+| Variable         | Description            | Default      |
+| ---------------- | ---------------------- | ------------ |
+| `PORT`           | HTTP server port       | `3000`       |
+| `NODE_ENV`       | Environment mode       | `production` |
+| `LOG_LEVEL`      | Logging verbosity      | `info`       |
+| `SESSION_SECRET` | Session encryption key | (generated)  |
 
 ## Database Configuration
 

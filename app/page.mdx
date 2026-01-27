@@ -3,8 +3,8 @@ title: Tracearr Documentation
 description: Complete documentation for Tracearr, the modern monitoring platform for Plex, Jellyfin, and Emby media servers. Installation guides, configuration, and troubleshooting.
 ---
 
-import { Callout } from "nextra/components"
-import Image from "next/image"
+import { Callout } from "nextra/components";
+import Image from "next/image";
 
 # Tracearr
 
@@ -17,7 +17,7 @@ Tracearr is a free, open-source monitoring platform that gives you complete visi
   alt="Tracearr dashboard showing real-time streams and world map"
   width={1920}
   height={952}
-  className="rounded-lg mt-6 shadow-md"
+  className="mt-6 rounded-lg shadow-md"
   priority
 />
 
@@ -29,15 +29,15 @@ If you run multiple media servers, you've probably dealt with this: Tautulli onl
 
 |                           | Tautulli | Jellystat | Tracearr |
 | ------------------------- | :------: | :-------: | :------: |
-| Plex support              | ✓        |           | ✓        |
-| Jellyfin support          |          | ✓         | ✓        |
-| Emby support              |          | ✓         | ✓        |
-| Multi-server dashboard    |          |           | ✓        |
-| Account sharing detection |          |           | ✓        |
-| Impossible travel alerts  |          |           | ✓        |
-| Trust scoring             |          |           | ✓        |
-| Import from Tautulli      | —        |           | ✓        |
-| Import from Jellystat     |          | —         | ✓        |
+| Plex support              |    ✓     |           |    ✓     |
+| Jellyfin support          |          |     ✓     |    ✓     |
+| Emby support              |          |     ✓     |    ✓     |
+| Multi-server dashboard    |          |           |    ✓     |
+| Account sharing detection |          |           |    ✓     |
+| Impossible travel alerts  |          |           |    ✓     |
+| Trust scoring             |          |           |    ✓     |
+| Import from Tautulli      |    —     |           |    ✓     |
+| Import from Jellystat     |          |     —     |    ✓     |
 
 ## Key Features
 
@@ -76,7 +76,8 @@ Six rule types to catch suspicious activity:
 ## Get Started
 
 <Callout type="info">
-Tracearr runs as a Docker container and requires TimescaleDB and Redis. The recommended setup takes about 5 minutes.
+  Tracearr runs as a Docker container and requires TimescaleDB and Redis. The
+  recommended setup takes about 5 minutes.
 </Callout>
 
 **Ready to install?** Head to the [Installation Guide](/getting-started/installation) to get Tracearr running with Docker Compose.

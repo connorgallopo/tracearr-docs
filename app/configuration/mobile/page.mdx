@@ -3,7 +3,7 @@ title: Mobile App - Pairing, Notifications & Settings
 description: Connect the Tracearr mobile app to your server. QR code pairing, push notification setup, multi-server support, and troubleshooting.
 ---
 
-import { Callout, Steps } from "nextra/components"
+import { Callout, Steps } from "nextra/components";
 
 # Mobile App
 
@@ -30,7 +30,8 @@ If you're accessing Tracearr through a reverse proxy or remotely, go to **Settin
 </Steps>
 
 <Callout type="warning">
-Without an external URL configured, the QR code will contain your local network address, which won't work when you're away from home.
+  Without an external URL configured, the QR code will contain your local
+  network address, which won't work when you're away from home.
 </Callout>
 
 ## Pairing a Device
@@ -60,7 +61,8 @@ Once paired, you'll be taken to the dashboard. Your device now appears in the "C
 </Steps>
 
 <Callout type="info">
-The pairing token expires after **5 minutes** and can only be used **once**. If it expires, click "Add Device" again to generate a new code.
+  The pairing token expires after **5 minutes** and can only be used **once**.
+  If it expires, click "Add Device" again to generate a new code.
 </Callout>
 
 ### Manual Entry
@@ -86,16 +88,16 @@ The mobile app supports push notifications for real-time alerts.
 
 You can enable or disable notifications for each event type:
 
-| Event | Description |
-|-------|-------------|
-| **Violation Detected** | A sharing rule was triggered |
-| **Stream Started** | Someone started watching |
-| **Stream Stopped** | Playback ended |
-| **Concurrent Streams** | User exceeded stream limit |
-| **New Device** | New device detected for a user |
-| **Trust Score Changed** | User's trust score degraded |
-| **Server Down** | Media server became unreachable |
-| **Server Up** | Media server is back online |
+| Event                   | Description                     |
+| ----------------------- | ------------------------------- |
+| **Violation Detected**  | A sharing rule was triggered    |
+| **Stream Started**      | Someone started watching        |
+| **Stream Stopped**      | Playback ended                  |
+| **Concurrent Streams**  | User exceeded stream limit      |
+| **New Device**          | New device detected for a user  |
+| **Trust Score Changed** | User's trust score degraded     |
+| **Server Down**         | Media server became unreachable |
+| **Server Up**           | Media server is back online     |
 
 ### Violation Filters
 
@@ -115,6 +117,7 @@ Pause non-critical notifications during sleeping hours:
 ### Rate Limiting
 
 To prevent notification spam, the app enforces rate limits:
+
 - Maximum notifications per minute
 - Maximum notifications per hour
 
@@ -127,6 +130,7 @@ In **Settings** → **Mobile** on the web dashboard:
 ### View Connected Devices
 
 Each device shows:
+
 - **Device Name** — e.g., "John's iPhone"
 - **Platform** — iOS or Android
 - **Last Seen** — When the device last connected

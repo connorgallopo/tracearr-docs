@@ -4,6 +4,7 @@ import { getPageMap } from "nextra/page-map";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Globe } from "lucide-react";
 import { SiGithub, SiDiscord } from "react-icons/si";
 import "./globals.css";
@@ -42,7 +43,9 @@ export const metadata: Metadata = {
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "16x16" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
     shortcut: [{ url: "/favicon.ico" }],
   },
   openGraph: {
@@ -82,7 +85,7 @@ const navbar = (
           width={32}
           height={32}
         />
-        <span className="font-bold text-lg">Tracearr</span>
+        <span className="text-lg font-bold">Tracearr</span>
       </div>
     }
     projectLink="https://github.com/connorgallopo/tracearr"
@@ -107,7 +110,7 @@ const footer = (
         href="https://tracearr.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        className="flex items-center gap-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
       >
         <Globe className="size-4" />
         Website
@@ -116,7 +119,7 @@ const footer = (
         href="https://github.com/connorgallopo/tracearr"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        className="flex items-center gap-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
       >
         <SiGithub className="size-4" />
         GitHub
@@ -125,7 +128,7 @@ const footer = (
         href="https://discord.gg/a7n3sFd2Yw"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        className="flex items-center gap-1.5 text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
       >
         <SiDiscord className="size-4" />
         Discord
@@ -177,6 +180,7 @@ export default async function RootLayout({
         >
           {children}
         </Layout>
+        <Analytics />
       </body>
       {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
