@@ -1,0 +1,46 @@
+---
+title: Environment Variables Reference
+description: Configure Tracearr with environment variables. Database, Redis, port, logging, and session settings for Docker and self-hosted deployments.
+---
+
+# Environment Variables
+
+Tracearr uses environment variables for core configuration.
+
+## Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL/TimescaleDB connection string | `postgres://user:pass@host:5432/tracearr` |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+
+## Optional Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | HTTP server port | `3000` |
+| `NODE_ENV` | Environment mode | `production` |
+| `LOG_LEVEL` | Logging verbosity | `info` |
+| `SESSION_SECRET` | Session encryption key | (generated) |
+
+## Database Configuration
+
+Tracearr requires TimescaleDB (PostgreSQL with the TimescaleDB extension) for time-series data storage.
+
+```bash
+DATABASE_URL=postgres://tracearr:password@localhost:5432/tracearr
+```
+
+## Redis Configuration
+
+Redis is used for caching and background job queues.
+
+```bash
+REDIS_URL=redis://localhost:6379
+```
+
+For Redis with authentication:
+
+```bash
+REDIS_URL=redis://:password@localhost:6379
+```

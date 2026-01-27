@@ -1,0 +1,99 @@
+---
+title: Debug Page - System Info & Maintenance
+description: Access Tracearr's debug page for system information, database statistics, log viewing, and maintenance actions including factory reset.
+---
+
+import { Callout } from "nextra/components"
+
+# Debug Page
+
+Tracearr includes a debug page at `/debug` for troubleshooting and advanced maintenance. This page is not linked from the main navigation — access it directly at:
+
+```
+http://your-tracearr:3000/debug
+```
+
+## System Information
+
+The debug page displays real-time system stats:
+
+- **Node.js version**, platform, and architecture
+- **Uptime** — how long Tracearr has been running
+- **Memory usage** — heap and RSS memory consumption
+- **Environment variables** — sanitized view of configuration
+
+## Database Statistics
+
+View database health and size information:
+
+- **Record counts** — sessions, violations, users, servers, rules, library items
+- **Database size** — total storage used
+- **Table sizes** — breakdown by table and TimescaleDB aggregates
+
+## Logs (Supervised Only)
+
+If running the `supervised` image, the debug page includes a Log Explorer for viewing PostgreSQL, Redis, and application logs directly in the browser.
+
+You can also access logs via CLI:
+
+```bash
+docker exec tracearr cat /var/log/supervisor/tracearr-error.log
+```
+
+Available log files in `/var/log/supervisor/`:
+
+| Log File | Contents |
+|----------|----------|
+| `tracearr.log` | Application stdout |
+| `tracearr-error.log` | Application errors |
+| `postgres.log` | PostgreSQL stdout |
+| `postgres-error.log` | PostgreSQL errors |
+| `redis.log` | Redis stdout |
+| `redis-error.log` | Redis errors |
+| `supervisord.log` | Supervisor process manager |
+
+<Callout type="info">
+Set `LOG_LEVEL=debug` in your environment for verbose application output.
+</Callout>
+
+### Standard Docker Logs
+
+If running the standard `latest` image with separate containers, use standard Docker log commands:
+
+```bash
+docker logs tracearr          # Application logs
+docker logs tracearr-postgres # Database logs
+docker logs tracearr-redis    # Cache logs
+```
+
+## Snapshot Management
+
+View and clean up library snapshots. Useful for removing suspicious or corrupted snapshot data that may affect Library Growth charts.
+
+## Maintenance Actions
+
+| Action | Description |
+|--------|-------------|
+| **Refresh Aggregates** | Manually refresh TimescaleDB continuous aggregates |
+| **Clear Stuck Jobs** | Reset jobs that show "already running" but aren't progressing |
+
+<Callout type="info">
+Use **Clear Stuck Jobs** when a maintenance job in Settings → Jobs says "already running" but shows no progress. This clears stale job state from a previous crash.
+</Callout>
+
+## Danger Zone
+
+<Callout type="error" title="Destructive Actions">
+These actions permanently delete data and cannot be undone. Use with caution.
+</Callout>
+
+| Action | What it deletes |
+|--------|-----------------|
+| **Clear Violations** | All violation records |
+| **Clear Rules** | All detection rules and their violations |
+| **Clear Termination Logs** | All stream termination history |
+| **Clear Library Cache** | All library metadata and snapshots |
+| **Clear Sessions** | All session history, violations, and termination logs |
+| **Clear Users** | All non-owner users and their associated data |
+| **Clear Servers** | All servers (cascades to users, sessions, violations, library) |
+| **Factory Reset** | Everything except your owner account — returns Tracearr to initial setup state |

@@ -1,0 +1,175 @@
+---
+title: Mobile App - Pairing, Notifications & Settings
+description: Connect the Tracearr mobile app to your server. QR code pairing, push notification setup, multi-server support, and troubleshooting.
+---
+
+import { Callout, Steps } from "nextra/components"
+
+# Mobile App
+
+The Tracearr mobile app lets you monitor your media servers on the go. Available for iOS and Android.
+
+## Enabling Mobile Access
+
+Before you can pair devices, you need to enable mobile access on your Tracearr server.
+
+<Steps>
+
+### Open Settings
+
+Go to **Settings** → **Mobile** in your Tracearr dashboard.
+
+### Enable Mobile Access
+
+Click **Enable Mobile Access**. This activates the pairing system and allows devices to connect.
+
+### Set External URL (if needed)
+
+If you're accessing Tracearr through a reverse proxy or remotely, go to **Settings** → **External URL** and set your public URL (e.g., `https://tracearr.yourdomain.com`). The mobile app uses this URL to connect.
+
+</Steps>
+
+<Callout type="warning">
+Without an external URL configured, the QR code will contain your local network address, which won't work when you're away from home.
+</Callout>
+
+## Pairing a Device
+
+You can pair up to 5 devices per Tracearr instance.
+
+### QR Code (Recommended)
+
+<Steps>
+
+### Generate a Pairing Code
+
+In **Settings** → **Mobile**, click **Add Device**. A QR code appears with a countdown timer.
+
+### Open the Tracearr App
+
+Launch the Tracearr app on your phone. On first launch, you'll see the pairing screen automatically.
+
+### Scan the QR Code
+
+Point your camera at the QR code. The app will automatically detect and pair with your server.
+
+### Done
+
+Once paired, you'll be taken to the dashboard. Your device now appears in the "Connected Devices" list on the web.
+
+</Steps>
+
+<Callout type="info">
+The pairing token expires after **5 minutes** and can only be used **once**. If it expires, click "Add Device" again to generate a new code.
+</Callout>
+
+### Manual Entry
+
+If you can't scan the QR code:
+
+1. In the mobile app, tap **Enter URL and Token Manually**
+2. Enter your **Server URL** — e.g., `https://tracearr.yourdomain.com`
+3. Enter the **Access Token** — shown below the QR code, starts with `trr_mob_...`
+4. Tap **Connect**
+
+## Push Notifications
+
+The mobile app supports push notifications for real-time alerts.
+
+### Enabling Notifications
+
+1. In the app, go to **Settings** → **Notifications**
+2. Toggle **Enable Push Notifications**
+3. Grant notification permissions when prompted by your device
+
+### Notification Events
+
+You can enable or disable notifications for each event type:
+
+| Event | Description |
+|-------|-------------|
+| **Violation Detected** | A sharing rule was triggered |
+| **Stream Started** | Someone started watching |
+| **Stream Stopped** | Playback ended |
+| **Concurrent Streams** | User exceeded stream limit |
+| **New Device** | New device detected for a user |
+| **Trust Score Changed** | User's trust score degraded |
+| **Server Down** | Media server became unreachable |
+| **Server Up** | Media server is back online |
+
+### Violation Filters
+
+When violation notifications are enabled, you can filter by:
+
+- **Rule Type** — Impossible Travel, Simultaneous Locations, Device Velocity, Concurrent Streams, Geo Restriction
+- **Minimum Severity** — All, Warning & High only, or High only
+
+### Quiet Hours
+
+Pause non-critical notifications during sleeping hours:
+
+1. Enable **Quiet Hours**
+2. Set your start and end times (e.g., 11 PM to 8 AM)
+3. Optionally enable **Override for Critical** to still receive high-severity violation alerts
+
+### Rate Limiting
+
+To prevent notification spam, the app enforces rate limits:
+- Maximum notifications per minute
+- Maximum notifications per hour
+
+You can see your current rate limit status in the notification settings.
+
+## Managing Connected Devices
+
+In **Settings** → **Mobile** on the web dashboard:
+
+### View Connected Devices
+
+Each device shows:
+- **Device Name** — e.g., "John's iPhone"
+- **Platform** — iOS or Android
+- **Last Seen** — When the device last connected
+- **Connected Date** — When it was paired
+
+### Revoke a Device
+
+Click the trash icon next to a device to disconnect it. The device will need to pair again with a new token.
+
+### Revoke All Sessions
+
+Click **Revoke All** to disconnect every device at once. Useful if you suspect unauthorized access.
+
+### Disable Mobile Access
+
+Click **Disable Mobile Access** to turn off the feature entirely. All devices will be disconnected and the pairing system will be disabled.
+
+## Troubleshooting
+
+### "Invalid QR code" or "Pairing Failed"
+
+- The token may have expired (5-minute limit) — generate a new one
+- Ensure your phone has a clear view of the QR code
+- Try manual entry instead
+
+### App Can't Connect to Server
+
+- Verify your **External URL** is set correctly in Settings
+- Check that your server is accessible from outside your network
+- Ensure HTTPS is working if you're using it
+- Check your firewall allows incoming connections
+
+### Not Receiving Push Notifications
+
+1. Check that notifications are enabled in the app settings
+2. Verify your device's notification permissions for Tracearr
+3. Use **Send Test Notification** to verify the connection
+4. Check that you haven't hit rate limits
+
+### Device Shows "Last seen" a Long Time Ago
+
+The app updates its "last seen" timestamp when it connects to fetch data. If the app hasn't been opened recently, this is normal.
+
+### Can't Add More Devices
+
+The default limit is 5 devices. You'll need to remove an existing device before adding a new one.

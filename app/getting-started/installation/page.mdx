@@ -1,0 +1,59 @@
+---
+title: Installation Guide - Docker Compose Setup
+description: Install Tracearr with Docker Compose. Quick start guide with PostgreSQL, TimescaleDB, and Redis for monitoring Plex, Jellyfin, and Emby servers.
+---
+
+import { Callout } from "nextra/components"
+
+# Installation
+
+The recommended way to run Tracearr is with Docker Compose.
+
+## Docker Compose
+
+We maintain ready-to-use Docker Compose files in the [Tracearr repository](https://github.com/connorgallopo/Tracearr/tree/main/docker/examples):
+
+| File | Description |
+|------|-------------|
+| [docker-compose.pg18.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.pg18.yml) | **Recommended** — PostgreSQL 18 with TimescaleDB HA |
+| [docker-compose.example.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.example.yml) | Standard setup with PostgreSQL 16 |
+
+### Quick Start
+
+```bash
+# Download the recommended compose file
+curl -O https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.pg18.yml
+
+# Generate required secrets
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+echo "COOKIE_SECRET=$(openssl rand -hex 32)" >> .env
+
+# Start Tracearr
+docker compose -f docker-compose.pg18.yml up -d
+```
+
+Tracearr will be available at `http://localhost:3000`.
+
+<Callout type="info" title="Configuration">
+See the comments in the compose file for optional environment variables like `TZ`, `PORT`, `LOG_LEVEL`, and `DB_PASSWORD`.
+</Callout>
+
+## Other Platforms
+
+<Callout type="info" title="Community Integrations">
+Tracearr is also available on these platforms:
+
+- **[Unraid Community Apps](https://unraid.net/community/apps)** — Search for "Tracearr" in the Apps tab
+- **[TrueNAS Apps](https://apps.truenas.com/catalog/tracearr/)** — Available in the TrueNAS app catalog
+- **[Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr)** — Community helper script
+</Callout>
+
+<Callout type="warning" title="About the Supervised Image">
+The `supervised` image tag (`ghcr.io/connorgallopo/tracearr:supervised`) bundles TimescaleDB and Redis into a single container. This was developed specifically for **Unraid** and is only recommended for bare-metal installations where running separate database containers isn't practical.
+
+For all other environments (Docker Compose, Kubernetes, TrueNAS, Proxmox, etc.), use the standard `latest` tag with external TimescaleDB and Redis.
+</Callout>
+
+## Next Steps
+
+Once Tracearr is running, [connect your first media server](/getting-started/first-server).

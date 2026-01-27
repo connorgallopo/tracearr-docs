@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "nextra-theme-docs/style.css";
+
+/* Tracearr Brand - Accent Hue System */
+:root {
+  --accent-hue: 187; /* Cyan - Brand primary */
+
+  /* Nextra theme overrides */
+  --nextra-primary-hue: 187deg;
+  --nextra-primary-saturation: 85%;
+}
+
+/* Dark mode as default */
+html {
+  color-scheme: dark;
+}

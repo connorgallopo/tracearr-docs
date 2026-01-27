@@ -1,0 +1,125 @@
+---
+title: FAQ - Troubleshooting & Common Questions
+description: Frequently asked questions about Tracearr. Troubleshooting sessions, geolocation issues, reverse proxy setup, maintenance jobs, and more.
+---
+
+# Frequently Asked Questions
+
+## General
+
+### What media servers does Tracearr support?
+
+Tracearr supports **Plex**, **Jellyfin**, and **Emby**. You can monitor multiple servers of different types from a single Tracearr instance.
+
+### Is Tracearr free?
+
+Yes, Tracearr is free and open source under the AGPL-3.0 license.
+
+### Can I import data from Tautulli or Jellystat?
+
+Yes, Tracearr supports importing historical data from both Tautulli and Jellystat.
+
+## Installation
+
+### What are the system requirements?
+
+- Docker and Docker Compose (recommended)
+- 1GB RAM minimum (2GB recommended)
+- PostgreSQL/TimescaleDB for the database
+- Redis for caching
+
+### Can I run Tracearr without Docker?
+
+While Docker is recommended, you can run Tracearr directly with Node.js 20+. See the GitHub repository for manual installation instructions.
+
+## Troubleshooting
+
+### Tracearr can't connect to my media server
+
+1. Verify your server URL is correct and accessible from Tracearr
+2. Check that your API key/token is valid
+3. Ensure there are no firewall rules blocking the connection
+4. Check the Tracearr logs for specific error messages
+
+### Sessions aren't being tracked
+
+1. Verify the server connection is active in Settings → Servers
+2. Check that polling is enabled for the server
+3. Start a playback session and wait for the next poll interval
+
+### I don't see any location data / Everything shows as local
+
+Tracearr uses client IP addresses reported by your media server to determine geolocation. If all sessions show as "local" or have no location data, your media server isn't seeing the real client IPs — usually because a reverse proxy is in front of it.
+
+**Two things need to be configured:**
+
+1. **Your reverse proxy** must forward the real client IP via headers (`X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`)
+
+2. **Your media server** must be configured to trust those headers:
+   - **Jellyfin**: Add your reverse proxy's IP to **Settings → Networking → Known Proxies**
+   - **Emby**: Add your reverse proxy's IP to **Settings → Networking → Known Proxies**
+   - **Plex**: Generally handles this automatically, but check **Settings → Network → List of IP addresses and networks that are allowed without auth**
+
+See the [Jellyfin reverse proxy documentation](https://jellyfin.org/docs/general/post-install/networking/reverse-proxy/) for detailed configuration examples for Nginx, Caddy, Apache, Traefik, and more. The reverse proxy concepts apply to all media server types.
+
+**Quick checklist:**
+- Reverse proxy sets `X-Forwarded-For` to the client's real IP
+- Media server's "Known Proxies" includes your reverse proxy's IP address
+- For Docker setups, ensure the proxy sees real client IPs (not Docker network IPs)
+
+### The location data is wrong / IP geolocation is inaccurate
+
+IP-based geolocation is inherently imprecise. Here's why:
+
+- **ISPs assign IPs regionally**, not by exact address — your IP might be registered to a city 50+ miles away
+- **Mobile carriers and VPNs** often show locations far from the actual user
+- **IP databases are updated periodically**, so recently reassigned IPs may show old locations
+- **Some ISPs route traffic through central hubs**, making all users appear in one location
+- **CGNAT (Carrier-Grade NAT)** — Many ISPs, especially mobile carriers, use CGNAT where thousands of customers share the same public IP address. This means the IP geolocates to the carrier's infrastructure (often a data center), not the user's actual location. CGNAT is increasingly common as IPv4 addresses become scarce.
+
+**How Tracearr handles geolocation:**
+
+By default, Tracearr uses the [MaxMind GeoLite2](https://www.maxmind.com/en/geoip2-databases) database **locally** — all IP lookups happen on your server and no data is sent externally. This keeps your users' IP addresses private.
+
+**Enhanced GeoIP option (Plex only):**
+
+In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When enabled, Tracearr sends IP addresses to Plex's GeoIP service (`plex.tv/api/v2/geoip`) which may return more accurate results. The local MaxMind database is used as a fallback.
+
+| Option | Privacy | Accuracy |
+|--------|---------|----------|
+| Default (MaxMind) | All data stays local | Good for most cases |
+| Enhanced (Plex API) | IPs sent to plex.tv | Potentially more accurate |
+
+**Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
+
+## Data & Maintenance Jobs
+
+Tracearr includes maintenance jobs in **Settings → Jobs** to fix common data issues.
+
+### I see inconsistent device names like "AndroidTV", "Android TV", and "NVIDIA Shield"
+
+Run **Normalize Players** in Settings → Jobs. This standardizes device and platform names so they group correctly in charts and filters.
+
+### I see both "US" and "United States" in my country data
+
+Run **Normalize Countries** in Settings → Jobs. This converts full country names to standard codes so your world map and country filters work properly.
+
+### My imported Tautulli sessions show 0% progress
+
+Run **Fix Imported Progress** in Settings → Jobs. This recalculates progress values for imported sessions that have duration but missing progress data.
+
+### Users show "Never" for last activity even though they have watch history
+
+Run **Backfill User Dates** in Settings → Jobs. This scans session history to populate the first seen and last activity timestamps.
+
+### My Library Growth charts are empty or missing historical data
+
+Run **Backfill Library Snapshots** in Settings → Jobs. This generates historical data points from your library items.
+
+### My analytics numbers look wrong or charts show gaps
+
+Run **Full Aggregate Rebuild** in Settings → Jobs. This recalculates all statistics from scratch.
+
+### A job says "already running" but I don't see any progress
+
+Go to `/debug` (e.g., `http://your-tracearr:3000/debug`) and click **Clear Stuck Jobs**. A previous job crashed and left stale state.
