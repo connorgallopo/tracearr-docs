@@ -172,7 +172,7 @@ export default async function RootLayout({
           navbar={navbar}
           footer={footer}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/connorgallopo/tracearr-docs/tree/main/app"
+          docsRepositoryBase="https://github.com/connorgallopo/tracearr-docs/tree/main"
           editLink="Edit this page on GitHub"
         >
           {children}
