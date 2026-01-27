@@ -3,7 +3,7 @@ title: Import Watch History - Tautulli & Jellystat
 description: Import your existing watch history from Tautulli or Jellystat into Tracearr. Step-by-step guide for migrating Plex, Jellyfin, and Emby session data.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout } from "nextra/components";
 
 # Import Watch History
 
@@ -12,7 +12,10 @@ Tracearr can import your existing watch history from **Tautulli** (for Plex) and
 Access the import feature at **Settings** → **Import**.
 
 <Callout type="warning" title="Sync Your Server First">
-Before importing, make sure you've synced your media server in **Settings → Servers**. Tracearr matches imported sessions to existing users by their media server user ID. Sessions for users that don't exist in Tracearr will be skipped.
+  Before importing, make sure you've synced your media server in **Settings →
+  Servers**. Tracearr matches imported sessions to existing users by their media
+  server user ID. Sessions for users that don't exist in Tracearr will be
+  skipped.
 </Callout>
 
 ## Import from Tautulli
@@ -30,11 +33,11 @@ Tautulli import connects directly to your Tautulli instance via API — no file 
 
 Once connected, you'll see import options:
 
-| Option | Description |
-|--------|-------------|
-| **Target Server** | Select which Plex server to import sessions to |
-| **Overwrite friendly names** | Replace existing user nicknames with names from Tautulli |
-| **Include detailed stream data** | Fetch codec, bitrate, and resolution data for each session. Enables bandwidth/quality stats but significantly increases import time. *(Beta)* |
+| Option                           | Description                                                                                                                                   |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Target Server**                | Select which Plex server to import sessions to                                                                                                |
+| **Overwrite friendly names**     | Replace existing user nicknames with names from Tautulli                                                                                      |
+| **Include detailed stream data** | Fetch codec, bitrate, and resolution data for each session. Enables bandwidth/quality stats but significantly increases import time. _(Beta)_ |
 
 ### Step 3: Start Import
 
@@ -47,7 +50,8 @@ Click **Start Import** to begin. You'll see real-time progress showing:
 - **Errors** — Records that failed to import
 
 <Callout type="info">
-Tautulli import fetches data in pages via the API. Large libraries may take several minutes depending on your history size and network speed.
+  Tautulli import fetches data in pages via the API. Large libraries may take
+  several minutes depending on your history size and network speed.
 </Callout>
 
 ### Why Records Are Skipped
@@ -69,7 +73,9 @@ Jellystat import uses a JSON backup file that you export from Jellystat.
 3. Click **Export** and save the JSON file
 
 <Callout type="error" title="Activity Backup Only">
-You must export an **Activity** backup specifically. Full backups are not supported — only the Activity backup contains the playback history needed for import.
+  You must export an **Activity** backup specifically. Full backups are not
+  supported — only the Activity backup contains the playback history needed for
+  import.
 </Callout>
 
 ### Step 2: Upload and Configure
@@ -78,10 +84,10 @@ You must export an **Activity** backup specifically. Full backups are not suppor
 2. Drag and drop your JSON file or click to select it
 3. Configure import options:
 
-| Option | Description |
-|--------|-------------|
-| **Enrich with media metadata** | Fetches season/episode numbers and artwork from your server. Slower but provides better data quality. *(Recommended)* |
-| **Update existing records** | Updates previously imported sessions with codec, bitrate, and transcode data from the backup. Useful when re-importing to backfill new fields. |
+| Option                         | Description                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Enrich with media metadata** | Fetches season/episode numbers and artwork from your server. Slower but provides better data quality. _(Recommended)_                          |
+| **Update existing records**    | Updates previously imported sessions with codec, bitrate, and transcode data from the backup. Useful when re-importing to backfill new fields. |
 
 ### Step 3: Start Import
 
@@ -101,7 +107,8 @@ Records may be skipped for these reasons:
 - **Duplicate session** — The session was already imported in a previous run.
 
 <Callout type="info">
-If many records are skipped due to "user not found", ensure you've synced your server recently in **Settings → Servers**.
+  If many records are skipped due to "user not found", ensure you've synced your
+  server recently in **Settings → Servers**.
 </Callout>
 
 ## Migrating from Playback Reporting Plugin
@@ -109,7 +116,8 @@ If many records are skipped due to "user not found", ensure you've synced your s
 If you're using the [Jellyfin Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) to track watch history, you can migrate that data to Tracearr through Jellystat.
 
 <Callout type="info" title="Direct Import Planned">
-Direct import from the Playback Reporting plugin is planned for a future Tracearr release. For now, use Jellystat as an intermediary.
+  Direct import from the Playback Reporting plugin is planned for a future
+  Tracearr release. For now, use Jellystat as an intermediary.
 </Callout>
 
 ### Migration Path
@@ -125,19 +133,22 @@ Direct import from the Playback Reporting plugin is planned for a future Tracear
 This is a one-time migration. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if desired.
 
 <Callout type="warning">
-Some users have reported issues with TV show metadata when importing from the Playback Reporting plugin to Jellystat. Movies typically import cleanly, but TV episodes may show incomplete data. This is a limitation of the plugin's data format, not Tracearr.
+  Some users have reported issues with TV show metadata when importing from the
+  Playback Reporting plugin to Jellystat. Movies typically import cleanly, but
+  TV episodes may show incomplete data. This is a limitation of the plugin's
+  data format, not Tracearr.
 </Callout>
 
 ## After Importing
 
 After import completes, you may want to run some maintenance jobs in **Settings → Jobs**:
 
-| Job | When to Run |
-|-----|-------------|
-| **Normalize Players** | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV") |
-| **Fix Imported Progress** | If imported sessions show 0% progress |
-| **Backfill User Dates** | If users show "Never" for last activity despite having history |
-| **Full Aggregate Rebuild** | If charts or statistics look incorrect |
+| Job                        | When to Run                                                             |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Normalize Players**      | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV") |
+| **Fix Imported Progress**  | If imported sessions show 0% progress                                   |
+| **Backfill User Dates**    | If users show "Never" for last activity despite having history          |
+| **Full Aggregate Rebuild** | If charts or statistics look incorrect                                  |
 
 See the [FAQ](/faq) for more details on these jobs.
 
