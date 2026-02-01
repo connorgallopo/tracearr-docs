@@ -81,14 +81,14 @@ IP-based geolocation is inherently imprecise. Here's why:
 
 By default, Tracearr uses the [MaxMind GeoLite2](https://www.maxmind.com/en/geoip2-databases) database **locally** — all IP lookups happen on your server and no data is sent externally. This keeps your users' IP addresses private.
 
-**Enhanced GeoIP option (Plex only):**
+**Enhanced GeoIP option:**
 
-In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When enabled, Tracearr sends IP addresses to Plex's GeoIP service (`plex.tv/api/v2/geoip`) which may return more accurate results. The local MaxMind database is used as a fallback.
+In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When enabled, Tracearr sends IP addresses to Plex's GeoIP service (`plex.tv/api/v2/geoip`) which may return more accurate results. This works for all media servers, not just Plex. The local MaxMind database is used as a fallback.
 
 | Option | Privacy | Accuracy |
 |--------|---------|----------|
 | Default (MaxMind) | All data stays local | Good for most cases |
-| Enhanced (Plex API) | IPs sent to plex.tv | Potentially more accurate |
+| Enhanced | IPs sent to plex.tv | Potentially more accurate |
 
 **Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
 
