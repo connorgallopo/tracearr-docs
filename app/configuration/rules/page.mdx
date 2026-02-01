@@ -1,0 +1,424 @@
+---
+title: Rules - Automated Monitoring & Actions
+description: Create automated rules to monitor sessions, detect suspicious activity, and take actions like sending notifications or terminating streams.
+---
+
+import { Callout } from "nextra/components"
+
+# Rules
+
+Rules let you automate how Tracearr responds to what's happening on your media servers. You define the conditions to watch for, and the actions to take when those conditions are met.
+
+**Common uses:**
+
+- Limit how many streams a user can have at once
+- Get notified when someone streams from an unusual country
+- Detect account sharing by tracking impossible travel patterns
+- Automatically terminate streams that violate your policies
+
+Rules are evaluated in real-time as sessions start and change. When a rule's conditions match, Tracearr executes the actions you've configured — whether that's logging the event, sending a notification, adjusting a user's trust score, or terminating the stream.
+
+<Callout type="info">
+Rules apply to all servers you've connected unless you scope them to a specific server.
+</Callout>
+
+## Building a Rule
+
+Every rule has three parts:
+
+1. **Name and description** — How you'll identify the rule in your list
+2. **Conditions** — What to look for (e.g., "more than 3 concurrent streams")
+3. **Actions** — What to do when conditions match (e.g., "send a notification")
+
+To create a rule, go to **Configuration → Rules** and click **New Rule**.
+
+### Conditions
+
+Conditions define what triggers your rule. Each condition has three parts:
+
+- **Field** — What you're checking (like "concurrent streams" or "country")
+- **Operator** — How to compare (like "greater than" or "equals")
+- **Value** — What to compare against (like "3" or "United States")
+
+For example: `Concurrent Streams` `is greater than` `3`
+
+#### Combining Conditions
+
+You can add multiple conditions to a rule using AND/OR logic:
+
+- **Conditions in the same group** use OR logic — any one of them can trigger the rule
+- **Different groups** use AND logic — all groups must have at least one matching condition
+
+**Example:** You want to detect users streaming from outside the US, but only if they're also on a mobile device:
+
+| Group 1 | Group 2 |
+|---------|---------|
+| Country is not US | Device Type is mobile |
+| | Device Type is tablet |
+
+This triggers when the country isn't US **AND** the device is mobile **OR** tablet.
+
+### Available Fields
+
+Here are all the fields you can use in conditions, grouped by category.
+
+#### Session Behavior
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Concurrent Streams | Number of active streams from the same user | 1, 2, 3... |
+| Active Session Distance | Distance in kilometers between simultaneous sessions | 100, 500, 1000... |
+| Travel Speed | Calculated speed between consecutive sessions (km/h) | 500, 1000... |
+| Unique IPs in Window | Number of different IP addresses used within a time period | 3, 5, 10... |
+| Unique Devices in Window | Number of different devices used within a time period | 2, 3, 5... |
+| Inactive Days | Days since the user last streamed | 30, 90, 180... |
+
+<Callout type="info">
+Fields with "in Window" let you specify a time window (in hours) to check. For example, "more than 5 unique IPs in the last 24 hours."
+</Callout>
+
+#### Stream Quality
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Source Resolution | Original media quality | 4K, 1080p, 720p, 480p, SD |
+| Output Resolution | What the user is actually receiving | 4K, 1080p, 720p, 480p, SD |
+| Is Transcoding | Whether the server is converting the stream | Yes / No |
+| Is Transcode Downgrade | Output quality is lower than source | Yes / No |
+| Source Bitrate | Original media bitrate in Mbps | 5, 10, 20... |
+
+#### User Attributes
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| User | Specific user(s) to target | Select from dropdown |
+| Trust Score | The user's current trust score (0-100) | 50, 75, 90... |
+| Account Age | Days since the account was created | 7, 30, 90... |
+
+#### Device & Client
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Device Type | Category of device being used | Mobile, Tablet, TV, Desktop, Browser |
+| Client Name | The media player application | Plex for iOS, Jellyfin Web, Infuse... |
+| Platform | Operating system or platform | iOS, Android, Windows, macOS, Roku, Apple TV... |
+
+#### Network & Location
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Is Local Network | Whether streaming from your home network | Yes / No |
+| Country | Geographic location based on IP address | Select from dropdown |
+| IP in Range | Check if IP falls within a CIDR range | 192.168.1.0/24, 10.0.0.0/8... |
+
+<Callout type="info">
+Country detection uses IP geolocation, which may not be accurate for users on VPNs or certain mobile networks.
+</Callout>
+
+#### Scope
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Server | Which media server the session is on | Select from dropdown |
+| Media Type | Type of content being played | Movie, Episode, Music Track, Photo, Live TV |
+
+### Operators
+
+Operators determine how the field is compared to your value. The available operators depend on the field type.
+
+#### Comparison Operators
+
+Used with numeric fields like concurrent streams, trust score, or travel speed.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| equals | Exactly matches | Trust Score equals 100 |
+| does not equal | Anything except this value | Concurrent Streams does not equal 1 |
+| greater than | More than (not including) | Travel Speed greater than 500 |
+| at least | This value or more | Concurrent Streams at least 3 |
+| less than | Fewer than (not including) | Trust Score less than 50 |
+| at most | This value or fewer | Account Age at most 7 |
+
+#### Selection Operators
+
+Used with dropdown fields like country, device type, or platform.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| is | Matches the selected value | Country is United States |
+| is not | Anything except this value | Device Type is not Desktop |
+| is one of | Matches any in a list | Country is one of US, Canada, UK |
+| is not one of | Doesn't match any in a list | Platform is not one of iOS, Android |
+
+#### Text Operators
+
+Used with text fields like client name.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| contains | Includes this text anywhere | Client Name contains "Plex" |
+| does not contain | Doesn't include this text | Client Name does not contain "Web" |
+
+### Actions
+
+Actions define what happens when a rule's conditions are met. You can add multiple actions to a single rule — they all execute when the rule triggers.
+
+#### Create Violation
+
+Records a violation against the user. Violations appear in the user's history and affect their trust score over time.
+
+| Setting | Description |
+|---------|-------------|
+| Severity | **Low**, **Warning**, or **High** — affects how prominently it's displayed |
+| Cooldown | Minutes to wait before creating another violation for the same user (prevents spam) |
+
+#### Send Notification
+
+Sends an alert through your configured notification channels.
+
+| Setting | Description |
+|---------|-------------|
+| Channels | Which channels to notify: Push, Discord, Email, or Webhook |
+| Cooldown | Minutes to wait before sending another notification for the same trigger |
+
+#### Log Only
+
+Records the event in the system log without taking any other action. Useful for testing rules before enabling more impactful actions.
+
+| Setting | Description |
+|---------|-------------|
+| Message | Optional custom message to include in the log |
+
+#### Adjust Trust Score
+
+Increases or decreases the user's trust score by a specific amount.
+
+| Setting | Description |
+|---------|-------------|
+| Amount | Value from -100 to +100 (negative decreases, positive increases) |
+
+#### Set Trust Score
+
+Sets the user's trust score to a specific value, regardless of their current score.
+
+| Setting | Description |
+|---------|-------------|
+| Value | Trust score to set (0-100) |
+
+#### Reset Trust Score
+
+Resets the user's trust score back to the default value of 100. No configuration needed.
+
+#### Terminate Stream
+
+Immediately stops the user's active stream.
+
+| Setting | Description |
+|---------|-------------|
+| Delay | Seconds to wait before terminating (0-300), giving the user a moment to finish |
+| Cooldown | Minutes to wait before terminating another stream from the same user |
+
+<Callout type="warning">
+Use this action carefully. Terminating streams can frustrate legitimate users if your rule conditions are too broad.
+</Callout>
+
+#### Send Message to Client
+
+Displays a message on the user's media player. Useful for warnings before taking stronger action.
+
+| Setting | Description |
+|---------|-------------|
+| Message | Text to display (1-500 characters) |
+
+<Callout type="info">
+This action only works with Jellyfin and Emby. Plex doesn't support sending messages to clients except when terminating a stream.
+</Callout>
+
+### Multiple Actions
+
+You can combine actions in a single rule. For example, you might want to:
+
+1. Create a warning violation
+2. Send a Discord notification
+3. Send a message to the client
+
+All three actions will execute when the rule triggers.
+
+## Managing Rules
+
+### Viewing Your Rules
+
+The Rules page shows all your rules in a list. Each rule displays:
+
+- **Name** and description
+- **Status** — whether the rule is active or disabled
+- **Summary** — a quick overview of conditions and actions
+- **Violation count** — how many times the rule has triggered
+
+### Enabling and Disabling Rules
+
+You can toggle rules on and off without deleting them. This is useful for:
+
+- Testing a new rule before fully enabling it
+- Temporarily disabling a rule during maintenance
+- Keeping rules you might want to use again later
+
+To toggle a rule, click the switch next to it in the rules list. You can also select multiple rules and use **Bulk Actions → Enable** or **Disable**.
+
+### Editing Rules
+
+Click on any rule to open the editor. You can change the name, description, conditions, and actions. Changes take effect immediately after saving.
+
+### Deleting Rules
+
+To delete a rule, open it and click **Delete**, or select multiple rules and use **Bulk Actions → Delete**.
+
+<Callout type="warning">
+Deleting a rule is permanent. The rule's violation history is preserved, but the rule itself cannot be recovered.
+</Callout>
+
+### Rule Scope
+
+By default, rules apply to all your servers. To limit a rule to a specific server, use the **Server** condition field in your rule's conditions.
+
+## Classic Rules
+
+If you used Tracearr before version 1.4.13, you may have had **Classic Rules** — predefined rule types with fixed logic:
+
+- **Impossible Travel** — Detects physically impossible movement between sessions
+- **Simultaneous Locations** — Flags concurrent sessions from distant locations
+- **Device Velocity** — Watches for excessive IP changes in a time window
+- **Concurrent Streams** — Limits how many streams a user can have at once
+- **Geo Restriction** — Blocks or allows streaming from specific countries
+- **Account Inactivity** — Detects accounts that haven't streamed recently
+
+Classic rules were automatically migrated to the V2 format when you upgraded to version 1.4.13. Your existing rules continue to work with the same behavior, but you can now edit and customize them using the full V2 rule builder.
+
+<Callout type="info">
+If you had classic rules before upgrading, you'll find them converted to V2 rules with equivalent conditions and actions. No action is needed on your part.
+</Callout>
+
+## Examples
+
+Here are some common rules to get you started.
+
+### Limit Concurrent Streams
+
+Prevent users from streaming on more than 2 devices at once.
+
+| Conditions | Actions |
+|------------|---------|
+| Concurrent Streams is greater than 2 | Create Violation (Warning) |
+| | Send Notification (Discord) |
+
+### Detect Account Sharing
+
+Flag users streaming from multiple distant locations at the same time.
+
+| Conditions | Actions |
+|------------|---------|
+| Active Session Distance is greater than 500 | Create Violation (High) |
+| Is Local Network is No | Send Notification (Push) |
+
+<Callout type="info">
+The "Is Local Network is No" condition ensures you don't flag someone streaming at home on multiple devices.
+</Callout>
+
+### Block Streaming From Specific Countries
+
+Restrict streaming to only your allowed countries.
+
+| Conditions | Actions |
+|------------|---------|
+| Country is not one of US, Canada, UK | Terminate Stream |
+| | Create Violation (High) |
+
+### Warn New Users About Quality
+
+Send a message to new accounts if they're causing transcoding.
+
+| Conditions | Actions |
+|------------|---------|
+| Account Age is less than 7 | Send Message to Client: "Direct play is preferred when possible" |
+| Is Transcoding is Yes | Log Only |
+
+### Detect Suspicious New Accounts
+
+Flag new accounts showing multiple signs of potential abuse — streaming from an unusual country AND using multiple devices or IPs quickly.
+
+**Group 1 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Account Age is less than 14 |
+
+**Group 2 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Country is not one of US, Canada, UK |
+
+**Group 3 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Unique IPs in Window is greater than 3 (24 hours) |
+| Unique Devices in Window is greater than 2 (24 hours) |
+
+**Actions:** Create Violation (Warning), Send Notification (Discord), Adjust Trust Score (-10)
+
+This triggers when: Account is new **AND** country is unusual **AND** (too many IPs **OR** too many devices).
+
+### Restrict Heavy Transcoding for Remote Users
+
+Limit resource-heavy transcoding to local network or trusted users only.
+
+**Group 1 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Is Transcoding is Yes |
+| Is Transcode Downgrade is Yes |
+
+**Group 2 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Is Local Network is No |
+
+**Group 3 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Trust Score is less than 80 |
+
+**Actions:** Send Message to Client: "Please try a lower quality or direct play", Terminate Stream (delay: 30 seconds)
+
+This triggers when: (Transcoding **OR** downgrading) **AND** remote user **AND** not highly trusted.
+
+## Troubleshooting
+
+### Rule isn't triggering
+
+- **Check if the rule is enabled** — Look for the toggle switch in the rules list
+- **Verify your conditions** — Make sure the field, operator, and value match what you expect. For example, "greater than 3" won't trigger when the value is exactly 3
+- **Check condition grouping** — Remember that groups use AND logic. All groups must have at least one matching condition
+- **Review the cooldown** — If you set a cooldown on an action, it won't trigger again until the cooldown expires
+
+### Rule is triggering too often
+
+- **Add more conditions** — Narrow down when the rule applies by adding additional condition groups
+- **Increase cooldown** — Add or increase the cooldown on actions like notifications to reduce noise
+- **Exclude local network** — Add "Is Local Network is No" to ignore activity from your home network
+
+### Country detection seems wrong
+
+IP-based geolocation isn't perfect. It can be inaccurate when users are on:
+
+- VPNs or proxy services
+- Mobile networks (especially while traveling)
+- Corporate networks that route traffic through another location
+
+<Callout type="info">
+If you're seeing unexpected countries, check if the user might be using a VPN. The IP address shown in the session details can help you investigate.
+</Callout>
