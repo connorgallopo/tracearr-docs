@@ -66,6 +66,16 @@ docker logs tracearr-postgres # Database logs
 docker logs tracearr-redis    # Cache logs
 ```
 
+### Proxmox VE LXC Logs
+
+If running in a Proxmox VE LXC, use standard systemd journal commands:
+
+```bash
+journalctl -u tracearr   # Application logs
+journalctl -u postgresql # Database logs
+journalctl -u redis      # Cache logs
+```
+
 ## Snapshot Management
 
 View and clean up library snapshots. Useful for removing suspicious or corrupted snapshot data that may affect Library Growth charts.
