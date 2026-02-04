@@ -5,6 +5,10 @@ node_modules/
 .next/
 out/
 
+# Pagefind (generated search index)
+_pagefind/
+public/_pagefind/
+
 # Build
 dist/
 build/
