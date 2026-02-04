@@ -3,7 +3,7 @@ title: Installation Guide - Docker Compose Setup
 description: Install Tracearr with Docker Compose. Quick start guide with PostgreSQL, TimescaleDB, and Redis for monitoring Plex, Jellyfin, and Emby servers.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout, Tabs } from "nextra/components"
 
 # Installation
 
@@ -20,6 +20,8 @@ We maintain ready-to-use Docker Compose files in the [Tracearr repository](https
 
 ### Quick Start
 
+<Tabs items={['Linux/macOS', 'Windows (PowerShell)']} defaultIndex={0}>
+<Tabs.Tab>
 ```bash
 # Download the recommended compose file
 curl -O https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.pg18.yml
@@ -31,6 +33,21 @@ echo "COOKIE_SECRET=$(openssl rand -hex 32)" >> .env
 # Start Tracearr
 docker compose -f docker-compose.pg18.yml up -d
 ```
+</Tabs.Tab>
+<Tabs.Tab>
+```powershell
+# Download the recommended compose file
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.pg18.yml" -OutFile "docker-compose.pg18.yml"
+
+# Generate required secrets
+"JWT_SECRET=$(-join (1..32 | %{'{0:x2}' -f (Get-Random -Max 256)}))" > .env
+"COOKIE_SECRET=$(-join (1..32 | %{'{0:x2}' -f (Get-Random -Max 256)}))" >> .env
+
+# Start Tracearr
+docker compose -f docker-compose.pg18.yml up -d
+```
+</Tabs.Tab>
+</Tabs>
 
 Tracearr will be available at `http://localhost:3000`.
 
