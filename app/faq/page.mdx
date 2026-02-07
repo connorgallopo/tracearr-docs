@@ -3,6 +3,8 @@ title: FAQ - Troubleshooting & Common Questions
 description: Frequently asked questions about Tracearr. Troubleshooting sessions, geolocation issues, reverse proxy setup, maintenance jobs, and more.
 ---
 
+import { Tabs } from "nextra/components"
+
 # Frequently Asked Questions
 
 ## General
@@ -91,6 +93,35 @@ In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When en
 | Enhanced | IPs sent to plex.tv | Potentially more accurate |
 
 **Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
+
+### How do I reset my Tracearr password?
+
+You can reset your password using the built-in CLI script. No access to the web UI is required.
+
+This resets the password for your Tracearr user account, not your media server accounts.
+
+It will not work if you are using external authentication (e.g., Plex Sign-In) since those users don't have local passwords.
+
+<Tabs items={['Docker', 'Proxmox LXC']} defaultIndex={0}>
+<Tabs.Tab>
+```bash
+# Interactive mode (you will be prompted to enter a new password)
+docker exec -it tracearr node apps/server/scripts/reset-password.ts
+
+# Non-interactive mode (sets password to "newpassword123")
+docker exec -it tracearr node apps/server/scripts/reset-password.ts newpassword123
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash
+# Interactive mode (you will be prompted to enter a new password)
+node /opt/tracearr/apps/server/scripts/reset-password.ts
+
+# Non-interactive mode (sets password to "newpassword123")
+node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
+```
+</Tabs.Tab>
+</Tabs>
 
 ## Data & Maintenance Jobs
 
