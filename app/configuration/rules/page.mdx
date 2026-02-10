@@ -139,6 +139,16 @@ Used with numeric fields like concurrent streams, trust score, or travel speed.
 | less than | Fewer than (not including) | Trust Score less than 50 |
 | at most | This value or fewer | Account Age at most 7 |
 
+<Callout type="warning">
+**Common mistake:** When limiting something like concurrent streams or unique IPs, use **"greater than"** or **"at least"** — not "at most".
+
+For example, to trigger when a user has too many unique IPs:
+- Correct: `Unique IPs in Window greater than 3` — triggers at 4+ IPs
+- Wrong: `Unique IPs in Window at most 3` — triggers at 1, 2, or 3 IPs (the opposite)
+
+Think of it as: "trigger when the value **exceeds** my limit" — use **greater than** or **at least**.
+</Callout>
+
 #### Selection Operators
 
 Used with dropdown fields like country, device type, or platform.
@@ -215,11 +225,22 @@ Immediately stops the user's active stream.
 
 | Setting | Description |
 |---------|-------------|
-| Delay | Seconds to wait before terminating (0-300), giving the user a moment to finish |
+| Target | Which session(s) to terminate (see options below) |
+| Message | Optional message to display to the user when their stream is terminated (1-500 characters) |
 | Cooldown | Minutes to wait before terminating another stream from the same user |
 
+**Target options:**
+
+| Target | Behavior |
+|--------|----------|
+| Triggering session | Only the session that triggered this rule (default) |
+| Oldest session | The user's longest-running active session |
+| Newest session | The user's most recently started session |
+| All except one (keep oldest) | Terminates all sessions except the oldest, bringing the user down to 1 stream |
+| All user sessions | Terminates every active session for the user |
+
 <Callout type="warning">
-Use this action carefully. Terminating streams can frustrate legitimate users if your rule conditions are too broad.
+Use this action carefully. Terminating streams can frustrate legitimate users if your rule conditions are too broad. The "All user sessions" target is especially aggressive.
 </Callout>
 
 #### Send Message to Client
@@ -229,6 +250,7 @@ Displays a message on the user's media player. Useful for warnings before taking
 | Setting | Description |
 |---------|-------------|
 | Message | Text to display (1-500 characters) |
+| Target | Which session(s) to message — same options as Terminate Stream (defaults to triggering session) |
 
 <Callout type="info">
 This action only works with Jellyfin and Emby. Plex doesn't support sending messages to clients except when terminating a stream.
@@ -392,7 +414,7 @@ Limit resource-heavy transcoding to local network or trusted users only.
 |------------------------------|
 | Trust Score is less than 80 |
 
-**Actions:** Send Message to Client: "Please try a lower quality or direct play", Terminate Stream (delay: 30 seconds)
+**Actions:** Send Message to Client: "Please try a lower quality or direct play", Terminate Stream
 
 This triggers when: (Transcoding **OR** downgrading) **AND** remote user **AND** not highly trusted.
 
