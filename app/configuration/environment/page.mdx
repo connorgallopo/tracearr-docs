@@ -3,6 +3,8 @@ title: Environment Variables Reference
 description: Configure Tracearr with environment variables. Database, Redis, port, logging, and session settings for Docker and self-hosted deployments.
 ---
 
+import { Callout } from "nextra/components"
+
 # Environment Variables
 
 Tracearr uses environment variables for core configuration.
@@ -22,6 +24,9 @@ Tracearr uses environment variables for core configuration.
 | `NODE_ENV` | Environment mode | `production` |
 | `LOG_LEVEL` | Logging verbosity | `info` |
 | `SESSION_SECRET` | Session encryption key | (generated) |
+| `TZ` | Timezone | `UTC` |
+| `CORS_ORIGIN` | Allowed CORS origin for API requests | `*` |
+| `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
 
 ## Database Configuration
 
@@ -43,4 +48,14 @@ For Redis with authentication:
 
 ```bash
 REDIS_URL=redis://:password@localhost:6379
+```
+
+To enable Redis key prefixing:
+
+<Callout type="warning">
+Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensure proper namespacing and avoid key collisions in shared Redis instances.
+</Callout>
+
+```bash
+REDIS_PREFIX=myprefix:
 ```
