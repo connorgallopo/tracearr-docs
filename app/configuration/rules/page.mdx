@@ -16,7 +16,7 @@ Rules let you automate how Tracearr responds to what's happening on your media s
 - Detect account sharing by tracking impossible travel patterns
 - Automatically terminate streams that violate your policies
 
-Rules are evaluated in real-time as sessions start and change. When a rule's conditions match, Tracearr executes the actions you've configured — whether that's logging the event, sending a notification, adjusting a user's trust score, or terminating the stream.
+Rules are evaluated in real-time as sessions start and change. When a rule's conditions match, Tracearr automatically creates a violation and executes any additional actions you've configured — whether that's logging the event, sending a notification, adjusting a user's trust score, or terminating the stream.
 
 <Callout type="info">
 Rules apply to all servers you've connected unless you scope them to a specific server.
@@ -24,11 +24,12 @@ Rules apply to all servers you've connected unless you scope them to a specific 
 
 ## Building a Rule
 
-Every rule has three parts:
+Every rule has four parts:
 
 1. **Name and description** — How you'll identify the rule in your list
-2. **Conditions** — What to look for (e.g., "more than 3 concurrent streams")
-3. **Actions** — What to do when conditions match (e.g., "send a notification")
+2. **Severity** — How serious a violation from this rule is: **Low**, **Warning**, or **High**
+3. **Conditions** — What to look for (e.g., "more than 3 concurrent streams")
+4. **Actions** (optional) — Additional side-effects when conditions match (e.g., "send a notification")
 
 To create a rule, go to **Configuration → Rules** and click **New Rule**.
 
@@ -169,18 +170,23 @@ Used with text fields like client name.
 | contains | Includes this text anywhere | Client Name contains "Plex" |
 | does not contain | Doesn't include this text | Client Name does not contain "Web" |
 
+### Severity
+
+Every rule has a severity level that determines how the resulting violations are classified. Set this in the rule builder alongside the name and description.
+
+| Severity | Use For |
+|----------|---------|
+| **Low** | Informational events you want to track but aren't urgent |
+| **Warning** | Potentially suspicious activity that should be reviewed (default) |
+| **High** | Serious violations that need immediate attention |
+
+Severity affects how prominently violations are displayed and can help you prioritize which issues to investigate first.
+
 ### Actions
 
-Actions define what happens when a rule's conditions are met. You can add multiple actions to a single rule — they all execute when the rule triggers.
+When a rule's conditions are met, Tracearr **automatically creates a violation** with the rule's severity level. You don't need to configure this — it happens for every rule.
 
-#### Create Violation
-
-Records a violation against the user. Violations appear in the user's history and affect their trust score over time.
-
-| Setting | Description |
-|---------|-------------|
-| Severity | **Low**, **Warning**, or **High** — affects how prominently it's displayed |
-| Cooldown | Minutes to wait before creating another violation for the same user (prevents spam) |
+Actions are optional side-effects you can add on top of the automatic violation. You can add multiple actions to a single rule — they all execute when the rule triggers.
 
 #### Send Notification
 
@@ -260,11 +266,11 @@ This action only works with Jellyfin and Emby. Plex doesn't support sending mess
 
 You can combine actions in a single rule. For example, you might want to:
 
-1. Create a warning violation
-2. Send a Discord notification
-3. Send a message to the client
+1. Send a Discord notification
+2. Send a message to the client
+3. Adjust the user's trust score
 
-All three actions will execute when the rule triggers.
+All actions execute when the rule triggers, in addition to the automatic violation creation.
 
 ## Managing Rules
 
@@ -273,6 +279,7 @@ All three actions will execute when the rule triggers.
 The Rules page shows all your rules in a list. Each rule displays:
 
 - **Name** and description
+- **Severity** — the violation severity level (Low, Warning, High)
 - **Status** — whether the rule is active or disabled
 - **Summary** — a quick overview of conditions and actions
 - **Violation count** — how many times the rule has triggered
@@ -289,7 +296,7 @@ To toggle a rule, click the switch next to it in the rules list. You can also se
 
 ### Editing Rules
 
-Click on any rule to open the editor. You can change the name, description, conditions, and actions. Changes take effect immediately after saving.
+Click on any rule to open the editor. You can change the name, description, severity, conditions, and actions. Changes take effect immediately after saving.
 
 ### Deleting Rules
 
@@ -328,19 +335,22 @@ Here are some common rules to get you started.
 
 Prevent users from streaming on more than 2 devices at once.
 
+**Severity:** Warning
+
 | Conditions | Actions |
 |------------|---------|
-| Concurrent Streams is greater than 2 | Create Violation (Warning) |
-| | Send Notification (Discord) |
+| Concurrent Streams is greater than 2 | Send Notification (Discord) |
 
 ### Detect Account Sharing
 
 Flag users streaming from multiple distant locations at the same time.
 
+**Severity:** High
+
 | Conditions | Actions |
 |------------|---------|
-| Active Session Distance is greater than 500 | Create Violation (High) |
-| Is Local Network is No | Send Notification (Push) |
+| Active Session Distance is greater than 500 | Send Notification (Push) |
+| Is Local Network is No | |
 
 <Callout type="info">
 The "Is Local Network is No" condition ensures you don't flag someone streaming at home on multiple devices.
@@ -350,14 +360,17 @@ The "Is Local Network is No" condition ensures you don't flag someone streaming 
 
 Restrict streaming to only your allowed countries.
 
+**Severity:** High
+
 | Conditions | Actions |
 |------------|---------|
 | Country is not one of US, Canada, UK | Terminate Stream |
-| | Create Violation (High) |
 
 ### Warn New Users About Quality
 
 Send a message to new accounts if they're causing transcoding.
+
+**Severity:** Low
 
 | Conditions | Actions |
 |------------|---------|
@@ -387,13 +400,17 @@ Flag new accounts showing multiple signs of potential abuse — streaming from a
 | Unique IPs in Window is greater than 3 (24 hours) |
 | Unique Devices in Window is greater than 2 (24 hours) |
 
-**Actions:** Create Violation (Warning), Send Notification (Discord), Adjust Trust Score (-10)
+**Severity:** Warning
+
+**Actions:** Send Notification (Discord), Adjust Trust Score (-10)
 
 This triggers when: Account is new **AND** country is unusual **AND** (too many IPs **OR** too many devices).
 
 ### Restrict Heavy Transcoding for Remote Users
 
 Limit resource-heavy transcoding to local network or trusted users only.
+
+**Severity:** High
 
 **Group 1 (AND)**
 
@@ -418,6 +435,24 @@ Limit resource-heavy transcoding to local network or trusted users only.
 
 This triggers when: (Transcoding **OR** downgrading) **AND** remote user **AND** not highly trusted.
 
+## Violation Evidence
+
+When a rule triggers, Tracearr records detailed **condition evidence** on the violation. This shows exactly what values were evaluated and whether each condition matched, making it easy to understand why a rule fired.
+
+You can view the evidence on any violation's detail page under the **Condition Evidence** section. Each condition group shows:
+
+- Whether the group as a whole matched
+- Each individual condition with its **actual value**, the **operator and threshold**, and whether it matched
+- How many **related sessions** contributed to the result (for conditions like concurrent streams or session distance)
+
+The violation detail page also shows all **related sessions** in a table — for example, if a concurrent streams rule triggers at 5 streams, you'll see the triggering session plus the 4 other active sessions that caused the match. Conditions like travel speed and session distance also link to the sessions involved, along with extra details like calculated distance or location data.
+
+This is especially useful for:
+
+- **Debugging rules** — Understanding why a rule triggered (or didn't) for a specific session
+- **Reviewing violations** — Seeing the exact values and related sessions before taking action
+- **Tuning thresholds** — Checking actual values to decide if your thresholds are set appropriately
+
 ## Troubleshooting
 
 ### Rule isn't triggering
@@ -426,6 +461,7 @@ This triggers when: (Transcoding **OR** downgrading) **AND** remote user **AND**
 - **Verify your conditions** — Make sure the field, operator, and value match what you expect. For example, "greater than 3" won't trigger when the value is exactly 3
 - **Check condition grouping** — Remember that groups use AND logic. All groups must have at least one matching condition
 - **Review the cooldown** — If you set a cooldown on an action, it won't trigger again until the cooldown expires
+- **Check the evidence** — If the rule has triggered before, look at the violation's condition evidence to see what actual values were evaluated
 
 ### Rule is triggering too often
 
