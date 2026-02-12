@@ -4,6 +4,7 @@ description: Configure Tracearr with environment variables. Database, Redis, por
 ---
 
 import { Callout } from "nextra/components"
+import Image from "next/image"
 
 # Environment Variables
 
@@ -27,6 +28,7 @@ Tracearr uses environment variables for core configuration.
 | `TZ` | Timezone | `UTC` |
 | `CORS_ORIGIN` | Allowed CORS origin for API requests | `*` |
 | `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
+| `CLAIM_CODE` | Claim code for first time setup | none |
 
 ## Database Configuration
 
@@ -59,3 +61,27 @@ Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensur
 ```bash
 REDIS_PREFIX=myprefix:
 ```
+
+## Claim Code
+
+The `CLAIM_CODE` environment variable is used to protect the initial setup page. \
+This is recommended when Tracearr is exposed to the public internet.
+
+When set, the claim code will be printed to the log on startup.
+
+<Image
+  src="/images/claimcode-log.png"
+  alt="Claim code"
+  className="rounded-lg mt-6 shadow-md"
+  width={541}
+  height={232}
+/>
+
+Before you can access the setup page, you must enter the claim code.
+<Image
+  src="/images/claimcode-web.png"
+  alt="Claim code"
+  className="rounded-lg mt-6 shadow-md"
+  width={513}
+  height={360}
+/>
