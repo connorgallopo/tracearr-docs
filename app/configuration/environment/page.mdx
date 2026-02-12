@@ -3,6 +3,9 @@ title: Environment Variables Reference
 description: Configure Tracearr with environment variables. Database, Redis, port, logging, and session settings for Docker and self-hosted deployments.
 ---
 
+import { Callout } from "nextra/components"
+import Image from "next/image"
+
 # Environment Variables
 
 Tracearr uses environment variables for core configuration.
@@ -22,6 +25,10 @@ Tracearr uses environment variables for core configuration.
 | `NODE_ENV` | Environment mode | `production` |
 | `LOG_LEVEL` | Logging verbosity | `info` |
 | `SESSION_SECRET` | Session encryption key | (generated) |
+| `TZ` | Timezone | `UTC` |
+| `CORS_ORIGIN` | Allowed CORS origin for API requests | `*` |
+| `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
+| `CLAIM_CODE` | Claim code for first time setup | none |
 
 ## Database Configuration
 
@@ -44,3 +51,37 @@ For Redis with authentication:
 ```bash
 REDIS_URL=redis://:password@localhost:6379
 ```
+
+To enable Redis key prefixing:
+
+<Callout type="warning">
+Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensure proper namespacing and avoid key collisions in shared Redis instances.
+</Callout>
+
+```bash
+REDIS_PREFIX=myprefix:
+```
+
+## Claim Code
+
+The `CLAIM_CODE` environment variable is used to protect the initial setup page. \
+This is recommended when Tracearr is exposed to the public internet.
+
+When set, the claim code will be printed to the log on startup.
+
+<Image
+  src="/images/claimcode-log.png"
+  alt="Claim code"
+  className="rounded-lg mt-6 shadow-md"
+  width={541}
+  height={232}
+/>
+
+Before you can access the setup page, you must enter the claim code.
+<Image
+  src="/images/claimcode-web.png"
+  alt="Claim code"
+  className="rounded-lg mt-6 shadow-md"
+  width={513}
+  height={360}
+/>
