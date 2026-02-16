@@ -40,8 +40,8 @@ docker compose -f docker-compose.pg18.yml up -d
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.pg18.yml" -OutFile "docker-compose.pg18.yml"
 
 # Generate required secrets
-"JWT_SECRET=$(-join (1..16 | %{'{0:x2}' -f (Get-Random -Max 256)}))" > .env
-"COOKIE_SECRET=$(-join (1..16 | %{'{0:x2}' -f (Get-Random -Max 256)}))" >> .env
+"JWT_SECRET=$(-join (1..16 | %{'{0:x2}' -f (Get-Random -Max 256)}))" | Out-File -Encoding ascii .env
+"COOKIE_SECRET=$(-join (1..16 | %{'{0:x2}' -f (Get-Random -Max 256)}))" | Out-File -Encoding ascii -Append .env
 
 # Start Tracearr
 docker compose -f docker-compose.pg18.yml up -d
