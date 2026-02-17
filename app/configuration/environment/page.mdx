@@ -29,6 +29,7 @@ Tracearr uses environment variables for core configuration.
 | `CORS_ORIGIN` | Allowed CORS origin for API requests | `*` |
 | `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
 | `CLAIM_CODE` | Claim code for first time setup | none |
+| `BASE_PATH` | Base path when served under a subpath | none |
 
 ## Database Configuration
 
@@ -85,3 +86,16 @@ Before you can access the setup page, you must enter the claim code.
   width={513}
   height={360}
 />
+
+## Base Path
+
+Set `BASE_PATH` when you want Tracearr to be served under a subpath. \
+This ensures all routes, assets, and links are prefixed correctly.
+
+```bash
+BASE_PATH=/tracearr
+```
+
+<Callout type="info">
+You only need to set this if Tracearr is accessed through a reverse proxy under a subpath (e.g. `https://example.com/tracearr`). If Tracearr is served at the root, this can be left unset.
+</Callout>
