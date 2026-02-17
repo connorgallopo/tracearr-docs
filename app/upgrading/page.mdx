@@ -1,0 +1,44 @@
+---
+title: Upgrading Tracearr
+description: How to upgrade Tracearr to the latest version using Docker Compose. Pull new images and recreate containers with zero data loss.
+---
+
+import { Callout } from "nextra/components"
+
+# Upgrading
+
+Tracearr uses the `latest` Docker image tag by default, so upgrading is straightforward — pull the new image and recreate the container.
+
+TimescaleDB and Redis are persisted in a volume, so your database and configuration will be preserved during the upgrade process.
+
+## Docker Compose
+
+This guide assumes you followed the [Quick Start](http://localhost:3005/getting-started/installation#quick-start) instructions to set up Tracearr with Docker Compose.
+
+From the directory containing your `docker-compose.pg18.yml` file, run:
+
+```bash
+docker compose -f docker-compose.pg18.yml pull tracearr
+docker compose -f docker-compose.pg18.yml up -d
+```
+
+This will:
+1. Download the latest Tracearr image
+2. Recreate the container with the new image
+3. Preserve your database and configuration
+
+<Callout type="info">
+If you are using a different compose file, make sure to update the commands accordingly.
+</Callout>
+
+### Cleaning Up Old Images
+
+After upgrading, you can remove unused images to free up disk space:
+
+```bash
+docker image prune
+```
+
+<Callout type="warning">
+Make sure to review the images being removed before confirming, as this will delete all dangling images.
+</Callout>
