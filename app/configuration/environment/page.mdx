@@ -30,6 +30,7 @@ Tracearr uses environment variables for core configuration.
 | `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
 | `CLAIM_CODE` | Claim code for first time setup | none |
 | `BASE_PATH` | Base path when served under a subpath | none |
+| `DNS_CACHE_MAX_TTL` | DNS cache maximum TTL in seconds | disabled |
 
 ## Database Configuration
 
@@ -98,4 +99,19 @@ BASE_PATH=/tracearr
 
 <Callout type="info">
 You only need to set this if Tracearr is accessed through a reverse proxy under a subpath (e.g. `https://example.com/tracearr`). If Tracearr is served at the root, this can be left unset.
+</Callout>
+
+## DNS Cache
+
+Set `DNS_CACHE_MAX_TTL` to enable DNS caching for outgoing requests. \
+This can improve performance by reducing the number of DNS lookups for frequently accessed hosts. \
+DNS caching is disabled if `DNS_CACHE_MAX_TTL` is not set.
+
+```bash
+DNS_CACHE_MAX_TTL=3600
+```
+
+<Callout type="info">
+Tracearr will respect the TTL provided by the DNS server, but will not cache entries longer than the value set in `DNS_CACHE_MAX_TTL`.
+Error responses (e.g. DNS resolution failures) are not cached to ensure that transient issues do not persist longer than necessary.
 </Callout>
