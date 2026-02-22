@@ -35,6 +35,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/getting-started/installation/railway`,
+      lastModified: getLastModified(
+        "getting-started/installation/railway/page.mdx",
+      ),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/getting-started/first-server`,
       lastModified: getLastModified("getting-started/first-server/page.mdx"),
       changeFrequency: "monthly",
@@ -65,8 +73,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/configuration/rules`,
+      lastModified: getLastModified("configuration/rules/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/configuration/debug`,
       lastModified: getLastModified("configuration/debug/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/upgrading`,
+      lastModified: getLastModified("upgrading/page.mdx"),
       changeFrequency: "monthly",
       priority: 0.7,
     },

@@ -1,0 +1,127 @@
+---
+title: Deploy to Railway
+description: Deploy Tracearr to Railway with one click.
+---
+
+import { Callout, Steps } from "nextra/components"
+
+# Installation
+
+[Railway](https://railway.com?referralCode=tracearr) is a cloud platform that makes it easy to deploy Tracearr with TimescaleDB and Redis. \
+This guide will walk you through the process of deploying Tracearr on Railway in just a few steps.
+
+## Deploy on Railway
+
+This will provision:
+
+- **Tracearr** application
+- **TimescaleDB** database
+- **Redis** cache
+
+<Callout type="info">
+You'll need a [Railway account](https://railway.com?referralCode=tracearr) to deploy. \
+Railway offers a free trial with limited usage, and paid plans start at $5/month. \
+Our test deployment on Railway costs around $3.50/month, but actual costs may vary based on usage. \
+We recommend turning on [cost control](https://docs.railway.com/deploy/cost-control) features in Railway to avoid unexpected charges.
+</Callout>
+
+<Steps>
+{<h3>Click &nbsp; <a href="https://railway.com/new/template/tracearr?referralCode=tracearr&utm_medium=integration&utm_source=template&utm_campaign=tracearr" target="_blank" rel="noopener noreferrer"><img src="https://railway.com/button.svg" alt="Deploy on Railway" style={{display: "inline", verticalAlign: "middle"}} /></a></h3>}
+
+You'll be taken to the Railway template page showing the three services that will be provisioned.
+
+![Railway deploy template](/images/railway-deploy-template.png)
+
+{<h3>Configure the Tracearr service</h3>}
+
+Click **Configure** on the Tracearr service card to set your environment variables.
+
+{<h3>Set your timezone and claim code</h3>}
+
+Fill in the **TZ** variable with your timezone (e.g. `America/New_York`) and set a **CLAIM_CODE** to secure the setup wizard. Click **Save Config** when done.
+
+![Railway configure variables](/images/railway-configure-variables.png)
+
+{<h3>Click Deploy</h3>}
+
+Once configured, click the **Deploy** button at the bottom of the template page. Railway will provision all three services automatically.
+
+{<h3>Wait for deployment to complete</h3>}
+
+{<h3>Click on your Tracearr service</h3>}
+
+![Railway Service](/images/railway-service.png)
+
+{<h3>Find the Tracearr URL in the Deployments tab</h3>}
+
+Click on the URL to access the Tracearr setup wizard. \
+In this example, the URL is `tracearr-demo.up.railway.app`. \
+It may take a minute for the URL to become active after deployment.
+
+![Railway Tracearr URL](/images/railway-deployments-tab.png)
+
+{<h3>Complete the Tracearr setup wizard</h3>}
+
+Enter your Claim Code and create an admin account to finish the setup wizard. \
+Once completed, you can start adding media servers and enjoy Tracearr on Railway!
+
+{<h3>Done</h3>}
+</Steps>
+
+---
+
+## Custom Domain
+
+To use a custom domain, go to your service's **Settings** > **Networking** > **Custom Domain** and follow Railway's instructions to configure your DNS records.
+
+![Railway Custom Domain](/images/railway-custom-domain.png)
+
+---
+
+## Updating Tracearr
+
+To update Tracearr, you can either enable automatic updates or manually apply updates when prompted. Both methods ensure you get the latest features and security patches with minimal downtime.
+
+### Automatic Updates
+
+<Steps>
+{<h3>Go to the Railway dashboard</h3>}
+
+{<h3>Click on your Tracearr service</h3>}
+
+![Railway Service](/images/railway-service.png)
+
+{<h3>In the Settings tab, click "Configure auto updates" in the Source section</h3>}
+
+![Railway Auto Updates](/images/railway-service-settings.png)
+
+{<h3>Configure Auto Updates and hit "Save"</h3>}
+
+![Railway Auto Updates](/images/railway-auto-updates.png)
+
+{<h3>Done</h3>}
+</Steps>
+
+---
+
+### Manual Updates
+
+<Steps>
+{<h3>Go to the Railway dashboard</h3>}
+
+{<h3>Click on your Tracearr service</h3>}
+
+![Railway Service](/images/railway-service.png)
+
+{<h3>In the Settings tab, click Upgrade in the Source section</h3>}
+
+![Railway Manual Update](/images/railway-manual-update.png)
+
+{<h3>Done</h3>}
+</Steps>
+
+---
+
+## Next Steps
+
+Once Tracearr is running, [connect your first media server](/getting-started/first-server).
