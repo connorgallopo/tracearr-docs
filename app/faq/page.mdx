@@ -7,19 +7,52 @@ import { Tabs } from "nextra/components"
 
 # Frequently Asked Questions
 
+**General**
+- [What media servers does Tracearr support?](#what-media-servers-does-tracearr-support)
+- [Is Tracearr free?](#is-tracearr-free)
+- [Can I import data from Tautulli or Jellystat?](#can-i-import-data-from-tautulli-or-jellystat)
+
+**Installation**
+- [What are the system requirements?](#what-are-the-system-requirements)
+- [Can I run Tracearr without Docker?](#can-i-run-tracearr-without-docker)
+
+**Troubleshooting**
+- [Tracearr can't connect to my media server](#tracearr-cant-connect-to-my-media-server)
+- [Sessions aren't being tracked](#sessions-arent-being-tracked)
+- [I don't see any location data / Everything shows as local](#i-dont-see-any-location-data--everything-shows-as-local)
+- [The location data is wrong / IP geolocation is inaccurate](#the-location-data-is-wrong--ip-geolocation-is-inaccurate)
+- [How do I reset my Tracearr password?](#how-do-i-reset-my-tracearr-password)
+
+**Data & Maintenance Jobs**
+- [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
+- [I see both "US" and "United States" in my country data](#i-see-both-us-and-united-states-in-my-country-data)
+- [My imported Tautulli sessions show 0% progress](#my-imported-tautulli-sessions-show-0-progress)
+- [Users show "Never" for last activity](#users-show-never-for-last-activity-even-though-they-have-watch-history)
+- [My Library Growth charts are empty](#my-library-growth-charts-are-empty-or-missing-historical-data)
+- [My analytics numbers look wrong or charts show gaps](#my-analytics-numbers-look-wrong-or-charts-show-gaps)
+- [A job says "already running" but I don't see any progress](#a-job-says-already-running-but-i-dont-see-any-progress)
+
+---
+
 ## General
 
 ### What media servers does Tracearr support?
 
 Tracearr supports **Plex**, **Jellyfin**, and **Emby**. You can monitor multiple servers of different types from a single Tracearr instance.
 
+---
+
 ### Is Tracearr free?
 
 Yes, Tracearr is free and open source under the AGPL-3.0 license.
 
+---
+
 ### Can I import data from Tautulli or Jellystat?
 
 Yes, Tracearr supports importing historical data from both Tautulli and Jellystat.
+
+---
 
 ## Installation
 
@@ -30,9 +63,13 @@ Yes, Tracearr supports importing historical data from both Tautulli and Jellysta
 - PostgreSQL/TimescaleDB for the database
 - Redis for caching
 
+---
+
 ### Can I run Tracearr without Docker?
 
 While Docker is recommended, you can run Tracearr directly with Node.js 20+. See the GitHub repository for manual installation instructions.
+
+---
 
 ## Troubleshooting
 
@@ -43,11 +80,15 @@ While Docker is recommended, you can run Tracearr directly with Node.js 20+. See
 3. Ensure there are no firewall rules blocking the connection
 4. Check the Tracearr logs for specific error messages
 
+---
+
 ### Sessions aren't being tracked
 
 1. Verify the server connection is active in Settings → Servers
 2. Check that polling is enabled for the server
 3. Start a playback session and wait for the next poll interval
+
+---
 
 ### I don't see any location data / Everything shows as local
 
@@ -68,6 +109,8 @@ See the [Jellyfin reverse proxy documentation](https://jellyfin.org/docs/general
 - Reverse proxy sets `X-Forwarded-For` to the client's real IP
 - Media server's "Known Proxies" includes your reverse proxy's IP address
 - For Docker setups, ensure the proxy sees real client IPs (not Docker network IPs)
+
+---
 
 ### The location data is wrong / IP geolocation is inaccurate
 
@@ -93,6 +136,8 @@ In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When en
 | Enhanced | IPs sent to plex.tv | Potentially more accurate |
 
 **Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
+
+---
 
 ### How do I reset my Tracearr password?
 
@@ -123,6 +168,8 @@ node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
 </Tabs.Tab>
 </Tabs>
 
+---
+
 ## Data & Maintenance Jobs
 
 Tracearr includes maintenance jobs in **Settings → Jobs** to fix common data issues.
@@ -131,25 +178,37 @@ Tracearr includes maintenance jobs in **Settings → Jobs** to fix common data i
 
 Run **Normalize Players** in Settings → Jobs. This standardizes device and platform names so they group correctly in charts and filters.
 
+---
+
 ### I see both "US" and "United States" in my country data
 
 Run **Normalize Countries** in Settings → Jobs. This converts full country names to standard codes so your world map and country filters work properly.
+
+---
 
 ### My imported Tautulli sessions show 0% progress
 
 Run **Fix Imported Progress** in Settings → Jobs. This recalculates progress values for imported sessions that have duration but missing progress data.
 
+---
+
 ### Users show "Never" for last activity even though they have watch history
 
 Run **Backfill User Dates** in Settings → Jobs. This scans session history to populate the first seen and last activity timestamps.
+
+---
 
 ### My Library Growth charts are empty or missing historical data
 
 Run **Backfill Library Snapshots** in Settings → Jobs. This generates historical data points from your library items.
 
+---
+
 ### My analytics numbers look wrong or charts show gaps
 
 Run **Full Aggregate Rebuild** in Settings → Jobs. This recalculates all statistics from scratch.
+
+---
 
 ### A job says "already running" but I don't see any progress
 
