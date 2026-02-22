@@ -42,6 +42,33 @@ While Docker is recommended, you can run Tracearr directly with Node.js 20+. See
 2. Check that your API key/token is valid
 3. Ensure there are no firewall rules blocking the connection
 4. Check the Tracearr logs for specific error messages
+5. Try [Disabling IPv6 in Docker](#disabling-ipv6-in-docker)
+
+### Disabling IPv6 in Docker
+
+If you get "cannot reach [Plex/Emby/Jellyfin] server ... fetch failed" when adding your media server
+
+This is commonly caused by IPv6 resolution issues inside the Docker container. If your media server's hostname resolves to an IPv6 address but the network path doesn't fully support IPv6, the connection will fail.
+
+To fix this, disable IPv6 inside the Tracearr container by adding `sysctls` to your Docker Compose file:
+
+```yaml
+services:
+  tracearr:
+    image: tracearr/tracearr:latest
+    # ... your existing config ...
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+```
+
+After adding this, recreate the compose stack:
+
+```bash
+docker compose -f your-compose-file.yml down
+docker compose -f your-compose-file.yml up -d
+```
+
+This forces the container to use IPv4 only, which resolves the issue in most cases.
 
 ### Sessions aren't being tracked
 
