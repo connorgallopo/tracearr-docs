@@ -78,6 +78,19 @@ Here are all the fields you can use in conditions, grouped by category.
 Fields with "in Window" let you specify a time window (in hours) to check. For example, "more than 5 unique IPs in the last 24 hours."
 </Callout>
 
+##### Concurrent Streams Options
+
+The Concurrent Streams field has two modifier checkboxes:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| Exclude same device | On | Don't double-count if the same device appears multiple times. Usually leave this enabled. |
+| Unique IPs | Off | Only count sessions from different IP addresses. Enable this to detect account sharing while allowing same-household usage (multiple devices on the same network). |
+
+For example, if a user has 3 active sessions — 2 from the same home IP and 1 from a mobile network:
+- With **Unique IPs off**: Concurrent Streams = 3
+- With **Unique IPs on**: Concurrent Streams = 2 (only counts distinct IPs)
+
 #### Stream Quality
 
 | Field | Description | Example Values |
@@ -340,6 +353,10 @@ Prevent users from streaming on more than 2 devices at once.
 | Conditions | Actions |
 |------------|---------|
 | Concurrent Streams is greater than 2 | Send Notification (Discord) |
+
+<Callout type="info">
+**Tip:** Enable the "Unique IPs" checkbox to only count streams from different IP addresses. This lets household members share an account on multiple devices at home while still limiting external sharing.
+</Callout>
 
 ### Detect Account Sharing
 
