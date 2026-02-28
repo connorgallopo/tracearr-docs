@@ -65,8 +65,19 @@ Jellystat import uses a JSON backup file that you export from Jellystat.
 ### Step 1: Export from Jellystat
 
 1. In Jellystat, go to **Settings** → **Backup**
-2. Select **"Activity"** as the backup type
-3. Click **Export** and save the JSON file
+2. Under **Options**, **deselect everything except "Activity"** — selected options appear in purple, deselected options appear in red
+
+![Jellystat backup options with only Activity selected](/images/jellystat-backups.png)
+
+3. Go back to **Settings** → **Settings** and scroll down to the **Tasks** section
+4. Find **"Backup Jellystat"** and click the **Start** button on the far right
+5. Return to **Settings** → **Backup** — you should see a new backup with the current timestamp in the file name
+
+<Callout type="info">
+The **Date** column in Jellystat's backup list is a known bug and always shows an incorrect date. Use the **File Name** timestamp to identify your backup.
+</Callout>
+
+6. On the far right of your new backup, click **Actions** → **Download** to save the JSON file
 
 <Callout type="error" title="Activity Backup Only">
 You must export an **Activity** backup specifically. Full backups are not supported — only the Activity backup contains the playback history needed for import.
@@ -74,9 +85,14 @@ You must export an **Activity** backup specifically. Full backups are not suppor
 
 ### Step 2: Upload and Configure
 
-1. Select your **Target Server** (Jellyfin or Emby)
-2. Drag and drop your JSON file or click to select it
-3. Configure import options:
+1. In Tracearr, go to **Settings** → **Import**
+2. Select your **Target Server** (Jellyfin or Emby)
+3. Drag and drop your downloaded JSON file, or click to select it
+4. Configure import options:
+
+<Callout type="warning" title="Large File Uploads">
+For large backup files, it's recommended to access Tracearr directly via local IP or through a WireGuard/Tailscale connection. Reverse proxies may impose upload size limits that cause the import to fail.
+</Callout>
 
 | Option | Description |
 |--------|-------------|
@@ -119,7 +135,7 @@ Direct import from the Playback Reporting plugin is planned for a future Tracear
    - In Jellystat, go to **Settings**
    - Click **Task** → **Complete Sync with Jellyfin**
    - Click **Task** → **Import Playback Reporting Plugin Data**
-3. **Export from Jellystat** — Go to **Settings** → **Backup** → select **Activity** → **Export**
+3. **Export from Jellystat** — Follow the [export steps above](#step-1-export-from-jellystat) to create and download an Activity backup
 4. **Import into Tracearr** — Follow the [Jellystat import steps](#import-from-jellystat) above
 
 This is a one-time migration. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if desired.
