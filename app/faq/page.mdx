@@ -23,6 +23,7 @@ import { Tabs } from "nextra/components"
 - [I don't see any location data / Everything shows as local](#i-dont-see-any-location-data--everything-shows-as-local)
 - [The location data is wrong / IP geolocation is inaccurate](#the-location-data-is-wrong--ip-geolocation-is-inaccurate)
 - [How do I reset my Tracearr password?](#how-do-i-reset-my-tracearr-password)
+- [Server Resources is empty](#server-resources-is-empty)
 
 **Data & Maintenance Jobs**
 - [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
@@ -122,7 +123,9 @@ This forces the container to use IPv4 only, which resolves the issue in most cas
 
 ### I don't see any location data / Everything shows as local
 
-Tracearr uses client IP addresses reported by your media server to determine geolocation. If all sessions show as "local" or have no location data, your media server isn't seeing the real client IPs — usually because a reverse proxy is in front of it.
+> **Note:** Local streams (those originating from your home network) will never show location data — this is expected behavior. Geolocation only applies to remote streams from outside your network. If your *remote* streams are showing as "local" or missing location data, continue reading.
+
+Tracearr uses client IP addresses reported by your media server to determine geolocation. If remote sessions show as "local" or have no location data, your media server isn't seeing the real client IPs — usually because a reverse proxy is in front of it.
 
 **Two things need to be configured:**
 
@@ -197,6 +200,14 @@ node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
 ```
 </Tabs.Tab>
 </Tabs>
+
+---
+
+### Server Resources is empty
+
+The Server Resources panel (CPU, memory, and transcoder metrics) is only available for **Plex** and requires **Plex Pass**. Plex's resource monitoring API is a Plex Pass feature, and Tracearr currently does not detect whether your account has Plex Pass.
+
+If you're using Jellyfin or Emby, this section will not be displayed as these servers do not expose resource metrics through their APIs.
 
 ---
 
