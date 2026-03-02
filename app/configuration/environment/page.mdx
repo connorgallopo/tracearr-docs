@@ -31,6 +31,7 @@ Tracearr uses environment variables for core configuration.
 | `CLAIM_CODE` | Claim code for first time setup | none |
 | `BASE_PATH` | Base path when served under a subpath | none |
 | `DNS_CACHE_MAX_TTL` | DNS cache maximum TTL in seconds | disabled |
+| `GZIP_ENABLED` | Enable server-side gzip compression | `false` |
 
 ## Database Configuration
 
@@ -114,4 +115,18 @@ DNS_CACHE_MAX_TTL=3600
 <Callout type="info">
 Tracearr will respect the TTL provided by the DNS server, but will not cache entries longer than the value set in `DNS_CACHE_MAX_TTL`.
 Error responses (e.g. DNS resolution failures) are not cached to ensure that transient issues do not persist longer than necessary.
+</Callout>
+
+## Gzip Compression
+
+Set `GZIP_ENABLED=true` to enable server-side gzip compression for HTTP responses. \
+This compresses static assets and API responses, reducing bandwidth usage.
+
+```bash
+GZIP_ENABLED=true
+```
+
+<Callout type="info">
+Most deployments sit behind a reverse proxy (e.g. Nginx, Caddy, Traefik) that already handles compression. Only enable this if Tracearr is serving traffic directly without a compressing proxy in front of it. \
+Enabling gzip will slightly increase CPU usage on the server.
 </Callout>
