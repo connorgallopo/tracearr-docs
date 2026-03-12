@@ -1,0 +1,71 @@
+---
+title: Deploy with Portainer
+description: Deploy Tracearr as a Portainer stack. Step-by-step guide for deploying with the Portainer web UI.
+---
+
+import { Callout, Steps } from "nextra/components"
+
+# Portainer
+
+If you manage your Docker environment through [Portainer](https://www.portainer.io/), you can deploy Tracearr as a stack instead of using the command line. Portainer's stack feature is a web UI wrapper around Docker Compose.
+
+## Deploy a Stack
+
+<Steps>
+{<h3>Open the Stacks page</h3>}
+
+In Portainer, go to **Stacks** in the left sidebar, then click **Add stack**.
+
+{<h3>Name your stack</h3>}
+
+Enter a name like `tracearr`. Keep it lowercase with no spaces — Portainer uses this as a prefix for your containers.
+
+{<h3>Paste the compose file</h3>}
+
+Select **Web editor** as the build method, then paste the contents of [docker-compose.pg18.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.pg18.yml) (or [docker-compose.example.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.example.yml)) into the editor.
+
+{<h3>Add your environment variables</h3>}
+
+Scroll down to the **Environment variables** section below the editor. Click **Add an environment variable** and add the following:
+
+| Name | Value |
+|------|-------|
+| `JWT_SECRET` | Your generated 64-character hex string |
+| `COOKIE_SECRET` | A different generated 64-character hex string |
+
+You'll need to generate these values before deploying. See [Generating Secrets](/getting-started/installation#generating-secrets) for how to create them — the online generator option is the easiest if you don't have a terminal handy.
+
+You can also add optional variables here like `TZ` (e.g. `America/New_York`), `PORT`, `LOG_LEVEL`, or `DB_PASSWORD`.
+
+{<h3>Deploy the stack</h3>}
+
+Click **Deploy the stack** at the bottom of the page. Portainer will pull the images and start all three services (Tracearr, TimescaleDB, and Redis).
+
+{<h3>Access Tracearr</h3>}
+
+Once the stack is running, open `http://your-server-ip:3000` in your browser to reach the setup wizard.
+</Steps>
+
+---
+
+## Updating Tracearr
+
+To pull a newer version of Tracearr, go to **Stacks** → click your stack → **Editor** tab. Toggle **Re-pull image** on, then click **Update the stack**. Portainer will pull the latest image and recreate the containers with your existing volumes and configuration intact.
+
+---
+
+## Things to Know
+
+<Callout type="warning" title="Portainer does not auto-load .env files">
+Unlike the `docker compose` CLI, Portainer does **not** auto-load `.env` files from the project directory. You need to enter your environment variables directly in Portainer's UI as described above. Alternatively, you can click **"Load variables from .env file"** to upload an existing `.env` file. If your compose file references `${VARIABLE}` placeholders and those variables aren't defined in Portainer, they'll be empty.
+</Callout>
+
+<Callout type="info" title="Container naming">
+Portainer prefixes container names with the stack name (e.g. `tracearr-redis-1`). The compose files include explicit `container_name` values to override this, so the names should match what you see in the documentation.
+</Callout>
+
+---
+
+## Next Steps
+
+Once Tracearr is running, [connect your first media server](/getting-started/first-server).

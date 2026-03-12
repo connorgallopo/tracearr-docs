@@ -1,4 +1,5 @@
 export default {
-  index: 'Docker (Self-Hosted)',
+  index: 'Docker Compose',
+  portainer: 'Portainer',
   railway: 'Railway (Cloud)',
 }
