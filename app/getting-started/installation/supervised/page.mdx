@@ -56,9 +56,13 @@ The supervised image runs PostgreSQL 15, while the standard compose uses Postgre
 
 ## Why Named Volumes Matter Here
 
-The supervised image runs three processes as three different system users — `postgres`, `redis`, and `tracearr` — each writing to its own data directory. With bind mounts, you'd need to manually set correct ownership for each directory on the host and keep those permissions intact across updates, reboots, and filesystem changes. FUSE-based filesystems (like Unraid's array) make this even more unreliable.
+The supervised image runs three processes as three different system users — `postgres`, `redis`, and `tracearr` — each writing to its own data directory. On every startup, the entrypoint script runs `chown` and `chmod` across all three directories to ensure correct ownership before supervisord launches each process. PostgreSQL in particular requires `0700` permissions on its data directory and will refuse to start otherwise.
 
-Named volumes handle all of this automatically. Docker sets the right ownership when the volume is first created, and preserves it from there. Unless you have a specific reason to use bind mounts and understand the permission implications, stick with named volumes.
+Named volumes are backed by Docker's storage driver (typically ext4 or xfs), so these permission fixes work reliably every time. FUSE-based filesystems — like Unraid's array — may silently fail to apply `chown` or `chmod`, which means PostgreSQL sees the wrong permissions and won't start. supervisord will restart it in a loop, and the container will never become healthy.
+
+<Callout type="error" title="Bind mounts are not supported with the supervised image">
+If you need bind mounts, use the standard [Docker Compose](/getting-started/installation) setup instead — it runs each service in its own container with a single user, which is far more forgiving with host filesystem permissions. We don't recommend bind mounts in any case (see [Why not bind mounts?](/getting-started/installation#why-not-bind-mounts)), but if you must use them, the standard setup is the only one we provide support for.
+</Callout>
 
 ---
 
