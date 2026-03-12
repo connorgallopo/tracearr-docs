@@ -1,0 +1,106 @@
+---
+title: Supervised Installation (Unraid / Bare-Metal)
+description: Install Tracearr with the supervised all-in-one image. Bundles PostgreSQL, Redis, and Tracearr in a single container for Unraid and bare-metal hosts.
+---
+
+import { Callout } from "nextra/components"
+
+# Supervised
+
+The supervised image bundles PostgreSQL, Redis, and Tracearr into a single container using supervisord. It was built for environments where running separate database containers isn't practical.
+
+<Callout type="error" title="Bare-metal hosts only">
+This image is designed for **Unraid** and other bare-metal Docker hosts. Running it on VMs or nested container environments is unsupported. If you can run separate containers, use the standard [Docker Compose](/getting-started/installation) setup instead — it's more flexible, uses less memory, and runs a newer version of PostgreSQL.
+</Callout>
+
+## Requirements
+
+- **3GB RAM minimum** — the container runs PostgreSQL, Redis, and Node.js simultaneously. Below 3GB, the container will be killed by the OOM killer (exit code 137).
+- **Docker** with Compose V2
+
+## Quick Start
+
+```bash
+# Download the supervised compose file
+curl -O https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.supervised-example.yml
+
+# Start Tracearr
+docker compose -f docker-compose.supervised-example.yml up -d
+```
+
+That's it. No `.env` file needed — secrets are generated automatically on first boot and persisted across restarts.
+
+Tracearr will be available at `http://localhost:3000`.
+
+<Callout type="info" title="Configuration">
+You can set optional environment variables like `TZ`, `PORT`, and `LOG_LEVEL` by uncommenting them in the compose file. See the comments in [docker-compose.supervised-example.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.supervised-example.yml) for details.
+</Callout>
+
+---
+
+## How It Differs from Standard
+
+| | Standard (Docker Compose) | Supervised |
+|---|---|---|
+| **Containers** | 3 (Tracearr, TimescaleDB, Redis) | 1 (all bundled) |
+| **PostgreSQL** | 18 (TimescaleDB HA) | 15 (TimescaleDB) |
+| **Minimum RAM** | ~1GB | 3GB |
+| **Secrets** | Manual (`.env` file) | Auto-generated on first boot |
+| **Volumes** | `timescale_data`, `redis_data` | `tracearr_postgres`, `tracearr_redis`, `tracearr_data` |
+
+<Callout type="error" title="Don't mix PostgreSQL versions">
+The supervised image runs PostgreSQL 15, while the standard compose uses PostgreSQL 18. The on-disk binary format is incompatible between major versions — **you cannot switch between these setups and reuse the same data volumes**. If you try, PostgreSQL will refuse to start. Always back up with `pg_dump` before switching.
+</Callout>
+
+---
+
+## Why Named Volumes Matter Here
+
+The supervised image runs three processes as three different system users — `postgres`, `redis`, and `tracearr` — each writing to its own data directory. With bind mounts, you'd need to manually set correct ownership for each directory on the host and keep those permissions intact across updates, reboots, and filesystem changes. FUSE-based filesystems (like Unraid's array) make this even more unreliable.
+
+Named volumes handle all of this automatically. Docker sets the right ownership when the volume is first created, and preserves it from there. Unless you have a specific reason to use bind mounts and understand the permission implications, stick with named volumes.
+
+---
+
+## Backing Up Your Database
+
+Since the database runs inside the Tracearr container (not in a separate `tracearr-db` container), the backup commands are slightly different from the standard setup:
+
+```bash
+# Back up the database (compressed custom format, recommended)
+docker exec tracearr pg_dump -U tracearr -d tracearr -Fc > tracearr_backup.dump
+
+# Back up to plain SQL (human-readable, larger file)
+docker exec tracearr pg_dump -U tracearr -d tracearr > tracearr_backup.sql
+
+# Restore from custom format
+docker exec -i tracearr pg_restore -U tracearr -d tracearr --clean --if-exists < tracearr_backup.dump
+
+# Restore from plain SQL
+docker exec -i tracearr psql -U tracearr -d tracearr < tracearr_backup.sql
+```
+
+<Callout type="warning" title="A note on restoring">
+The restore commands use `--clean --if-exists`, which works for the common case. For a full disaster recovery, drop and recreate the database first:
+
+```bash
+# Stop Tracearr first, then:
+docker exec tracearr psql -U tracearr -d postgres -c "DROP DATABASE tracearr;"
+docker exec tracearr psql -U tracearr -d postgres -c "CREATE DATABASE tracearr OWNER tracearr;"
+docker exec -i tracearr pg_restore -U tracearr -d tracearr < tracearr_backup.dump
+```
+
+The TimescaleDB extension will be recreated by `pg_restore` from the dump file.
+</Callout>
+
+For a deeper explanation of why `pg_dump` is the right tool (and why copying raw database files isn't safe), see [Docker Volumes & Backups](/getting-started/installation#docker-volumes--backups) on the Docker Compose page.
+
+<Callout type="info" title="Built-in backups are coming">
+A built-in backup system for Tracearr is currently in development. In the meantime, `pg_dump` is the recommended way to back up your data.
+</Callout>
+
+---
+
+## Next Steps
+
+Once Tracearr is running, [connect your first media server](/getting-started/first-server).

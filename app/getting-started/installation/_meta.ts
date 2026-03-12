@@ -1,5 +1,6 @@
 export default {
   index: 'Docker Compose',
-  portainer: 'Portainer',
+  'docker-ui': 'Docker UI',
+  supervised: 'Supervised',
   railway: 'Railway (Cloud)',
 }

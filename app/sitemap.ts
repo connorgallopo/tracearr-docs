@@ -35,9 +35,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/getting-started/installation/portainer`,
+      url: `${baseUrl}/getting-started/installation/docker-ui`,
       lastModified: getLastModified(
-        "getting-started/installation/portainer/page.mdx",
+        "getting-started/installation/docker-ui/page.mdx",
+      ),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/getting-started/installation/supervised`,
+      lastModified: getLastModified(
+        "getting-started/installation/supervised/page.mdx",
       ),
       changeFrequency: "monthly",
       priority: 0.9,

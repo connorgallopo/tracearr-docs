@@ -7,12 +7,7 @@ import { Callout, Tabs } from "nextra/components"
 
 # Docker Compose
 
-We maintain ready-to-use Docker Compose files in the [Tracearr repository](https://github.com/connorgallopo/Tracearr/tree/main/docker/examples):
-
-| File | Description |
-|------|-------------|
-| [docker-compose.pg18.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.pg18.yml) | **Recommended** — PostgreSQL 18 with TimescaleDB HA |
-| [docker-compose.example.yml](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.example.yml) | Standard setup with PostgreSQL 16 |
+The recommended way to run Tracearr. This sets up three containers — Tracearr, TimescaleDB, and Redis — using our [ready-to-use compose file](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.pg18.yml).
 
 ## Quick Start
 
@@ -53,15 +48,17 @@ See the comments in the compose file for optional environment variables like `TZ
 
 ---
 
-## Generating Secrets
+## Generating Secrets Without the CLI
+
+<Callout type="info" title="Already used the Quick Start?">
+If you ran the Quick Start commands above, your secrets are already generated and saved in your `.env` file. You can skip this section.
+</Callout>
 
 Tracearr requires two secrets: `JWT_SECRET` and `COOKIE_SECRET`. Both need to be 64-character hexadecimal strings (a 256-bit key). These are used internally for signing authentication tokens and encrypting session cookies — they just need to be long, random, and unique to your installation.
 
-The Quick Start commands above handle this automatically, but if you need to generate them separately (for example, if you're deploying through [Portainer](/getting-started/installation/portainer) or another GUI), here are a few ways to do it.
+If you're deploying through a [Docker UI](/getting-started/installation/docker-ui) or another tool where you need to provide the secrets yourself, here's how to generate them.
 
-### Using a terminal
-
-This is the most straightforward method and produces cryptographically secure output.
+### Terminal
 
 <Tabs items={['Linux/macOS', 'Windows (PowerShell)']} defaultIndex={0}>
 <Tabs.Tab>
@@ -76,11 +73,11 @@ openssl rand -hex 32
 </Tabs.Tab>
 </Tabs>
 
-Run the command twice — once for `JWT_SECRET` and once for `COOKIE_SECRET`. Copy each output and paste it into your `.env` file or environment variable configuration.
+Run the command twice — once for `JWT_SECRET` and once for `COOKIE_SECRET`. Copy each output into your environment variable configuration.
 
-### Using an online generator
+### Online generator
 
-If you don't have terminal access (or just prefer a browser), you can use [randomkeygen.com/random-string](https://randomkeygen.com/random-string):
+If you don't have terminal access, you can use [randomkeygen.com/random-string](https://randomkeygen.com/random-string):
 
 1. Set **Length** to **64 Characters**
 2. Set **Character Set** to **Hexadecimal (0-9, a-f)**
@@ -105,17 +102,11 @@ Tracearr is also available on these platforms:
 - **[Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr)** — Community helper script
 </Callout>
 
-<Callout type="warning" title="About the Supervised Image">
-The `supervised` image tag (`ghcr.io/connorgallopo/tracearr:supervised`) bundles TimescaleDB and Redis into a single container. This was developed specifically for **Unraid** and is only recommended for bare-metal installations where running separate database containers isn't practical.
-
-For all other environments (Docker Compose, Kubernetes, TrueNAS, Proxmox, etc.), use the standard `latest` tag with external TimescaleDB and Redis.
-</Callout>
-
 ---
 
 ## Docker Volumes & Backups
 
-You'll notice the compose files use **named Docker volumes** (like `timescale_data` and `redis_data`) rather than bind mounts (like `./data:/var/lib/postgresql/data`). This is deliberate, and it matters more than you might expect.
+You'll notice the compose file uses **named Docker volumes** (like `timescale_data` and `redis_data`) rather than bind mounts (like `./data:/var/lib/postgresql/data`). This is deliberate, and it matters more than you might expect.
 
 ### Why not bind mounts?
 
@@ -124,8 +115,6 @@ PostgreSQL requires its data directory to be owned by the `postgres` user with `
 With bind mounts, the directory lives on your host filesystem, and ownership depends on how your host maps UIDs. If the UID of the `postgres` user inside the container doesn't match the owner of the directory on the host, you get a permissions mismatch and a database that won't boot. This is especially common on systems with FUSE-based filesystems (like Unraid's array), where permission mapping can be unreliable.
 
 Named volumes sidestep this entirely. Docker manages the volume's filesystem directly, so ownership and permissions are set correctly when the container first creates them — no manual setup needed.
-
-The [supervised image](#about-the-supervised-image) makes this even more critical. It runs three separate processes inside a single container — PostgreSQL, Redis, and Tracearr — each as a different system user (`postgres`, `redis`, `tracearr`), each writing to its own data directory. With bind mounts, you'd need to manually ensure correct ownership for each one and keep those permissions intact across container updates, host reboots, and filesystem changes. Named volumes handle all of this automatically.
 
 There's also a performance angle. Named volumes use Docker's storage driver, which on Linux typically means native filesystem access. Bind mounts through FUSE-based filesystems (common on NAS platforms) add an abstraction layer that introduces latency — not ideal for a database doing thousands of small reads and writes per second.
 
@@ -141,8 +130,6 @@ Even if you stop the database first, it has to be a **clean** shutdown. If Postg
 
 **The right tool is `pg_dump`.** It uses PostgreSQL's MVCC (Multi-Version Concurrency Control) system to take a consistent, point-in-time logical snapshot of your entire database — while it's still running. No downtime, no file permission headaches, no risk of partial writes. The output is a portable file that can be restored to any compatible PostgreSQL version, which also means you can migrate between major versions (e.g., PG16 to PG18) without worrying about binary format changes.
 
-<Tabs items={['Standard (separate db container)', 'Supervised (all-in-one)']} defaultIndex={0}>
-<Tabs.Tab>
 ```bash
 # Back up the database (compressed custom format, recommended)
 docker exec tracearr-db pg_dump -U tracearr -d tracearr -Fc > tracearr_backup.dump
@@ -156,23 +143,6 @@ docker exec -i tracearr-db pg_restore -U tracearr -d tracearr --clean --if-exist
 # Restore from plain SQL
 docker exec -i tracearr-db psql -U tracearr -d tracearr < tracearr_backup.sql
 ```
-</Tabs.Tab>
-<Tabs.Tab>
-```bash
-# Back up the database (the db runs inside the tracearr container)
-docker exec tracearr pg_dump -U tracearr -d tracearr -Fc > tracearr_backup.dump
-
-# Back up to plain SQL
-docker exec tracearr pg_dump -U tracearr -d tracearr > tracearr_backup.sql
-
-# Restore from custom format
-docker exec -i tracearr pg_restore -U tracearr -d tracearr --clean --if-exists < tracearr_backup.dump
-
-# Restore from plain SQL
-docker exec -i tracearr psql -U tracearr -d tracearr < tracearr_backup.sql
-```
-</Tabs.Tab>
-</Tabs>
 
 You can schedule this with a cron job, or run it manually whenever you want a snapshot. The `-Fc` (custom format) option compresses the output and supports selective restoration of individual tables if you ever need it.
 
@@ -193,10 +163,6 @@ The TimescaleDB extension will be recreated by `pg_restore` from the dump file �
 
 <Callout type="info" title="Built-in backups are coming">
 A built-in backup system for Tracearr is currently in development. In the meantime, `pg_dump` is the recommended way to back up your data.
-</Callout>
-
-<Callout type="error" title="Don't mix PostgreSQL major versions">
-The different compose files use different PostgreSQL versions — the supervised image runs PG15, the standard compose uses PG16, and the recommended compose uses PG18. PostgreSQL's on-disk binary format changes between major versions, so **you cannot swap to a different compose file and reuse the same data volume**. If you try, PostgreSQL will refuse to start. Always `pg_dump` your data before switching compose files.
 </Callout>
 
 <Callout type="info" title="TL;DR">
