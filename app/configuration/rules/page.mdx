@@ -14,6 +14,7 @@ Rules let you automate how Tracearr responds to what's happening on your media s
 - Limit how many streams a user can have at once
 - Get notified when someone streams from an unusual country
 - Detect account sharing by tracking impossible travel patterns
+- Automatically terminate streams that have been paused too long
 - Automatically terminate streams that violate your policies
 
 Rules are evaluated in real-time as sessions start and change. When a rule's conditions match, Tracearr automatically creates a violation and executes any additional actions you've configured — whether that's logging the event, sending a notification, adjusting a user's trust score, or terminating the stream.
@@ -73,9 +74,15 @@ Here are all the fields you can use in conditions, grouped by category.
 | Unique IPs in Window | Number of different IP addresses used within a time period | 3, 5, 10... |
 | Unique Devices in Window | Number of different devices used within a time period | 2, 3, 5... |
 | Inactive Days | Days since the user last streamed | 30, 90, 180... |
+| Current Pause Duration | How long the session has been continuously paused (minutes) | 5, 15, 30... |
+| Total Pause Duration | Total accumulated pause time across all pause/resume cycles (minutes) | 15, 30, 60... |
 
 <Callout type="info">
 Fields with "in Window" let you specify a time window (in hours) to check. For example, "more than 5 unique IPs in the last 24 hours."
+</Callout>
+
+<Callout type="info">
+**Current vs Total Pause Duration:** Current Pause Duration measures how long the session has been paused *right now* — it resets when the user resumes playback. Total Pause Duration tracks all pause time across the entire session, including multiple pause/resume cycles. Use Current Pause Duration to catch users who walk away mid-stream. Use Total Pause Duration to detect sessions with excessive overall pausing.
 </Callout>
 
 ##### Concurrent Streams Options
@@ -356,6 +363,20 @@ Prevent users from streaming on more than 2 devices at once.
 
 <Callout type="info">
 **Tip:** Enable the "Unique IPs" checkbox to only count streams from different IP addresses. This lets household members share an account on multiple devices at home while still limiting external sharing.
+</Callout>
+
+### Terminate Idle Paused Streams
+
+Free up server resources by terminating streams that have been paused for too long.
+
+**Severity:** Low
+
+| Conditions | Actions |
+|------------|---------|
+| Current Pause Duration is at least 15 | Terminate Stream (message: "Stream terminated due to inactivity") |
+
+<Callout type="info">
+**Tip:** Pause rules are evaluated continuously while a session is paused — Tracearr checks every poll cycle, so the stream will be terminated shortly after the threshold is crossed. You can also use Total Pause Duration to catch users who repeatedly pause and resume throughout a long session.
 </Callout>
 
 ### Detect Account Sharing
