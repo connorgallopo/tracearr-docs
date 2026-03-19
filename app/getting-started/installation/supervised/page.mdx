@@ -68,40 +68,23 @@ If you need bind mounts, use the standard [Docker Compose](/getting-started/inst
 
 ## Backing Up Your Database
 
-Since the database runs inside the Tracearr container (not in a separate `tracearr-db` container), the backup commands are slightly different from the standard setup:
+Tracearr has a [built-in Backup & Restore](/configuration/backup) system that creates consistent database snapshots, supports scheduled backups with retention, and handles restoring with automatic rollback. You can manage everything from the web UI under **Settings → Backup**.
+
+You can also create backups via the CLI:
 
 ```bash
-# Back up the database (compressed custom format, recommended)
-docker exec tracearr pg_dump -U tracearr -d tracearr -Fc > tracearr_backup.dump
-
-# Back up to plain SQL (human-readable, larger file)
-docker exec tracearr pg_dump -U tracearr -d tracearr > tracearr_backup.sql
-
-# Restore from custom format
-docker exec -i tracearr pg_restore -U tracearr -d tracearr --clean --if-exists < tracearr_backup.dump
-
-# Restore from plain SQL
-docker exec -i tracearr psql -U tracearr -d tracearr < tracearr_backup.sql
+docker exec tracearr node apps/server/scripts/backup.ts
 ```
 
-<Callout type="warning" title="A note on restoring">
-The restore commands use `--clean --if-exists`, which works for the common case. For a full disaster recovery, drop and recreate the database first:
+To copy a backup from the Docker volume to your host filesystem:
 
 ```bash
-# Stop Tracearr first, then:
-docker exec tracearr psql -U tracearr -d postgres -c "DROP DATABASE tracearr;"
-docker exec tracearr psql -U tracearr -d postgres -c "CREATE DATABASE tracearr OWNER tracearr;"
-docker exec -i tracearr pg_restore -U tracearr -d tracearr < tracearr_backup.dump
+docker cp tracearr:/data/backup ./tracearr-backups
 ```
 
-The TimescaleDB extension will be recreated by `pg_restore` from the dump file.
-</Callout>
+See [Backup & Restore](/configuration/backup) for full documentation.
 
-For a deeper explanation of why `pg_dump` is the right tool (and why copying raw database files isn't safe), see [Docker Volumes & Backups](/getting-started/installation#docker-volumes--backups) on the Docker Compose page.
-
-<Callout type="info" title="Built-in backups are coming">
-A built-in backup system for Tracearr is currently in development. In the meantime, `pg_dump` is the recommended way to back up your data.
-</Callout>
+For an explanation of why named volumes are used and why copying raw database files isn't safe, see [Docker Volumes & Backups](/getting-started/installation#docker-volumes--backups) on the Docker Compose page.
 
 ---
 

@@ -128,45 +128,24 @@ TimescaleDB makes this problem worse. Each hypertable chunk is stored as a separ
 
 Even if you stop the database first, it has to be a **clean** shutdown. If PostgreSQL is killed (OOM, Docker timeout, power loss), the data files are left in a crash state and require WAL replay to recover. A file-level backup of a dirty shutdown is not a valid backup.
 
-**The right tool is `pg_dump`.** It uses PostgreSQL's MVCC (Multi-Version Concurrency Control) system to take a consistent, point-in-time logical snapshot of your entire database — while it's still running. No downtime, no file permission headaches, no risk of partial writes. The output is a portable file that can be restored to any compatible PostgreSQL version, which also means you can migrate between major versions (e.g., PG16 to PG18) without worrying about binary format changes.
+Tracearr has a [built-in Backup & Restore](/configuration/backup) system that handles all of this for you — creating consistent `pg_dump` snapshots, scheduling automatic backups, and restoring with full rollback support. You can create and download backups from the web UI, or use the CLI for automation:
 
 ```bash
-# Back up the database (compressed custom format, recommended)
-docker exec tracearr-db pg_dump -U tracearr -d tracearr -Fc > tracearr_backup.dump
-
-# Back up to plain SQL (human-readable, larger file)
-docker exec tracearr-db pg_dump -U tracearr -d tracearr > tracearr_backup.sql
-
-# Restore from custom format
-docker exec -i tracearr-db pg_restore -U tracearr -d tracearr --clean --if-exists < tracearr_backup.dump
-
-# Restore from plain SQL
-docker exec -i tracearr-db psql -U tracearr -d tracearr < tracearr_backup.sql
+# Create a backup via CLI
+docker exec tracearr node apps/server/scripts/backup.ts
 ```
 
-You can schedule this with a cron job, or run it manually whenever you want a snapshot. The `-Fc` (custom format) option compresses the output and supports selective restoration of individual tables if you ever need it.
-
-<Callout type="warning" title="A note on restoring">
-The restore commands above use `--clean --if-exists`, which drops existing database objects before recreating them. This works well for the common case, but TimescaleDB's internal catalog tables and extension objects can occasionally run into dependency ordering issues during a `--clean` restore on complex databases.
-
-If you're doing a full disaster recovery or migrating to a fresh server, a cleaner approach is to drop and recreate the database first, then restore without `--clean`:
+If you want to copy a backup from the Docker volume to your host filesystem:
 
 ```bash
-# Stop Tracearr first, then:
-docker exec tracearr-db psql -U tracearr -d postgres -c "DROP DATABASE tracearr;"
-docker exec tracearr-db psql -U tracearr -d postgres -c "CREATE DATABASE tracearr OWNER tracearr;"
-docker exec -i tracearr-db pg_restore -U tracearr -d tracearr < tracearr_backup.dump
+# Copy the entire backup directory from the volume to your host
+docker cp tracearr:/data/backup ./tracearr-backups
 ```
 
-The TimescaleDB extension will be recreated by `pg_restore` from the dump file — no extra steps needed.
-</Callout>
-
-<Callout type="info" title="Built-in backups are coming">
-A built-in backup system for Tracearr is currently in development. In the meantime, `pg_dump` is the recommended way to back up your data.
-</Callout>
+See [Backup & Restore](/configuration/backup) for full documentation on manual backups, scheduled backups, uploads, and restoring.
 
 <Callout type="info" title="TL;DR">
-Named volumes work out of the box and keep your permissions correct. For backups, use `pg_dump` — don't copy raw database files. Bind mounts give you visible files on the host, but those files aren't safe to copy while PostgreSQL is running and aren't portable across major versions.
+Named volumes work out of the box and keep your permissions correct. For backups, use Tracearr's [built-in backup system](/configuration/backup) — don't copy raw database files. Bind mounts give you visible files on the host, but those files aren't safe to copy while PostgreSQL is running and aren't portable across major versions.
 </Callout>
 
 ---
