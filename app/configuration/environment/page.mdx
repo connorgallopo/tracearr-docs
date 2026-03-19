@@ -32,6 +32,7 @@ Tracearr uses environment variables for core configuration.
 | `BASE_PATH` | Base path when served under a subpath | none |
 | `DNS_CACHE_MAX_TTL` | DNS cache maximum TTL in seconds | disabled |
 | `GZIP_ENABLED` | Enable server-side gzip compression | `false` |
+| `BACKUP_DIR` | Directory for storing database backups | `/data/backup` |
 
 ## Database Configuration
 
@@ -129,4 +130,17 @@ GZIP_ENABLED=true
 <Callout type="info">
 Most deployments sit behind a reverse proxy (e.g. Nginx, Caddy, Traefik) that already handles compression. Only enable this if Tracearr is serving traffic directly without a compressing proxy in front of it. \
 Enabling gzip will slightly increase CPU usage on the server.
+</Callout>
+
+## Backup Directory
+
+Set `BACKUP_DIR` to customize where Tracearr stores database backups. The default location is `/data/backup` inside the container.
+
+```bash
+BACKUP_DIR=/custom/path/to/backups
+```
+
+<Callout type="info">
+When using Docker, the default `/data/backup` path is already configured as a volume. If you change this, ensure the directory exists and is writable, and mount it as a volume if needed. \
+See [Backup & Restore](/configuration/backup) for full documentation.
 </Callout>

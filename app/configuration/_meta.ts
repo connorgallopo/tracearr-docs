@@ -3,6 +3,7 @@ export default {
   environment: 'Environment Variables',
   rules: 'Rules',
   tailscale: 'Tailscale VPN',
+  backup: 'Backup & Restore',
   mobile: 'Mobile App',
   debug: 'Debug Page',
 }
