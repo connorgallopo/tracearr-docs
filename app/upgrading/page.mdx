@@ -1,6 +1,6 @@
 ---
 title: Upgrading Tracearr
-description: How to upgrade Tracearr to the latest version using Docker Compose. Pull new images and recreate containers with zero data loss.
+description: How to upgrade Tracearr to the latest version. Covers Docker Compose, Docker UI, Supervised, Railway, Proxmox VE, and Unraid.
 ---
 
 import { Callout } from "nextra/components"
@@ -31,7 +31,52 @@ This will:
 If you are using a different compose file, make sure to update the commands accordingly.
 </Callout>
 
-### Cleaning Up Old Images
+---
+
+## Docker UI
+
+If you deployed Tracearr through a Docker UI like Portainer, Dockge, or TrueNAS's built-in Custom App feature, look for an option to **re-pull images** or **redeploy** your stack. The exact label varies by tool — see the [Docker UI updating guide](/getting-started/installation/docker-ui#updating-tracearr) for details.
+
+---
+
+## Supervised
+
+From the directory containing your `docker-compose.supervised-example.yml` file, run:
+
+```bash
+docker compose -f docker-compose.supervised-example.yml pull tracearr
+docker compose -f docker-compose.supervised-example.yml up -d
+```
+
+---
+
+## Railway
+
+Railway supports both automatic and manual updates. See the [Railway updating guide](/getting-started/installation/railway#updating-tracearr) for how to configure auto-updates or manually trigger an upgrade from the dashboard.
+
+---
+
+## Proxmox VE
+
+If you installed Tracearr using the [Proxmox VE community helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr), you can update by logging into the Tracearr LXC container console and running:
+
+```bash
+update
+```
+
+This command is created automatically during installation. It pulls the latest version of the update script from the community-scripts repository, checks for a newer release, and applies the update.
+
+You can also update all community-script containers at once from the Proxmox host shell using the [update-apps](https://community-scripts.github.io/ProxmoxVE/scripts?id=update-apps) tool.
+
+---
+
+## Unraid
+
+In the Unraid web UI, go to the **Docker** tab, find Tracearr, and click **Check for Updates** or **Update**. Unraid will pull the latest image and recreate the container.
+
+---
+
+## Cleaning Up Old Images
 
 After upgrading, you can remove unused images to free up disk space:
 

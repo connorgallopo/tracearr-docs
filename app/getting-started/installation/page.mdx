@@ -92,18 +92,6 @@ Treat these values like passwords. Don't share them, don't commit them to Git, a
 
 ---
 
-## Other Platforms
-
-<Callout type="info" title="Community Integrations">
-Tracearr is also available on these platforms:
-
-- **[Unraid Community Apps](https://unraid.net/community/apps)** — Search for "Tracearr" in the Apps tab
-- **[TrueNAS Apps](https://apps.truenas.com/catalog/tracearr/)** — Available in the TrueNAS app catalog
-- **[Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr)** — Community helper script
-</Callout>
-
----
-
 ## Docker Volumes & Backups
 
 You'll notice the compose file uses **named Docker volumes** (like `timescale_data` and `redis_data`) rather than bind mounts (like `./data:/var/lib/postgresql/data`). This is deliberate, and it matters more than you might expect.

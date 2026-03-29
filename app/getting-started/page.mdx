@@ -3,6 +3,8 @@ title: Getting Started with Tracearr
 description: Quick start guide for Tracearr. Learn how to install with Docker and connect your Plex, Jellyfin, or Emby media server.
 ---
 
+import { Callout } from "nextra/components"
+
 # Getting Started
 
 This guide will help you install Tracearr and connect your first media server.
@@ -23,6 +25,19 @@ This guide will help you install Tracearr and connect your first media server.
 | [Railway](/getting-started/installation/railway) | Cloud hosting with no server to manage |
 
 Not sure? **Docker Compose** is the recommended default. If you manage Docker through a browser, pick **Docker UI**. If you're on Unraid, check the **Community Apps** tab first — Tracearr is available there as a one-click install.
+
+## Community Integrations
+
+Tracearr is also available on these platforms through community-maintained scripts and catalogs:
+
+- **[Unraid Community Apps](https://unraid.net/community/apps)** — Search for "Tracearr" in the Apps tab
+- **[Proxmox VE](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr)** — Community helper script for LXC containers
+
+<Callout type="warning" title="TrueNAS">
+The Tracearr listing in the TrueNAS app catalog is not maintained by the Tracearr developer. The catalog maintainers have modified dependencies and configuration without understanding Tracearr's architecture, which has caused issues for users. We do not recommend installing Tracearr through the TrueNAS app catalog.
+
+TrueNAS SCALE (24.10+) supports Docker Compose natively. You can deploy Tracearr using the [Docker UI](/getting-started/installation/docker-ui) guide — either through TrueNAS's built-in Custom App feature or by installing Portainer or Dockge from the TrueNAS app catalog.
+</Callout>
 
 ## After Installation
 
