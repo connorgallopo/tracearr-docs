@@ -64,6 +64,10 @@ Named volumes are backed by Docker's storage driver (typically ext4 or xfs), so 
 If you need bind mounts, use the standard [Docker Compose](/getting-started/installation) setup instead — it runs each service in its own container with a single user, which is far more forgiving with host filesystem permissions. We don't recommend bind mounts in any case (see [Why not bind mounts?](/getting-started/installation#why-not-bind-mounts)), but if you must use them, the standard setup is the only one we provide support for.
 </Callout>
 
+<Callout type="warning" title="Unraid: use a cache-backed path for database storage">
+If you install via the Unraid Community Apps template (which uses bind mounts), make sure the **PostgreSQL Data** path points to a cache-backed location — for example `/mnt/cache/appdata/tracearr/postgres` or `/mnt/appdata/tracearr/postgres` if you have a dedicated appdata share. Paths under `/mnt/user` go through Unraid's FUSE layer, which adds significant latency to every database read and write. On a typical setup this can make PostgreSQL checkpoints take 50–100x longer than they should, even on NVMe drives.
+</Callout>
+
 ---
 
 ## Backing Up Your Database
