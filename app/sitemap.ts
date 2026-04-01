@@ -51,6 +51,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/getting-started/installation/kubernetes`,
+      lastModified: getLastModified(
+        "getting-started/installation/kubernetes/page.mdx",
+      ),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/getting-started/installation/railway`,
       lastModified: getLastModified(
         "getting-started/installation/railway/page.mdx",

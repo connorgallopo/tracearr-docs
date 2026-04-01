@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     "Tautulli alternative",
     "session tracking",
     "Docker installation",
+    "Kubernetes",
+    "Helm chart",
     "self-hosted",
   ],
   authors: [{ name: "Tracearr" }],
