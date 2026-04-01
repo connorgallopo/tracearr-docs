@@ -7,4 +7,28 @@ const withNextra = nextra({
 export default withNextra({
   // Next.js options
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/getting-started/installation/portainer",
+        destination: "/getting-started/installation/docker-ui",
+        permanent: true,
+      },
+      {
+        source: "/debug",
+        destination: "/configuration/debug",
+        permanent: true,
+      },
+      {
+        source: "/update",
+        destination: "/upgrading",
+        permanent: true,
+      },
+      {
+        source: "/analytics",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
 });
