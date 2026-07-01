@@ -18,8 +18,10 @@ import { Tabs } from "nextra/components"
 
 **Troubleshooting**
 - [Tracearr can't connect to my media server](#tracearr-cant-connect-to-my-media-server)
+- [Jellyfin 12: Tracearr can't connect after upgrading Jellyfin](#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin)
 - [Disabling IPv6 in Docker](#disabling-ipv6-in-docker)
 - [Sessions aren't being tracked](#sessions-arent-being-tracked)
+- [Jellyfin or Emby sessions are slow to appear](#jellyfin-or-emby-sessions-are-slow-to-appear)
 - [I don't see any location data / Everything shows as local](#i-dont-see-any-location-data--everything-shows-as-local)
 - [The location data is wrong / IP geolocation is inaccurate](#the-location-data-is-wrong--ip-geolocation-is-inaccurate)
 - [How do I reset my Tracearr password?](#how-do-i-reset-my-tracearr-password)
@@ -86,6 +88,16 @@ While Docker is recommended, you can run Tracearr directly with Node.js 20+. See
 
 ---
 
+### Jellyfin 12: Tracearr can't connect after upgrading Jellyfin
+
+Jellyfin 12 disables legacy authorization by default, which rejects the older `X-Emby-Authorization` and `X-Emby-Token` headers that earlier Tracearr versions used to authenticate. A previously working Jellyfin server can start failing right after you upgrade it to 12.
+
+Upgrade Tracearr to **1.4.29 or newer**. From 1.4.29 on, Tracearr uses the standard `Authorization` header that Jellyfin 12 expects, and it stays compatible with Jellyfin 10.11 — so you can upgrade Tracearr before or after Jellyfin.
+
+You don't need to regenerate your API key. Regenerating it won't help on an older Tracearr version, and isn't necessary once you're on 1.4.29+.
+
+---
+
 ### Disabling IPv6 in Docker
 
 If you get "cannot reach [Plex/Emby/Jellyfin] server ... fetch failed" when adding your media server
@@ -116,9 +128,17 @@ This forces the container to use IPv4 only, which resolves the issue in most cas
 
 ### Sessions aren't being tracked
 
-1. Verify the server connection is active in Settings → Servers
-2. Check that polling is enabled for the server
-3. Start a playback session and wait for the next poll interval
+1. Verify the server connection is active in **Settings** → **Servers**
+2. Check that your API key or token is still valid
+3. Start a playback session — Plex sessions appear instantly, while Jellyfin and Emby sessions appear within a poll cycle
+
+---
+
+### Jellyfin or Emby sessions are slow to appear
+
+Plex pushes sessions to Tracearr instantly over SSE. Jellyfin and Emby are polled on an interval by default, so their sessions can take a poll cycle to show up.
+
+Install the [Tracearr SSE plugin](/configuration/realtime) on your Jellyfin or Emby server for instant, push-based sessions. See the [Real-Time Updates](/configuration/realtime) guide for setup.
 
 ---
 

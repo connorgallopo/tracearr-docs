@@ -1,0 +1,71 @@
+---
+title: Real-Time Updates - Jellyfin & Emby SSE Plugin
+description: Get instant Jellyfin and Emby session updates in Tracearr with the SSE plugin. Setup guide for the Jellyfin repository and the Emby plugin DLL.
+---
+
+import { Callout, Steps, Tabs } from "nextra/components"
+
+# Real-Time Updates
+
+Plex streams session updates to Tracearr instantly over Server-Sent Events (SSE). Jellyfin and Emby don't expose SSE on their own, so by default Tracearr detects their sessions by polling on an interval — sessions appear within a poll cycle rather than the moment they start.
+
+The **Tracearr SSE plugin** closes that gap. Once installed on your Jellyfin or Emby server, sessions push to Tracearr instantly, just like Plex. Without it, Tracearr keeps working through polling.
+
+<Callout type="info">
+The plugin is optional. Everything works without it — the plugin only removes the short polling delay for Jellyfin and Emby.
+</Callout>
+
+## Install the Plugin
+
+In Tracearr, go to **Settings** → **Servers** and click **Set up real-time updates** on a Jellyfin or Emby server card to see these same steps with a copy button for the URL.
+
+<Tabs items={['Jellyfin', 'Emby']}>
+<Tabs.Tab>
+
+<Steps>
+
+### Add the repository
+
+In your Jellyfin dashboard, go to **Plugins** → **Repositories** and add a repository named **Tracearr** with this URL:
+
+```
+https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json
+```
+
+### Install from the catalog
+
+Open the **Catalog** tab and install **Tracearr SSE**.
+
+### Restart Jellyfin
+
+Restart Jellyfin to load the plugin.
+
+</Steps>
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+<Steps>
+
+### Download the plugin
+
+Download the latest **Tracearr.Sse.Emby** release zip from the [releases page](https://github.com/Tracearr/Media-Server-SSE/releases).
+
+### Install the DLL
+
+Extract the plugin DLL into your Emby plugins folder.
+
+### Restart Emby
+
+Restart Emby to load the plugin.
+
+</Steps>
+
+</Tabs.Tab>
+</Tabs>
+
+Once the plugin is running, Tracearr detects it automatically — no restart of Tracearr needed. The server card in **Settings** → **Servers** shows the live connection status, so you can confirm the real-time link is active.
+
+<Callout type="info">
+The plugin is open source. You can review or build it yourself at [github.com/Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE).
+</Callout>

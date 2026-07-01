@@ -103,6 +103,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/configuration/realtime`,
+      lastModified: getLastModified("configuration/realtime/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/configuration/tailscale`,
       lastModified: getLastModified("configuration/tailscale/page.mdx"),
       changeFrequency: "monthly",

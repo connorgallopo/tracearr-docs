@@ -11,6 +11,10 @@ Tracearr uses the `latest` Docker image tag by default, so upgrading is straight
 
 TimescaleDB and Redis are persisted in a volume, so your database and configuration will be preserved during the upgrade process.
 
+<Callout type="warning" title="Jellyfin 12">
+If you run Jellyfin and plan to upgrade it to version 12, upgrade Tracearr to **1.4.29 or newer** at the same time. Jellyfin 12 disables legacy authorization, and older Tracearr versions can no longer connect to it. Tracearr 1.4.29+ works with both Jellyfin 12 and 10.11. See the [FAQ](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin) for details.
+</Callout>
+
 ## Docker Compose
 
 This guide assumes you followed the [Quick Start](/getting-started/installation#quick-start) instructions to set up Tracearr with Docker Compose.
