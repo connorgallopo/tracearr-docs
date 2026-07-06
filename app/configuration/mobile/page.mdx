@@ -64,7 +64,7 @@ Once paired, you'll be taken to the dashboard. Your device now appears in the "C
 </Steps>
 
 <Callout type="info">
-The pairing token expires after **5 minutes** and can only be used **once**. If it expires, click "Add Device" again to generate a new code.
+The pairing token expires after **15 minutes** and can only be used **once**. If it expires, click "Add Device" again to generate a new code.
 </Callout>
 
 ### Manual Entry
@@ -75,6 +75,14 @@ If you can't scan the QR code:
 2. Enter your **Server URL** — e.g., `https://tracearr.yourdomain.com`
 3. Enter the **Access Token** — shown below the QR code, starts with `trr_mob_...`
 4. Tap **Connect**
+
+### Session Expiry
+
+Paired devices use a **30-day rolling session**: any use within 30 days extends it, so a device you open regularly stays paired indefinitely. A device idle for more than 30 days needs to pair again.
+
+<Callout type="info">
+Devices paired before the authentication upgrade keep working on their existing tokens until they are re-paired; nothing expires them at 30 days. The 30-day rolling session applies to devices paired after upgrading.
+</Callout>
 
 ## Push Notifications
 
@@ -152,7 +160,7 @@ Click **Disable Mobile Access** to turn off the feature entirely. All devices wi
 
 ### "Invalid QR code" or "Pairing Failed"
 
-- The token may have expired (5-minute limit) — generate a new one
+- The token may have expired (15-minute limit) — generate a new one
 - Ensure your phone has a clear view of the QR code
 - Try manual entry instead
 

@@ -25,6 +25,10 @@ When you first access Tracearr, you'll be prompted to sign in or create an accou
 Plex servers must be owned by (or shared with admin access to) the Plex account you sign in with.
 </Callout>
 
+### Single Sign-On (OIDC)
+
+If your Tracearr instance is configured with an OIDC identity provider (Authentik, Authelia, Keycloak, and similar), the login page shows an SSO button. Click it to sign in through your provider, then connect servers as described below. See [OIDC Single Sign-On](/configuration/environment#oidc-single-sign-on) for the required environment variables.
+
 ### Jellyfin
 
 1. Click **Create Account** and set up a local Tracearr account
@@ -49,6 +53,10 @@ Plex servers must be owned by (or shared with admin access to) the Plex account 
 
 <Callout type="info">
 Jellyfin and Emby sessions are detected by polling out of the box. For instant, push-based sessions like Plex, install the [Tracearr SSE plugin](/configuration/realtime).
+</Callout>
+
+<Callout type="warning" title="Upgrading from an older version?">
+Signing in to Tracearr with Jellyfin credentials was removed. You sign in with a local Tracearr account, Plex, or SSO; Jellyfin and Emby servers are still fully supported for monitoring via API key as described above. If your install only ever logged in with Jellyfin credentials, see [Account Recovery](/configuration/recovery) to regain access.
 </Callout>
 
 ## Adding More Servers

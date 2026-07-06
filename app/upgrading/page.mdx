@@ -15,6 +15,24 @@ TimescaleDB and Redis are persisted in a volume, so your database and configurat
 If you run Jellyfin and plan to upgrade it to version 12, upgrade Tracearr to **1.4.29 or newer** at the same time. Jellyfin 12 disables legacy authorization, and older Tracearr versions can no longer connect to it. Tracearr 1.4.29+ works with both Jellyfin 12 and 10.11. See the [FAQ](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin) for details.
 </Callout>
 
+## Authentication Changes
+
+The latest release replaces Tracearr's authentication system. The upgrade itself requires nothing from you: no new environment variables are needed, and database migrations run automatically when the new version starts. What changes:
+
+1. **Jellyfin login is removed.** Signing in to Tracearr with Jellyfin credentials is no longer supported. Jellyfin and Emby servers are still fully supported for monitoring; only the login method is gone. If your install only ever logged in via Jellyfin, recover with either:
+   - the admin CLI: `docker exec -it tracearr node apps/server/scripts/cli.ts reset-password` (works even when the account has no existing password), or
+   - **Sign in with Plex**, when a Plex account is linked.
+
+   See [Account Recovery](/configuration/recovery) for details.
+
+2. **All web users must log in once after upgrading.** Existing web sessions are not carried over.
+
+3. **Mobile devices paired after upgrading use a 30-day rolling session.** Any use within 30 days extends it; a device idle for more than 30 days pairs again. Devices paired before the upgrade keep working on their existing tokens until they are re-paired; nothing expires them at 30 days.
+
+<Callout type="info" title="Reverse proxies">
+Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set `CORS_ORIGIN` to the public URL) for cookie login to work. See [Reverse Proxy](/configuration/environment#reverse-proxy).
+</Callout>
+
 ## Docker Compose
 
 This guide assumes you followed the [Quick Start](/getting-started/installation#quick-start) instructions to set up Tracearr with Docker Compose.
