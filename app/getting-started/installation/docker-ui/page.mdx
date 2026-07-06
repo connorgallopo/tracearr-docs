@@ -38,8 +38,9 @@ Most tools have an environment variables section below the compose editor — or
 |------|-------|
 | `JWT_SECRET` | A 64-character hex string |
 | `COOKIE_SECRET` | A different 64-character hex string |
+| `BETTER_AUTH_SECRET` | Optional — another 64-character hex string |
 
-You'll need to generate these values first. See [Generating Secrets](/getting-started/installation#generating-secrets-without-the-cli) for how — the online generator is the easiest option if you don't have a terminal.
+You'll need to generate these values first. See [Generating Secrets](/getting-started/installation#generating-secrets-without-the-cli) for how — the online generator is the easiest option if you don't have a terminal. `BETTER_AUTH_SECRET` is recommended but optional; when you leave it out, Tracearr derives it from `JWT_SECRET` automatically.
 
 You can also add optional variables like `TZ` (e.g. `America/New_York`), `PORT`, `LOG_LEVEL`, or `DB_PASSWORD`.
 

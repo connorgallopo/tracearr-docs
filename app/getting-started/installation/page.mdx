@@ -56,6 +56,8 @@ If you ran the Quick Start commands above, your secrets are already generated an
 
 Tracearr requires two secrets: `JWT_SECRET` and `COOKIE_SECRET`. Both need to be 64-character hexadecimal strings (a 256-bit key). These are used internally for signing authentication tokens and encrypting session cookies — they just need to be long, random, and unique to your installation.
 
+A third secret, `BETTER_AUTH_SECRET`, signs and encrypts login sessions. It is optional (when unset, Tracearr derives it from `JWT_SECRET` automatically), but we recommend setting it explicitly. Generate it the same way as the other two.
+
 If you're deploying through a [Docker UI](/getting-started/installation/docker-ui) or another tool where you need to provide the secrets yourself, here's how to generate them.
 
 ### Terminal
@@ -73,7 +75,7 @@ openssl rand -hex 32
 </Tabs.Tab>
 </Tabs>
 
-Run the command twice — once for `JWT_SECRET` and once for `COOKIE_SECRET`. Copy each output into your environment variable configuration.
+Run the command once per secret — `JWT_SECRET`, `COOKIE_SECRET`, and optionally `BETTER_AUTH_SECRET`. Copy each output into your environment variable configuration.
 
 ### Online generator
 
@@ -84,10 +86,10 @@ If you don't have terminal access, you can use [randomkeygen.com/random-string](
 3. Click **Generate**
 4. Copy the result
 
-Do this twice — you need one value for `JWT_SECRET` and a different one for `COOKIE_SECRET`. Don't reuse the same value for both.
+Do this once per secret — you need a different value for each of `JWT_SECRET`, `COOKIE_SECRET`, and (optionally) `BETTER_AUTH_SECRET`. Don't reuse the same value.
 
 <Callout type="warning" title="Keep your secrets private">
-Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them in support channels. If you think your secrets have been exposed, generate new ones and restart Tracearr — all existing sessions will be invalidated and users will need to log in again.
+Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them in support channels. If you think your secrets have been exposed, generate new ones and restart Tracearr — all existing sessions will be invalidated and users will need to log in again. Note that rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates web sessions and paired mobile devices, not just legacy tokens.
 </Callout>
 
 ---

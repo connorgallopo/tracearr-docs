@@ -16,6 +16,8 @@ Tracearr uses environment variables for core configuration.
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL/TimescaleDB connection string | `postgres://user:pass@host:5432/tracearr` |
 | `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `JWT_SECRET` | Signing key for authentication tokens | 64-character hex string |
+| `COOKIE_SECRET` | Cookie signing key | 64-character hex string |
 
 ## Optional Variables
 
@@ -24,9 +26,14 @@ Tracearr uses environment variables for core configuration.
 | `PORT` | HTTP server port | `3000` |
 | `NODE_ENV` | Environment mode | `production` |
 | `LOG_LEVEL` | Logging verbosity | `info` |
-| `SESSION_SECRET` | Session encryption key | (generated) |
+| `BETTER_AUTH_SECRET` | Session signing/encryption key | derived from `JWT_SECRET` |
 | `TZ` | Timezone | `UTC` |
-| `CORS_ORIGIN` | Allowed CORS origin for API requests | `*` |
+| `CORS_ORIGIN` | Allowed CORS origin for API requests | reflects the request origin |
+| `TRUST_PROXY` | Trust `X-Forwarded-*` headers from a reverse proxy | `false` |
+| `OIDC_ISSUER_URL` | OIDC issuer base URL | none |
+| `OIDC_CLIENT_ID` | OIDC client ID | none |
+| `OIDC_CLIENT_SECRET` | OIDC client secret | none |
+| `OIDC_PROVIDER_NAME` | Label for the SSO login button | `SSO` |
 | `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
 | `CLAIM_CODE` | Claim code for first time setup | none |
 | `BASE_PATH` | Base path when served under a subpath | none |
@@ -65,6 +72,53 @@ Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensur
 ```bash
 REDIS_PREFIX=myprefix:
 ```
+
+## Authentication Secrets
+
+Tracearr requires two secrets, each a long random string unique to your installation (generate with `openssl rand -hex 32`):
+
+- `JWT_SECRET` signs authentication tokens, including tokens for mobile devices paired on older versions.
+- `COOKIE_SECRET` signs cookies.
+
+A third secret, `BETTER_AUTH_SECRET`, signs and encrypts web and mobile sessions. It is optional: when unset, Tracearr derives it from `JWT_SECRET` (HKDF-SHA256), so existing installs need no new configuration. Setting it explicitly is recommended. Tracearr fails to start only when neither `BETTER_AUTH_SECRET` nor `JWT_SECRET` is set.
+
+```bash
+JWT_SECRET=<64-character hex string>
+COOKIE_SECRET=<64-character hex string>
+BETTER_AUTH_SECRET=<64-character hex string>  # optional, recommended
+```
+
+<Callout type="warning">
+Rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates all web sessions and paired mobile devices. If you run multiple Tracearr instances against the same database, every instance must share the same `BETTER_AUTH_SECRET`, or the same `JWT_SECRET` when relying on derivation.
+</Callout>
+
+## OIDC Single Sign-On
+
+Tracearr supports login through an OIDC identity provider (Authentik, Authelia, Keycloak, and similar). OIDC login is enabled only when all three of `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, and `OIDC_CLIENT_SECRET` are set.
+
+```bash
+OIDC_ISSUER_URL=https://auth.example.com
+OIDC_CLIENT_ID=tracearr
+OIDC_CLIENT_SECRET=<from your identity provider>
+OIDC_PROVIDER_NAME=Authentik  # optional, defaults to "SSO"
+```
+
+When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`.
+
+## Reverse Proxy
+
+Behind an HTTPS reverse proxy, logins work as long as the proxy preserves the `Host` header, forwards `X-Forwarded-Host`, or `CORS_ORIGIN` is set to the public URL. Forward `X-Forwarded-Proto` so session cookies carry the `Secure` attribute over HTTPS.
+
+```bash
+CORS_ORIGIN=https://tracearr.example.com
+TRUST_PROXY=true
+```
+
+When `CORS_ORIGIN` is unset, the API reflects the request origin. Set `TRUST_PROXY=true` so Tracearr resolves the real client IP from `X-Forwarded-*` headers; this makes sign-in rate limits count per client instead of per proxy.
+
+<Callout type="info">
+Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set `CORS_ORIGIN` to the public URL) for cookie login to work.
+</Callout>
 
 ## Claim Code
 

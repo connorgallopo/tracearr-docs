@@ -43,6 +43,8 @@ kubectl get secret tracearr -n tracearr -o jsonpath='{.data.COOKIE_SECRET}' | ba
 ```
 
 Back these up if you plan to reinstall — losing them invalidates all user sessions.
+
+The chart does not manage a `BETTER_AUTH_SECRET` value. Tracearr derives it from `JWT_SECRET` automatically, so chart installs need no extra configuration. If you want to set it explicitly, add it as an environment variable on the Tracearr deployment.
 </Callout>
 
 ---
