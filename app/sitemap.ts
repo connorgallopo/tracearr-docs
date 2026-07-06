@@ -121,6 +121,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/configuration/recovery`,
+      lastModified: getLastModified("configuration/recovery/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/configuration/debug`,
       lastModified: getLastModified("configuration/debug/page.mdx"),
       changeFrequency: "monthly",

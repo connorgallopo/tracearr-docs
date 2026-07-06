@@ -164,6 +164,8 @@ See the [Jellyfin reverse proxy documentation](https://jellyfin.org/docs/general
 - Media server's "Known Proxies" includes your reverse proxy's IP address
 - For Docker setups, ensure the proxy sees real client IPs (not Docker network IPs)
 
+If Tracearr itself is behind a reverse proxy, see the [Reverse Proxy](/configuration/environment#reverse-proxy) section of the environment variables reference for the `TRUST_PROXY` and `CORS_ORIGIN` settings.
+
 ---
 
 ### The location data is wrong / IP geolocation is inaccurate
@@ -199,7 +201,7 @@ You can reset your password using the built-in CLI script. No access to the web 
 
 This resets the password for your Tracearr user account, not your media server accounts.
 
-It will not work if you are using external authentication (e.g., Plex Sign-In) since those users don't have local passwords.
+It works for any user, including accounts that only ever signed in with Plex: if the account has no local password yet, the reset creates one. As a security measure, resetting a password also signs out all of that user's existing sessions.
 
 <Tabs items={['Docker', 'Proxmox LXC']} defaultIndex={0}>
 <Tabs.Tab>
@@ -221,6 +223,14 @@ node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
 ```
 </Tabs.Tab>
 </Tabs>
+
+Tracearr also ships a fuller admin recovery CLI with commands for resetting passwords, changing usernames and emails, listing users, and re-enabling local login:
+
+```bash
+docker exec -it tracearr node apps/server/scripts/cli.ts <command>
+```
+
+See [Account Recovery](/configuration/recovery) for all commands and lockout scenarios.
 
 ---
 

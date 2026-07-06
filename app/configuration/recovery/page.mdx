@@ -1,0 +1,107 @@
+---
+title: Account Recovery & Admin CLI
+description: Recover access to a locked-out Tracearr instance. Reset passwords, list users, change usernames and emails, and re-enable local login with the built-in admin CLI.
+---
+
+import { Callout, Tabs } from "nextra/components"
+
+# Account Recovery
+
+If you're locked out of your Tracearr instance, you can recover access with the built-in admin CLI. It runs directly against the database, so no working web login is required — you only need shell access to wherever Tracearr runs.
+
+## Common Lockout Scenarios
+
+**You upgraded and used to sign in with Jellyfin credentials.** Signing in to Tracearr with Jellyfin credentials was removed. Jellyfin and Emby servers are still fully supported for monitoring; only the login method is gone. Run [`reset-password`](#reset-password) to set a password for your account, then sign in with it. If your account has a linked Plex account, **Sign in with Plex** also works with no CLI needed.
+
+**You forgot your password.** Run [`reset-password`](#reset-password). It works even when the account only ever signed in with Plex and has no password at all.
+
+**Local login is disabled and SSO is broken.** If a misconfigured OIDC provider (or a disabled local login setting) leaves the login page unusable, run [`enable-local-login`](#enable-local-login), then sign in with username and password.
+
+**You're not sure which account is which.** Run [`list-users`](#list-users) to see every user with their email, role, and available login methods.
+
+<Callout type="info">
+If your account has a linked Plex account, **Sign in with Plex** keeps working through all of these scenarios — try it before reaching for the CLI.
+</Callout>
+
+## Running the CLI
+
+<Tabs items={['Docker', 'Proxmox LXC', 'From source (pnpm)']} defaultIndex={0}>
+<Tabs.Tab>
+```bash
+docker exec -it tracearr node apps/server/scripts/cli.ts <command> [args]
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash
+node /opt/tracearr/apps/server/scripts/cli.ts <command> [args]
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```bash
+pnpm --filter @tracearr/server cli <command> [args]
+```
+</Tabs.Tab>
+</Tabs>
+
+Running it without a command prints the usage summary.
+
+## Commands
+
+### reset-password
+
+```bash
+docker exec -it tracearr node apps/server/scripts/cli.ts reset-password [username] [--generate]
+```
+
+Resets a user's password. Without a username it targets the owner account. By default it prompts you to enter a new password; pass `--generate` to have it generate and print a random one instead.
+
+Key behaviors:
+
+- Works even when the account has no existing password (for example, an owner who only ever signed in with Plex or Jellyfin) — local username/password login is created for the account.
+- Signs out all of the user's existing sessions as a security measure.
+- If Redis is unreachable, the command fails without changing the password. Fix Redis connectivity and re-run it.
+
+```bash
+# Reset the owner's password interactively
+docker exec -it tracearr node apps/server/scripts/cli.ts reset-password
+
+# Reset a specific user's password to a generated value
+docker exec -it tracearr node apps/server/scripts/cli.ts reset-password alice --generate
+```
+
+### set-username
+
+```bash
+docker exec -it tracearr node apps/server/scripts/cli.ts set-username <current-username> <new-username>
+```
+
+Renames a user's login username. Usernames are stored lowercase; the command fails cleanly if the new name is already taken by another login-enabled account.
+
+### set-email
+
+```bash
+docker exec -it tracearr node apps/server/scripts/cli.ts set-email <username> <new-email>
+```
+
+Changes a user's email address. The command fails cleanly if the email is already in use by another account.
+
+### list-users
+
+```bash
+docker exec tracearr node apps/server/scripts/cli.ts list-users
+```
+
+Lists every user with their username, email, role, and login methods (for example `credential`, `plex`).
+
+### enable-local-login
+
+```bash
+docker exec tracearr node apps/server/scripts/cli.ts enable-local-login
+```
+
+Re-enables local username/password login. Use this when an OIDC misconfiguration or a disabled local login setting has made the login page unusable. Combine with [`reset-password`](#reset-password) if you also need a working password.
+
+## Related
+
+- [How do I reset my Tracearr password?](/faq#how-do-i-reset-my-tracearr-password) in the FAQ covers the simpler `reset-password.ts` wrapper script.
+- [Environment Variables](/configuration/environment#oidc-single-sign-on) documents the OIDC login configuration.
