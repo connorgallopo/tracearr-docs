@@ -75,7 +75,7 @@ openssl rand -hex 32
 </Tabs.Tab>
 </Tabs>
 
-Run the command once per secret — `JWT_SECRET`, `COOKIE_SECRET`, and optionally `BETTER_AUTH_SECRET`. Copy each output into your environment variable configuration.
+Run the command once per secret: `JWT_SECRET`, `COOKIE_SECRET`, and optionally `BETTER_AUTH_SECRET`. Copy each output into your environment variable configuration.
 
 ### Online generator
 
@@ -86,10 +86,10 @@ If you don't have terminal access, you can use [randomkeygen.com/random-string](
 3. Click **Generate**
 4. Copy the result
 
-Do this once per secret — you need a different value for each of `JWT_SECRET`, `COOKIE_SECRET`, and (optionally) `BETTER_AUTH_SECRET`. Don't reuse the same value.
+Do this once per secret: you need a different value for each of `JWT_SECRET`, `COOKIE_SECRET`, and (optionally) `BETTER_AUTH_SECRET`. Don't reuse the same value.
 
 <Callout type="warning" title="Keep your secrets private">
-Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them in support channels. If you think your secrets have been exposed, generate new ones and restart Tracearr — all existing sessions will be invalidated and users will need to log in again. Note that rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates web sessions and paired mobile devices, not just legacy tokens.
+Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them in support channels. If you think your secrets have been exposed, generate new ones and restart Tracearr. All existing sessions will be invalidated and users will need to log in again. Note that rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates web sessions and paired mobile devices, not just legacy tokens.
 </Callout>
 
 ---

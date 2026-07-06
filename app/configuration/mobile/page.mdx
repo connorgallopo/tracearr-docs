@@ -78,7 +78,7 @@ If you can't scan the QR code:
 
 ### Session Expiry
 
-Paired devices use a **30-day rolling session**: any use within 30 days extends it, so a device you open regularly stays paired indefinitely. A device idle for more than 30 days needs to pair again.
+Devices paired after the authentication upgrade use a **30-day rolling session**: any use within 30 days extends it, so a device you open regularly stays paired indefinitely. A device idle for more than 30 days needs to pair again.
 
 <Callout type="info">
 Devices paired before the authentication upgrade keep working on their existing tokens until they are re-paired; nothing expires them at 30 days. The 30-day rolling session applies to devices paired after upgrading.
@@ -160,7 +160,7 @@ Click **Disable Mobile Access** to turn off the feature entirely. All devices wi
 
 ### "Invalid QR code" or "Pairing Failed"
 
-- The token may have expired (15-minute limit) — generate a new one
+- The token may have expired (15-minute limit). Generate a new one
 - Ensure your phone has a clear view of the QR code
 - Try manual entry instead
 

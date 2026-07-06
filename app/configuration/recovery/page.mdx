@@ -7,7 +7,7 @@ import { Callout, Tabs } from "nextra/components"
 
 # Account Recovery
 
-If you're locked out of your Tracearr instance, you can recover access with the built-in admin CLI. It runs directly against the database, so no working web login is required — you only need shell access to wherever Tracearr runs.
+If you're locked out of your Tracearr instance, you can recover access with the built-in admin CLI. It runs directly against the database, so no working web login is required. You only need shell access to wherever Tracearr runs.
 
 ## Common Lockout Scenarios
 
@@ -20,7 +20,7 @@ If you're locked out of your Tracearr instance, you can recover access with the 
 **You're not sure which account is which.** Run [`list-users`](#list-users) to see every user with their email, role, and available login methods.
 
 <Callout type="info">
-If your account has a linked Plex account, **Sign in with Plex** keeps working through all of these scenarios — try it before reaching for the CLI.
+If your account has a linked Plex account, **Sign in with Plex** keeps working through all of these scenarios. Try it before reaching for the CLI.
 </Callout>
 
 ## Running the CLI
@@ -57,7 +57,7 @@ Resets a user's password. Without a username it targets the owner account. By de
 
 Key behaviors:
 
-- Works even when the account has no existing password (for example, an owner who only ever signed in with Plex or Jellyfin) — local username/password login is created for the account.
+- Works even when the account has no existing password (for example, an owner who only ever signed in with Plex or Jellyfin). In that case, local username/password login is created for the account.
 - Signs out all of the user's existing sessions as a security measure.
 - If Redis is unreachable, the command fails without changing the password. Fix Redis connectivity and re-run it.
 
