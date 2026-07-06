@@ -207,19 +207,19 @@ It works for any user, including accounts that only ever signed in with Plex: if
 <Tabs.Tab>
 ```bash
 # Interactive mode (you will be prompted to enter a new password)
-docker exec -it tracearr node apps/server/scripts/reset-password.ts
+docker exec -it tracearr node apps/server/dist/scripts/reset-password.js
 
 # Non-interactive mode (sets password to "newpassword123")
-docker exec -it tracearr node apps/server/scripts/reset-password.ts newpassword123
+docker exec -it tracearr node apps/server/dist/scripts/reset-password.js newpassword123
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```bash
 # Interactive mode (you will be prompted to enter a new password)
-node /opt/tracearr/apps/server/scripts/reset-password.ts
+node /opt/tracearr/apps/server/dist/scripts/reset-password.js
 
 # Non-interactive mode (sets password to "newpassword123")
-node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
+node /opt/tracearr/apps/server/dist/scripts/reset-password.js newpassword123
 ```
 </Tabs.Tab>
 </Tabs>
@@ -227,7 +227,7 @@ node /opt/tracearr/apps/server/scripts/reset-password.ts newpassword123
 Tracearr also ships a fuller admin recovery CLI with commands for resetting passwords, changing usernames and emails, listing users, and re-enabling local login:
 
 ```bash
-docker exec -it tracearr node apps/server/scripts/cli.ts <command>
+docker exec -it tracearr node apps/server/dist/scripts/cli.js <command>
 ```
 
 See [Account Recovery](/configuration/recovery) for all commands and lockout scenarios.

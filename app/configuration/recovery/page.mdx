@@ -28,12 +28,12 @@ If your account has a linked Plex account, **Sign in with Plex** keeps working t
 <Tabs items={['Docker', 'Proxmox LXC', 'From source (pnpm)']} defaultIndex={0}>
 <Tabs.Tab>
 ```bash
-docker exec -it tracearr node apps/server/scripts/cli.ts <command> [args]
+docker exec -it tracearr node apps/server/dist/scripts/cli.js <command> [args]
 ```
 </Tabs.Tab>
 <Tabs.Tab>
 ```bash
-node /opt/tracearr/apps/server/scripts/cli.ts <command> [args]
+node /opt/tracearr/apps/server/dist/scripts/cli.js <command> [args]
 ```
 </Tabs.Tab>
 <Tabs.Tab>
@@ -50,7 +50,7 @@ Running it without a command prints the usage summary.
 ### reset-password
 
 ```bash
-docker exec -it tracearr node apps/server/scripts/cli.ts reset-password [username] [--generate]
+docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password [username] [--generate]
 ```
 
 Resets a user's password. Without a username it targets the owner account. By default it prompts you to enter a new password; pass `--generate` to have it generate and print a random one instead.
@@ -63,16 +63,16 @@ Key behaviors:
 
 ```bash
 # Reset the owner's password interactively
-docker exec -it tracearr node apps/server/scripts/cli.ts reset-password
+docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password
 
 # Reset a specific user's password to a generated value
-docker exec -it tracearr node apps/server/scripts/cli.ts reset-password alice --generate
+docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password alice --generate
 ```
 
 ### set-username
 
 ```bash
-docker exec -it tracearr node apps/server/scripts/cli.ts set-username <current-username> <new-username>
+docker exec -it tracearr node apps/server/dist/scripts/cli.js set-username <current-username> <new-username>
 ```
 
 Renames a user's login username. Usernames are stored lowercase; the command fails cleanly if the new name is already taken by another login-enabled account.
@@ -80,7 +80,7 @@ Renames a user's login username. Usernames are stored lowercase; the command fai
 ### set-email
 
 ```bash
-docker exec -it tracearr node apps/server/scripts/cli.ts set-email <username> <new-email>
+docker exec -it tracearr node apps/server/dist/scripts/cli.js set-email <username> <new-email>
 ```
 
 Changes a user's email address. The command fails cleanly if the email is already in use by another account.
@@ -88,7 +88,7 @@ Changes a user's email address. The command fails cleanly if the email is alread
 ### list-users
 
 ```bash
-docker exec tracearr node apps/server/scripts/cli.ts list-users
+docker exec tracearr node apps/server/dist/scripts/cli.js list-users
 ```
 
 Lists every user with their username, email, role, and login methods (for example `credential`, `plex`).
@@ -96,12 +96,12 @@ Lists every user with their username, email, role, and login methods (for exampl
 ### enable-local-login
 
 ```bash
-docker exec tracearr node apps/server/scripts/cli.ts enable-local-login
+docker exec tracearr node apps/server/dist/scripts/cli.js enable-local-login
 ```
 
 Re-enables local username/password login. Use this when an OIDC misconfiguration or a disabled local login setting has made the login page unusable. Combine with [`reset-password`](#reset-password) if you also need a working password.
 
 ## Related
 
-- [How do I reset my Tracearr password?](/faq#how-do-i-reset-my-tracearr-password) in the FAQ covers the simpler `reset-password.ts` wrapper script.
+- [How do I reset my Tracearr password?](/faq#how-do-i-reset-my-tracearr-password) in the FAQ covers the simpler `reset-password.js` wrapper script.
 - [Environment Variables](/configuration/environment#oidc-single-sign-on) documents the OIDC login configuration.

@@ -20,7 +20,7 @@ If you run Jellyfin and plan to upgrade it to version 12, upgrade Tracearr to **
 The latest release replaces Tracearr's authentication system. The upgrade itself requires nothing from you: no new environment variables are needed, and database migrations run automatically when the new version starts. What changes:
 
 1. **Jellyfin login is removed.** Signing in to Tracearr with Jellyfin credentials is no longer supported. Jellyfin and Emby servers are still fully supported for monitoring; only the login method is gone. If your install only ever logged in via Jellyfin, recover with either:
-   - the admin CLI: `docker exec -it tracearr node apps/server/scripts/cli.ts reset-password` (works even when the account has no existing password), or
+   - the admin CLI: `docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password` (works even when the account has no existing password), or
    - **Sign in with Plex**, when a Plex account is linked.
 
    See [Account Recovery](/configuration/recovery) for details.
