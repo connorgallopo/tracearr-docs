@@ -94,7 +94,7 @@ Rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is n
 
 ## OIDC Single Sign-On
 
-Tracearr supports login through an OIDC identity provider (Authentik, Authelia, Keycloak, and similar). OIDC login is enabled only when all three of `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, and `OIDC_CLIENT_SECRET` are set.
+Tracearr supports login through an OIDC identity provider (Authentik, Authelia, Keycloak, and similar). OIDC login is enabled only when all three of `OIDC_ISSUER_URL`, `OIDC_CLIENT_ID`, and `OIDC_CLIENT_SECRET` are set. The endpoint for the redirect URI is at `/api/v1/auth/oauth2/callback/oidc`.
 
 ```bash
 OIDC_ISSUER_URL=https://auth.example.com
