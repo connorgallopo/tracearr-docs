@@ -133,6 +133,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/api`,
+      lastModified: getLastModified("api/page.tsx"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/upgrading`,
       lastModified: getLastModified("upgrading/page.mdx"),
       changeFrequency: "monthly",
