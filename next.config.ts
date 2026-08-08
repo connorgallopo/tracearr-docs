@@ -20,12 +20,22 @@ export default withNextra({
         permanent: true,
       },
       {
+        source: "/rules",
+        destination: "/configuration/rules",
+        permanent: true,
+      },
+      {
         source: "/update",
         destination: "/upgrading",
         permanent: true,
       },
       {
         source: "/analytics",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/performance",
         destination: "/",
         permanent: true,
       },
