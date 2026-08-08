@@ -139,6 +139,42 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/sse-plugin`,
+      lastModified: getLastModified("sse-plugin/page.mdx"),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/sse-plugin/installation`,
+      lastModified: getLastModified("sse-plugin/installation/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/sse-plugin/events`,
+      lastModified: getLastModified("sse-plugin/events/page.mdx"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/sse-plugin/consuming`,
+      lastModified: getLastModified("sse-plugin/consuming/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/sse-plugin/comparison`,
+      lastModified: getLastModified("sse-plugin/comparison/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/sse-plugin/troubleshooting`,
+      lastModified: getLastModified("sse-plugin/troubleshooting/page.mdx"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/upgrading`,
       lastModified: getLastModified("upgrading/page.mdx"),
       changeFrequency: "monthly",

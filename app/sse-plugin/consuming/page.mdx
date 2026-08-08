@@ -1,0 +1,136 @@
+---
+title: Consuming the Stream - curl, Browser, Node, Python
+description: Connect to the Jellyfin or Emby SSE endpoint from curl, a browser EventSource, Node, or Python, with reconnect and resync patterns that hold up.
+---
+
+import { Callout, Tabs } from "nextra/components"
+
+# Consuming the Stream
+
+The endpoint speaks standard Server-Sent Events over HTTP. Any language with an HTTP client that can read a response body incrementally can consume it: no SDK, no library requirement.
+
+## curl
+
+The quickest way to watch events live:
+
+<Tabs items={['Jellyfin', 'Emby']}>
+<Tabs.Tab>
+
+```bash
+curl -N -H 'Authorization: MediaBrowser Token="YOUR_API_KEY"' \
+  http://your-jellyfin:8096/api/sse/events
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```bash
+curl -N -H 'X-Emby-Token: YOUR_API_KEY' \
+  http://your-emby:8096/emby/sse/events
+```
+
+</Tabs.Tab>
+</Tabs>
+
+`-N` disables curl's output buffering so events print as they arrive.
+
+## Browser (EventSource)
+
+The browser's built-in `EventSource` can't set request headers, so on Jellyfin pass the token as a query parameter instead:
+
+```js
+const source = new EventSource(
+  "http://your-jellyfin:8096/api/sse/events?api_key=YOUR_API_KEY"
+);
+
+source.addEventListener("playing", (e) => {
+  const evt = JSON.parse(e.data);
+  console.log(`${evt.userId} started playing ${evt.itemId}`);
+});
+
+source.addEventListener("server.stats", (e) => {
+  const stats = JSON.parse(e.data);
+  console.log(`CPU ${stats.hostCpuUtilization}%`);
+});
+```
+
+`EventSource` reconnects automatically after a drop, which is the behavior you want here.
+
+<Callout type="warning">
+A token in a URL lands in server access logs and browser history. Use the query parameter for local tooling and dashboards on your own network; use a header-capable client for anything else. Emby's endpoint authenticates via the `X-Emby-Token` header, so browser `EventSource` isn't an option there; use a server-side proxy or one of the clients below.
+</Callout>
+
+## Node
+
+Node 18+ can stream the response body with plain `fetch`, headers included:
+
+```js
+const res = await fetch("http://your-jellyfin:8096/api/sse/events", {
+  headers: { Authorization: 'MediaBrowser Token="YOUR_API_KEY"' },
+});
+
+let buffer = "";
+for await (const chunk of res.body.pipeThrough(new TextDecoderStream())) {
+  buffer += chunk;
+  const frames = buffer.split("\n\n");
+  buffer = frames.pop(); // keep the partial frame
+
+  for (const frame of frames) {
+    const event = frame.match(/^event: (.*)$/m)?.[1];
+    const data = frame.match(/^data: (.*)$/m)?.[1];
+    if (event && data) {
+      console.log(event, JSON.parse(data));
+    }
+  }
+}
+```
+
+Wrap this in a reconnect loop for anything long-running; the pattern is below.
+
+## Python
+
+With [`httpx`](https://www.python-httpx.org/):
+
+```python
+import httpx
+import json
+
+headers = {"Authorization": 'MediaBrowser Token="YOUR_API_KEY"'}
+
+with httpx.stream(
+    "GET",
+    "http://your-jellyfin:8096/api/sse/events",
+    headers=headers,
+    timeout=httpx.Timeout(10, read=None),
+) as response:
+    event = None
+    for line in response.iter_lines():
+        if line.startswith("event: "):
+            event = line[7:]
+        elif line.startswith("data: ") and event:
+            print(event, json.loads(line[6:]))
+            event = None
+```
+
+`read=None` matters: the connection stays open indefinitely, and the default read timeout would kill it between events. The 30-second `ping` guarantees you never wait longer than that for a line.
+
+## Reconnect and Resync
+
+Two things are true of any SSE stream, this one included:
+
+1. Connections drop: server restarts, network blips, an intermediary timing out.
+2. Events that fired while you were disconnected are gone. The stream is a live signal, not a queue.
+
+So the durable pattern is: on every (re)connect, poll the server once to re-establish current state (`/Sessions` for playback, your library sync for content), then rely on events until the next drop. A client that falls more than 512 events behind is disconnected on purpose for the same reason: reconnecting and resyncing beats silently missing events.
+
+The `hello` event tells you each connection attempt actually reached the plugin, and `ping` every 30 seconds tells you the connection is still alive.
+
+## What People Build on This
+
+A few concrete shapes this stream fits, drawn from what people already bolt onto media server events today:
+
+- Home Assistant automations: dim the lights on `playing`, raise them on `paused`, without a webhook receiver or polling.
+- Pause qBittorrent (or throttle anything) while streams are active, event-driven instead of a 30-second poll.
+- Notifications with your own logic (Discord, ntfy, Gotify) triggered from a 20-line script instead of a plugin's template system.
+- Live dashboards fed by `server.stats` and session events.
+- Scrobbling and watch-state sync driven by `stopped` with `playedToCompletion`.

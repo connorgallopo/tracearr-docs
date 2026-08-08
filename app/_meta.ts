@@ -2,6 +2,7 @@ export default {
   index: 'Introduction',
   'getting-started': 'Getting Started',
   configuration: 'Configuration',
+  'sse-plugin': 'SSE Plugin',
   upgrading: 'Upgrading',
   api: {
     title: 'API Reference',

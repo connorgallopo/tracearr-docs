@@ -1,0 +1,110 @@
+---
+title: Install the SSE Plugin - Jellyfin & Emby
+description: Install the Tracearr SSE plugin from the Jellyfin plugin repository or the Emby release zip, then verify the event stream with curl.
+---
+
+import { Callout, Steps, Tabs } from "nextra/components"
+
+# Installation
+
+Jellyfin installs from a plugin repository through the dashboard. Emby has no user-pasteable repository equivalent, so the Emby plugin installs manually from the release zip.
+
+<Callout type="info">
+Using Tracearr? **Settings** → **Servers** → **Set up real-time updates** on a Jellyfin or Emby server card walks through these same steps with a copy button for the URL, and the card shows the live connection status once the plugin is running.
+</Callout>
+
+<Tabs items={['Jellyfin', 'Emby']}>
+<Tabs.Tab>
+
+Requires Jellyfin 10.11 or newer.
+
+<Steps>
+
+### Add the repository
+
+In your Jellyfin dashboard, go to **Plugins** → **Repositories** and add a repository named **Tracearr** with this URL:
+
+```
+https://raw.githubusercontent.com/Tracearr/Media-Server-SSE/main/manifest.json
+```
+
+### Install from the catalog
+
+Open the **Catalog** tab and install **Tracearr SSE**.
+
+### Restart Jellyfin
+
+Restart Jellyfin to load the plugin.
+
+</Steps>
+
+Plugin updates show up in the catalog like any other Jellyfin plugin.
+
+If you'd rather not add a repository: download `Tracearr.Sse.Jellyfin_<version>.zip` from [Releases](https://github.com/Tracearr/Media-Server-SSE/releases) and extract `Jellyfin.Plugin.Sse.dll` and `MediaServer.Sse.Core.dll` into `plugins/Tracearr SSE/` inside your Jellyfin data directory, then restart.
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+Requires Emby 4.9 or newer. No Emby Premiere subscription is needed.
+
+<Steps>
+
+### Download the plugin
+
+Download the latest `Tracearr.Sse.Emby_<version>.zip` from the [releases page](https://github.com/Tracearr/Media-Server-SSE/releases).
+
+### Install the DLL
+
+Extract `Emby.Plugin.Sse.dll` into Emby's `programdata/plugins/` directory.
+
+### Restart Emby
+
+Restart Emby to load the plugin.
+
+</Steps>
+
+To update, repeat the same steps with the new release zip.
+
+</Tabs.Tab>
+</Tabs>
+
+## Verify It's Working
+
+Connect to the endpoint with `curl`. The plugin answers immediately with a `hello` event carrying its version:
+
+<Tabs items={['Jellyfin', 'Emby']}>
+<Tabs.Tab>
+
+```bash
+curl -N -H 'Authorization: MediaBrowser Token="YOUR_API_KEY"' \
+  http://your-jellyfin:8096/api/sse/events
+```
+
+</Tabs.Tab>
+<Tabs.Tab>
+
+```bash
+curl -N -H 'X-Emby-Token: YOUR_API_KEY' \
+  http://your-emby:8096/emby/sse/events
+```
+
+</Tabs.Tab>
+</Tabs>
+
+```
+event: hello
+data: {"version":"0.4.0.0","server":"jellyfin"}
+```
+
+Leave it running and start playback on any device; a `playing` event should arrive within a second. If nothing comes through, see [Troubleshooting](/sse-plugin/troubleshooting).
+
+## Verifying Release Files
+
+Each release includes SHA-256 checksums and a GitHub build attestation:
+
+```bash
+sha256sum -c SHA256SUMS
+gh attestation verify Tracearr.Sse.Jellyfin_<version>.zip --owner Tracearr
+```
+
+The attestation proves the zip was built by this repository's CI from public source.

@@ -1,0 +1,68 @@
+---
+title: Troubleshooting the SSE Plugin
+description: Fixes for 401s, silent streams, reverse proxy buffering, and repeated disconnects on the Jellyfin and Emby SSE endpoint.
+---
+
+import { Callout } from "nextra/components"
+
+# Troubleshooting
+
+Work top to bottom; each check assumes the previous one passed.
+
+## 401 Unauthorized
+
+The token isn't reaching the server in a form it accepts.
+
+- **Jellyfin:** the header is `Authorization: MediaBrowser Token="YOUR_API_KEY"`. The `MediaBrowser` prefix and quotes around the token are part of the format. `X-Emby-Token: YOUR_API_KEY` and `?api_key=YOUR_API_KEY` also work.
+- **Emby:** use `X-Emby-Token: YOUR_API_KEY`.
+- API keys are created in the server dashboard, not user passwords or usernames. A user access token from a login session also works on Jellyfin.
+
+## 404 Not Found
+
+- **Jellyfin:** the path is `/api/sse/events`. A 404 usually means the plugin isn't loaded: check **Dashboard** → **Plugins** for **Tracearr SSE** with status Active, and confirm the server was restarted after install.
+- **Emby:** the path is `/emby/sse/events`, not `/api/sse/events`.
+- Jellyfin older than 10.11 won't load the plugin at all; the release targets ABI 10.11.
+
+## Connected, `hello` Arrives, Then Nothing
+
+The stream is working; there's nothing to report yet.
+
+- `ping` arrives every 30 seconds regardless. If pings come through, the connection is healthy.
+- Playback events only fire for actual media playback; theme music and local trailers are filtered out on purpose.
+- `progress` events arrive at whatever rate the server reports, typically every 5–10 seconds during playback.
+- `server.stats` arrives every 6 seconds, but host CPU/RAM values only exist on Linux hosts.
+
+Start a movie on any device. If a `playing` event doesn't arrive within a couple of seconds, check the server log for entries from the plugin.
+
+## Events Stall Behind a Reverse Proxy
+
+Buffering proxies hold small responses until a buffer fills, which is fatal for a stream that trickles. The plugin sends `X-Accel-Buffering: no`, which nginx honors by default, so most setups work untouched. If yours doesn't:
+
+```nginx
+location /api/sse/ {
+    proxy_pass http://jellyfin:8096;
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 1h;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+}
+```
+
+`proxy_read_timeout` matters too: nginx's default is 60 seconds, and while the 30-second ping normally stays under it, a stricter local value will cut idle streams. Cloudflare's proxy passes SSE but enforces its own idle timeout; the ping keeps the stream under that as well.
+
+## Client Keeps Getting Disconnected
+
+If the server log shows `disconnected on buffer overflow`, your client is reading slower than events arrive. Each client gets a 512-event buffer; when it fills, the plugin ends that stream on purpose so the client reconnects and resyncs instead of silently losing events. Read in a tight loop and hand events off to slow work (database writes, HTTP calls) asynchronously.
+
+Disconnects without overflow log lines are network-path issues: see the reverse proxy section above, and check for anything between client and server that recycles long-lived connections.
+
+## Tracearr Doesn't Show the Real-Time Badge
+
+- Tracearr detects the plugin automatically, but only on a server it's already connected to; check the server card in **Settings** → **Servers**.
+- The Tracearr container must be able to reach the media server URL you configured; if Tracearr connects through a reverse proxy, the SSE path has to survive it (see above).
+- Sessions still work without the plugin via polling, so streams appearing with a short delay means the SSE link specifically is down, not the server connection.
+
+## Still Stuck
+
+Server-side messages from the plugin appear in the normal Jellyfin/Emby log; search it for `SSE`. Open an issue at [Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE/issues) with the log lines, or ask in the [Discord](https://discord.gg/a7n3sFd2Yw).

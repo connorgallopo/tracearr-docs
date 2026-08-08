@@ -236,9 +236,12 @@ See [Account Recovery](/configuration/recovery) for all commands and lockout sce
 
 ### Server Resources is empty
 
-The Server Resources panel (CPU, memory, and transcoder metrics) is only available for **Plex** and requires **Plex Pass**. Plex's resource monitoring API is a Plex Pass feature, and Tracearr currently does not detect whether your account has Plex Pass.
+What the Server Resources panel needs depends on the server:
 
-If you're using Jellyfin or Emby, this section will not be displayed as these servers do not expose resource metrics through their APIs.
+- **Plex** requires **Plex Pass**: resource monitoring is a Plex Pass API feature, and Tracearr currently does not detect whether your account has it.
+- **Jellyfin and Emby** don't expose CPU or memory through their APIs at all. Installing the [SSE plugin](/sse-plugin) (v0.4 or newer) fills the panel with a live sample every 6 seconds. Host-level values require the media server to run on Linux, including in a container.
+
+If the panel is empty, the server you're looking at is missing its respective requirement above.
 
 ---
 

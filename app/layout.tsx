@@ -175,6 +175,7 @@ export default async function RootLayout({
           navbar={navbar}
           footer={footer}
           pageMap={await getPageMap()}
+          sidebar={{ defaultMenuCollapseLevel: 1, autoCollapse: true }}
           docsRepositoryBase="https://github.com/connorgallopo/tracearr-docs/tree/main"
           editLink="Edit this page on GitHub"
         >

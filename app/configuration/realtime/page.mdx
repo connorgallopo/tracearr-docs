@@ -1,5 +1,5 @@
 ---
-title: Real-Time Updates - Jellyfin & Emby SSE Plugin
+title: Set Up Real-Time Updates in Tracearr
 description: Get instant Jellyfin and Emby session updates in Tracearr with the SSE plugin. Setup guide for the Jellyfin repository and the Emby plugin DLL.
 ---
 
@@ -69,3 +69,9 @@ Once the plugin is running, Tracearr detects it automatically — no restart of 
 <Callout type="info">
 The plugin is open source. You can review or build it yourself at [github.com/Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE).
 </Callout>
+
+## Beyond Tracearr
+
+The plugin does more than push sessions. It streams library changes, scheduled task progress, and a CPU/RAM sample every 6 seconds. That last one is what powers Tracearr's Server Resources charts for Jellyfin and Emby. The stream is a standard SSE endpoint, so anything else you run can consume it too.
+
+The [SSE Plugin section](/sse-plugin) covers the full [event reference](/sse-plugin/events), [client examples](/sse-plugin/consuming) in curl, JavaScript, and Python, and [troubleshooting](/sse-plugin/troubleshooting).

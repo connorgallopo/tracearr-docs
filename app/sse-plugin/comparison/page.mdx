@@ -1,0 +1,69 @@
+---
+title: Jellyfin Events - Webhooks vs WebSocket vs SSE
+description: The four ways to get playback events out of Jellyfin and Emby - the webhook plugin, the WebSocket API, polling /Sessions, and the SSE plugin - compared honestly.
+---
+
+import { Callout } from "nextra/components"
+
+# Webhooks, WebSocket, or SSE?
+
+If you want to know when playback starts on your Jellyfin or Emby server, there are four routes. Each one is the right answer for something. Here's how they differ and where each breaks down.
+
+## The Four Routes
+
+Every row is a capability, so **Yes** is always the good answer. The table assumes the consumer is what this section is for: a third-party app authenticating with an API key. Numbered notes below the table carry the receipts.
+
+| Can it… | Webhook plugin | WebSocket | Polling `/Sessions` | SSE plugin |
+|---|---|---|---|---|
+| Deliver events instantly | **Yes** | **Yes** | No | **Yes** |
+| See sessions with API-key auth | **Yes** | No [1] | **Yes** | **Yes** |
+| Work with nothing hosted on your side | No | **Yes** | **Yes** | **Yes** |
+| Send a pause event | No [2] | No [1] | No | **Yes** |
+| Send library events one per item | No [3] | Unclear | No | **Yes** |
+| Report server CPU/RAM | No | No | No | **Yes** |
+| Work on Emby without paying | No [4] | Unclear [5] | **Yes** | **Yes** |
+| Post to Discord/Slack with no code | **Yes** | No | No | No |
+| Work without installing a plugin | No | **Yes** | **Yes** | No |
+
+1. With a plain API key the socket authenticates, but session data never arrives after subscribing; reported and closed as "not planned" ([jellyfin#13479](https://github.com/jellyfin/jellyfin/issues/13479)).
+2. Open request since 2024 ([#289](https://github.com/jellyfin/jellyfin-plugin-webhook/issues/289)); the confirmed workaround is enabling continuous progress webhooks and watching the `IsPaused` flag.
+3. Item-added notifications are flushed in batches by a scheduled task, with a documented history of not firing at all ([#252](https://github.com/jellyfin/jellyfin-plugin-webhook/issues/252)).
+4. Emby's webhook feature requires an [Emby Premiere](https://emby.media/support/articles/Webhooks.html) subscription.
+5. Emby ships a WebSocket for its own clients; what it delivers to third-party API-key consumers is not documented.
+
+## The Webhook Plugin
+
+Jellyfin's [official webhook plugin](https://github.com/jellyfin/jellyfin-plugin-webhook) pushes notifications to a URL you configure, with Handlebars templates and ready-made destinations for Discord, Gotify, Pushover, Slack, and SMTP. For "post to my Discord channel when a movie starts," it's the established answer and a fine one.
+
+Its model has structural limits when the consumer is an application rather than a chat channel:
+
+- **You are the server.** Your app must expose an HTTP endpoint the media server can reach, which is a real cost behind NAT, in containers, or on a laptop. People fight this in practice: receiving the generic webhook into a Python script produced bare 415 errors that sat unanswered for years ([#185](https://github.com/jellyfin/jellyfin-plugin-webhook/issues/185)), and Home Assistant users spent months in a thread working out the required Content-Type header ([HA community](https://community.home-assistant.io/t/jellyfin-playback-notification/418403)).
+- **There is no pause event.** The request has been open since 2024 ([#289](https://github.com/jellyfin/jellyfin-plugin-webhook/issues/289)), and a Jellyfin team member confirmed the only workaround is enabling Playback Progress notifications and watching the `IsPaused` flag ([forum thread](https://forum.jellyfin.org/t-webhook-api-playback-status)). That means accepting a continuous flood of progress posts to catch an occasional pause.
+- **Item-added events are batched.** They're flushed by a scheduled task rather than sent per item, and have a documented history of not firing at all ([#252](https://github.com/jellyfin/jellyfin-plugin-webhook/issues/252)).
+
+## The WebSocket API
+
+Jellyfin's `/socket` endpoint is how its own web and app clients stay current, and the official SDKs wrap it. For a third-party server-to-server tool, the sticking point is authentication: connect with a plain API key and session data never arrives after you subscribe; reported, then closed as "not planned" ([#13479](https://github.com/jellyfin/jellyfin/issues/13479)). Tools that went WebSocket-first have felt this; Jellystat's active-sessions dashboard breaking on Jellyfin 10.11 is an open example ([Jellystat#488](https://github.com/CyferShepard/Jellystat/issues/488)).
+
+There's also no standalone protocol documentation outside the SDK internals, so you're reverse-engineering client behavior either way.
+
+Emby ships its own WebSocket for clients and its docs recommend it over polling. But what it delivers to third-party API-key consumers is not documented, and its webhook feature (the supported outbound-events path) requires an Emby Premiere subscription.
+
+## Polling `/Sessions`
+
+Universal, simple, works on every server and every version. This is what Tracearr does without the plugin, what Home Assistant's official Jellyfin integration does, and what most monitoring tools fall back to. The cost is built in: a session that starts right after a poll sits invisible until the next one, pause/resume flapping between polls is invisible entirely, and you're re-fetching full session state on a timer to detect what's usually nothing.
+
+Polling is also the right *recovery* mechanism even with events; see [reconnect and resync](/sse-plugin/consuming#reconnect-and-resync).
+
+## The SSE Plugin
+
+The SSE plugin inverts the webhook model: your client opens one outbound HTTP request to the media server and holds it open. Auth is the server's normal API token. Pause is a first-class event. Library items arrive one event per item, as they land. Task progress and a 6-second CPU/RAM sample come down the same stream, numbers neither server offers through its API at all.
+
+As far as public repos and forums show, no other SSE endpoint exists for either server. The trade-offs are the honest ones inherent to the model: events broadcast to every connected client with no per-connection filtering, and a dropped connection means missed events, so clients resync on reconnect.
+
+## Which One Should You Use?
+
+- Discord/Pushover/Slack notifications with no code: the **webhook plugin**, that's what it's for.
+- You're building a Jellyfin client app with a user login: the **WebSocket**, same as the official clients.
+- Maximum compatibility, no plugin installs allowed: **poll `/Sessions`** and accept the interval.
+- Your app consumes events (monitoring, automation, scrobbling, dashboards, anything that reacts): the **SSE plugin**. [Install it](/sse-plugin/installation), then start from the [event reference](/sse-plugin/events).
