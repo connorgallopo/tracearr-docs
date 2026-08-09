@@ -1,13 +1,13 @@
 ---
-title: Import Watch History - Tautulli & Jellystat
-description: Import your existing watch history from Tautulli or Jellystat into Tracearr. Step-by-step guide for migrating Plex, Jellyfin, and Emby session data.
+title: Import Watch History - Tautulli & Playback Reporting
+description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, or Jellystat. Step-by-step guide for migrating Plex, Jellyfin, and Emby session data.
 ---
 
 import { Callout } from "nextra/components"
 
 # Import Watch History
 
-Tracearr can import your existing watch history from **Tautulli** (for Plex) and **Jellystat** (for Jellyfin/Emby). This lets you keep your historical data when migrating to Tracearr.
+Tracearr can import your existing watch history from **Tautulli** (for Plex), the **Playback Reporting plugin**, or **Jellystat** (the last two for Jellyfin/Emby). This lets you keep your historical data when migrating to Tracearr.
 
 Access the import feature at **Settings** → **Import**.
 
@@ -120,25 +120,74 @@ Records may be skipped for these reasons:
 If many records are skipped due to "user not found", ensure you've synced your server recently in **Settings → Servers**.
 </Callout>
 
-## Migrating from Playback Reporting Plugin
+## Import from Playback Reporting Plugin
 
-If you're using the [Jellyfin Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) to track watch history, you can migrate that data to Tracearr through Jellystat.
+Tracearr can import history directly from the [Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting), available in the official plugin catalog for both Jellyfin and Emby. No file export and no separate Jellystat installation are needed. Tracearr talks to the plugin's API directly, using the server connection already configured in **Settings → Servers**.
 
-<Callout type="info" title="Direct Import Planned">
-Direct import from the Playback Reporting plugin is planned for a future Tracearr release. For now, use Jellystat as an intermediary.
+<Callout type="info">
+The plugin only records history from the point it was installed onward. Sessions from before that aren't recoverable through this import.
 </Callout>
 
-### Migration Path
+### Step 1: Check the Plugin
 
-1. **Install Jellystat** temporarily alongside your Jellyfin server
-2. **Import your Playback Reporting data into Jellystat:**
-   - In Jellystat, go to **Settings**
-   - Click **Task** → **Complete Sync with Jellyfin**
-   - Click **Task** → **Import Playback Reporting Plugin Data**
-3. **Export from Jellystat** — Follow the [export steps above](#step-1-export-from-jellystat) to create and download an Activity backup
-4. **Import into Tracearr** — Follow the [Jellystat import steps](#import-from-jellystat) above
+1. In Tracearr, go to **Settings** → **Import**, then the **Jellyfin/Emby** tab
+2. In the **Playback Reporting Plugin** section, above Jellystat's, select your **Target Server**
+3. Click **Check Plugin**
 
-This is a one-time migration. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if desired.
+Tracearr queries the plugin's admin SQL endpoint with that server's existing connection details. A successful check reports how many records the plugin holds and the date range they span. If the plugin isn't detected, either it isn't installed or Tracearr can't reach it with the server's current connection settings.
+
+<Callout type="info" title="The plugin trims its own history">
+Playback Reporting runs a scheduled "Trim Db" task that deletes records older than its Max Data Age setting. History the plugin has already trimmed cannot be imported. If the check reports fewer records than you expect, look at the plugin's settings on your media server before importing.
+</Callout>
+
+### Step 2: Configure Import
+
+| Option | Description |
+|--------|-------------|
+| **Server Timezone** | The timezone of the machine running Jellyfin or Emby. Defaults to your browser's timezone, which is often not the same machine. |
+| **Enrich with media metadata** | Fetches season/episode numbers, year, artwork, and runtime from your server. *(Recommended)* |
+| **Import the full date range** | By default, rows whose timestamps fall inside the range Tracearr already tracks for this server are skipped as overlapping. Enable this to re-scan the entire plugin history regardless of overlap, for a Tracearr history that has gaps. Duplicate rows are still skipped either way. |
+
+<Callout type="warning" title="Timezone matters">
+The plugin stores every timestamp in the media server host's local time, with no timezone marker attached. If **Server Timezone** doesn't match the host, every imported session shifts by the difference between the two zones.
+</Callout>
+
+### Step 3: Start Import
+
+Click **Start Import**. Progress shows:
+
+- **Processed** — Records read from the plugin
+- **Imported** — Successfully imported sessions
+- **Skipped** — Records not imported, including duplicates and rows that overlap history Tracearr already has
+- **Enriched** — Records enhanced with metadata (if enabled)
+- **Errors** — Records that failed
+
+Re-running the import is safe. Once a server's history is in Tracearr, later runs land in the duplicate and overlap counters instead of creating new sessions.
+
+### Why Records Are Skipped
+
+Records may be skipped for these reasons:
+
+- **User not found** — The Jellyfin/Emby user doesn't exist in Tracearr. Sync your server first to add all users.
+- **Duplicate record** — The row was already imported, either directly or through a prior Jellystat import of the same plugin data.
+- **Overlapping record** — The row's timestamp falls inside a date range Tracearr already has for this server. Enable **Import the full date range** to import it anyway.
+
+<Callout type="info" title="Emby records more than Jellyfin">
+Emby's Playback Reporting plugin also logs client IP addresses and pause duration, so Emby imports carry location data and pause time alongside each session. Jellyfin's plugin records neither field, so Jellyfin imports have no IP or location data.
+
+Neither plugin records codec or bitrate. Imported sessions have no stream-detail data on either server, and it can't be backfilled later since the plugin never captured it.
+</Callout>
+
+### Falling Back to Jellystat
+
+If the plugin has already been removed from your server, or you'd rather not reinstall it, Jellystat can still bridge the gap. Use this path only for history the direct import cannot reach: a Jellystat backup import that covers the same plays as an earlier direct import will insert them again, because the Jellystat importer checks only its own record IDs.
+
+1. **Install Jellystat** temporarily alongside your Jellyfin or Emby server
+2. **Import your Playback Reporting data into Jellystat** — in Jellystat, go to **Settings**, then **Task** → **Complete Sync with Jellyfin**, then **Task** → **Import Playback Reporting Plugin Data**
+3. **Export from Jellystat** — follow the [export steps above](#step-1-export-from-jellystat) to create and download an Activity backup
+4. **Import into Tracearr** — follow the [Jellystat import steps](#import-from-jellystat) above
+
+This is a one-time migration path. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if you'd like.
 
 <Callout type="warning">
 Some users have reported issues with TV show metadata when importing from the Playback Reporting plugin to Jellystat. Movies typically import cleanly, but TV episodes may show incomplete data. This is a limitation of the plugin's data format, not Tracearr.
@@ -164,3 +213,4 @@ You can run imports multiple times safely:
 - **Duplicate detection** — Sessions already in Tracearr are automatically skipped
 - **Incremental updates** — Only new sessions since the last import are added
 - **Stream details update** — Use the "Update existing records" option (Jellystat) to backfill codec/bitrate data on previously imported sessions
+- **Playback Reporting overlap guard** — Rows whose timestamps fall inside the range Tracearr already tracks for a server are skipped as overlapping, on top of duplicate detection. Rows that already arrived through a prior Jellystat import of the same plugin data are caught by duplicate detection instead. Enable **Import the full date range** to re-scan a server's entire plugin history; duplicate detection still keeps any row from landing twice.
