@@ -136,6 +136,10 @@ The plugin only records history from the point it was installed onward. Sessions
 
 Tracearr queries the plugin's admin SQL endpoint with that server's existing connection details. A successful check reports how many records the plugin holds and the date range they span. If the plugin isn't detected, either it isn't installed or Tracearr can't reach it with the server's current connection settings.
 
+<Callout type="warning" title="Jellyfin 10.11.9 or newer: check fails with a 500">
+If the check says the plugin isn't installed and shows `500 Internal Server Error`, but Playback Reporting is installed and working, your Jellyfin has a plugin build that predates an API change in 10.11.9. Uninstall and reinstall the plugin from the catalog; the updater won't offer the fix on its own. See the [FAQ entry](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error) for why.
+</Callout>
+
 <Callout type="info" title="The plugin trims its own history">
 Playback Reporting runs a scheduled "Trim Db" task that deletes records older than its Max Data Age setting. History the plugin has already trimmed cannot be imported. If the check reports fewer records than you expect, look at the plugin's settings on your media server before importing.
 </Callout>

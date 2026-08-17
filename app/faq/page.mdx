@@ -19,6 +19,7 @@ import { Tabs } from "nextra/components"
 **Troubleshooting**
 - [Tracearr can't connect to my media server](#tracearr-cant-connect-to-my-media-server)
 - [Jellyfin 12: Tracearr can't connect after upgrading Jellyfin](#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin)
+- [Jellyfin 10.11.9+: Playback Reporting check fails with a 500 error](#jellyfin-10119-playback-reporting-check-fails-with-a-500-error)
 - [Disabling IPv6 in Docker](#disabling-ipv6-in-docker)
 - [Sessions aren't being tracked](#sessions-arent-being-tracked)
 - [Jellyfin or Emby sessions are slow to appear](#jellyfin-or-emby-sessions-are-slow-to-appear)
@@ -55,7 +56,7 @@ Yes, Tracearr is free and open source under the AGPL-3.0 license.
 
 ### Can I import data from Tautulli or Jellystat?
 
-Yes, Tracearr supports importing historical data from both Tautulli and Jellystat.
+Yes. Tracearr imports from Tautulli (Plex), directly from the Playback Reporting plugin (Jellyfin and Emby), and from a Jellystat backup file. See the [import guide](/getting-started/import).
 
 ---
 
@@ -95,6 +96,29 @@ Jellyfin 12 disables legacy authorization by default, which rejects the older `X
 Upgrade Tracearr to **1.4.29 or newer**. From 1.4.29 on, Tracearr uses the standard `Authorization` header that Jellyfin 12 expects, and it stays compatible with Jellyfin 10.11 — so you can upgrade Tracearr before or after Jellyfin.
 
 You don't need to regenerate your API key. Regenerating it won't help on an older Tracearr version, and isn't necessary once you're on 1.4.29+.
+
+---
+
+### Jellyfin 10.11.9+: Playback Reporting check fails with a 500 error
+
+**Check Plugin** on the Import page reports that Playback Reporting isn't installed and shows `jellyfin request failed: 500 Internal Server Error`, even though the plugin is installed and its own reports load fine. The Jellyfin log has a matching entry for `POST /user_usage_stats/submit_custom_query`:
+
+```
+System.MissingMethodException: Method not found: 'System.Collections.Generic.IEnumerable`1<...User> MediaBrowser.Controller.Library.IUserManager.get_Users()'.
+```
+
+Jellyfin 10.11.9 removed the `IUserManager.Users` API that Playback Reporting version 17 calls. The plugin's `submit_custom_query` endpoint, the one Tracearr imports through, now fails before it runs. The plugin project fixed this the day after 10.11.9 shipped, but published the fixed build under the same version number, 17.0.0.0. Jellyfin's plugin updater only offers versions newer than the one installed, so any install from before May 22, 2026 keeps the broken build and still shows as up to date in the plugin catalog.
+
+Uninstall and reinstall the plugin to pull the fixed build:
+
+1. In Jellyfin, go to **Dashboard** → **Plugins**, open **Playback Reporting**, and uninstall it
+2. Restart Jellyfin
+3. Reinstall **Playback Reporting** from the catalog and restart again
+4. Back in Tracearr, click **Check Plugin** again
+
+Your history is safe. The plugin keeps its database at `playback_reporting.db` in Jellyfin's data folder, outside the plugin folder that uninstalling removes.
+
+Nothing on the Tracearr side can work around this; the exception is thrown inside the plugin before Tracearr's query is read. See [issue #1001](https://github.com/connorgallopo/Tracearr/issues/1001) for the full trace and the upstream Jellyfin and plugin changes.
 
 ---
 
