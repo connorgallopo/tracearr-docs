@@ -210,11 +210,11 @@ Actions are optional side-effects you can add on top of the automatic violation.
 
 #### Send Notification
 
-Sends an alert through your configured notification channels.
+Sends an alert to the notification destinations you pick.
 
 | Setting | Description |
 |---------|-------------|
-| Channels | Which channels to notify: Push, Discord, Email, or Webhook |
+| Destinations | Which destinations receive it; pick from Settings → Notifications |
 | Cooldown | Minutes to wait before sending another notification for the same trigger |
 
 #### Log Only
@@ -286,7 +286,7 @@ This action only works with Jellyfin and Emby. Plex doesn't support sending mess
 
 You can combine actions in a single rule. For example, you might want to:
 
-1. Send a Discord notification
+1. Send a notification to your Discord destination
 2. Send a message to the client
 3. Adjust the user's trust score
 
@@ -359,7 +359,7 @@ Prevent users from streaming on more than 2 devices at once.
 
 | Conditions | Actions |
 |------------|---------|
-| Concurrent Streams is greater than 2 | Send Notification (Discord) |
+| Concurrent Streams is greater than 2 | Send Notification (Discord destination) |
 
 <Callout type="info">
 **Tip:** Enable the "Unique IPs" checkbox to only count streams from different IP addresses. This lets household members share an account on multiple devices at home while still limiting external sharing.
@@ -387,7 +387,7 @@ Flag users streaming from multiple distant locations at the same time.
 
 | Conditions | Actions |
 |------------|---------|
-| Active Session Distance is greater than 500 | Send Notification (Push) |
+| Active Session Distance is greater than 500 | Send Notification (Mobile push destination) |
 | Is Local Network is No | |
 
 <Callout type="info">
@@ -440,7 +440,7 @@ Flag new accounts showing multiple signs of potential abuse — streaming from a
 
 **Severity:** Warning
 
-**Actions:** Send Notification (Discord), Adjust Trust Score (-10)
+**Actions:** Send Notification (Discord destination), Adjust Trust Score (-10)
 
 This triggers when: Account is new **AND** country is unusual **AND** (too many IPs **OR** too many devices).
 

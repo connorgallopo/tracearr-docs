@@ -13,10 +13,20 @@ Most settings are available in the **Settings** page:
 
 - **Servers** — Add and manage media server connections
 - **[Real-Time Updates](/configuration/realtime)** — Instant Jellyfin and Emby sessions with the SSE plugin
-- **Notifications** — Configure Discord webhooks and alerts
+- **Notifications** — Add the destinations alerts are sent to (see below)
 - **Sharing Detection** — Set up rules for account sharing detection
 - **Appearance** — Customize the dashboard
 - **[Tailscale VPN](/configuration/tailscale)** — Connect to your tailnet with the built-in Tailscale integration
+
+## Notification destinations
+
+A destination is a named place notifications go. Mobile push and browser toasts are built in; you add the rest under **Settings → Notifications**: Discord, ntfy, Gotify, Apprise, Pushover, or a JSON webhook. You can have more than one of the same type. Two Discord webhooks pointing at different rooms is a normal setup.
+
+Each destination picks which system events it receives, such as a violation being detected or a server going down. Rule actions work differently. A rule's Send Notification action names the destinations it sends to, and it reaches them whether or not they subscribe to that event.
+
+Destination secrets (webhook URLs, API tokens, user keys) are encrypted in the database. The key is derived from `JWT_SECRET` unless you set `ENCRYPTION_KEY` to a 64-character hex string, which takes precedence.
+
+Two things follow from that. Rotating `JWT_SECRET` while `ENCRYPTION_KEY` is unset leaves Tracearr unable to read the stored secrets; the destinations list flags each affected one so you can re-enter it. And a backup can only be restored with the same secret it was written under, so keep `JWT_SECRET` (or `ENCRYPTION_KEY`) alongside the backup file.
 
 ## Environment Variables
 
