@@ -66,14 +66,20 @@ Yes. Tracearr imports from Tautulli (Plex), directly from the Playback Reporting
 
 - Docker and Docker Compose (recommended)
 - 1GB RAM minimum (2GB recommended)
-- PostgreSQL/TimescaleDB for the database
+- PostgreSQL with the TimescaleDB extension for the database
 - Redis for caching
 
 ---
 
 ### Can I run Tracearr without Docker?
 
-While Docker is recommended, you can run Tracearr directly with Node.js 20+. See the GitHub repository for manual installation instructions.
+Yes, on Proxmox. The [community helper script](https://community-scripts.github.io/ProxmoxVE/scripts?id=tracearr), which we maintain, installs Tracearr, PostgreSQL with TimescaleDB, and Redis into an LXC container with no Docker involved. That is the only non-Docker install we support. See [Upgrading](/upgrading#proxmox-ve) for how to update it.
+
+Anything else (bare metal, your own VM, a distro package) is on you. There is no written guide and we don't recommend it. The pieces are all in the repo if you want to work it out: [`docker/Dockerfile`](https://github.com/connorgallopo/Tracearr/blob/main/docker/Dockerfile) shows how the app is built with pnpm and started (`node apps/server/dist/index.js` on Node 22 or newer), [`docker/docker-compose.dev.yml`](https://github.com/connorgallopo/Tracearr/blob/main/docker/docker-compose.dev.yml) shows the services it expects next to it, and [`docker/Dockerfile.supervised`](https://github.com/connorgallopo/Tracearr/blob/main/docker/Dockerfile.supervised) installs all three on one Debian image, which is as close to a manual install as the repo gets. The Proxmox script is worth reading for the same reason, since it puts the same stack onto a plain OS without containers.
+
+The database is where this gets hard. Tracearr needs PostgreSQL with the TimescaleDB and `timescaledb_toolkit` extensions loaded and `pg_trgm` available, plus Redis. A plain PostgreSQL install does not work: the migrations create hypertables, continuous aggregates, and compression and retention policies, and they fail on the first run without TimescaleDB. PostgreSQL also has to run with settings Tracearr depends on. Read them off the `command:` line in [`docker-compose.pg18.yml`](https://github.com/connorgallopo/Tracearr/blob/main/docker/examples/docker-compose.pg18.yml), in particular `max_locks_per_transaction=4096` and `max_connections=150`, along with 512MB of shared memory. Leave those at stock values and a large Tautulli import runs out of lock table space.
+
+If you go that route, you are on your own. We can't help with problems that only show up outside the images and the Proxmox script.
 
 ---
 
