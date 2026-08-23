@@ -1,0 +1,870 @@
+---
+title: Automations - Automated Monitoring & Actions
+description: Create automations to watch sessions, detect suspicious activity, and take actions like sending notifications or terminating streams.
+---
+
+import { Callout } from "nextra/components"
+
+# Automations
+
+Automations let you set how Tracearr responds to what's happening on your media servers. You pick what starts one, add any checks it should pass first, and say what happens then.
+
+**Common uses:**
+
+- Limit how many streams a user can have at once
+- Get notified when someone streams from an unusual country
+- Detect account sharing by tracking impossible travel patterns
+- Automatically terminate streams that have been paused too long
+- Post to Discord when a server goes down, or when something new shows up in a library
+
+Automations are evaluated as things happen: a stream starting or stopping, a server dropping off, an item arriving in a library. Each evaluation that gets far enough to be recorded is a **run**, and runs are the history you read afterwards.
+
+Tracearr ships ready-made automations; each one marks the blanks to fill.
+
+<Callout type="info">
+Automations apply to all servers you've connected unless you scope them to a specific server, account, or person.
+</Callout>
+
+## Violation or Alert
+
+Every automation has a **kind**, which decides what its runs mean. In the builder it's the last thing in **Then do…**, under **When this runs, record it as**, and it appears once there's an action to record:
+
+| Kind | What a run is |
+|------|---------------|
+| **A violation** | Listed in Violations. It carries a severity and waits for you to acknowledge or dismiss it. |
+| **An alert** | Recorded in Activity. Actions still fire, but it never becomes a violation and has no severity. |
+
+A violation is the default and matches how rules behaved before. Pick an alert for the automations whose job is to send a message or nudge a trust score. A "new device seen" alert doesn't need to sit in a violation queue.
+
+Switching to an alert hides the severity field and, if you haven't added any actions yet, adds a Send Notification row for you. Switching back removes that suggested row and leaves anything you built.
+
+The API knows the two kinds as `policy` and `notification`, and those are the words `POST /api/v1/automations` takes. The rest of this page uses "policy automation" and "notification automation" where it's talking about the shape of a thing rather than about a label on screen.
+
+## Building an Automation
+
+Go to **Manage → Automations** in the sidebar and click **New automation**. You get a gallery of ready-made automations, a box to paste a share code into, and **Start from scratch**, which opens the builder.
+
+The builder is one column, and it reads as a sentence in three parts:
+
+| Section | What goes in it |
+|---------|-----------------|
+| **When…** | The triggers. Any one of them starts the automation, and you need at least one. |
+| **And only if…** | Conditions, all optional. Leave it empty and the automation runs every time a trigger fires. |
+| **Then do…** | Actions, also optional. An automation with none still records its runs. |
+
+Above those sits a card holding the **Name** and **Description** fields, and under them what you've built **in plain words**: *When a stream starts or a stream has been paused for 30 minutes, and only if the stream is transcoding; send to team-discord.* Click any part of that sentence and the builder scrolls to the row it came from. The active switch is in the title bar. **Who this applies to**, which is the scope, closes the **When…** step, beside the triggers it narrows.
+
+Every row has a switch. Turning one off leaves it in place, marked **Skipped**, and takes it out of the sentence. That's how you take one condition out of the picture without losing how it was written.
+
+### The Live Check
+
+Under the sentence, **Right now on the servers** runs what you've built against whatever is playing right now, and updates as you type. Each session gets a verdict in words, and expanding one shows which conditions passed and what their values were.
+
+It appears once you've picked a trigger that involves a stream, and hides itself otherwise: a server-down automation has nothing playing to check against. Cooldowns and sessions already handled aren't simulated, so a check that says it would run tells you the conditions match, not that a run will definitely be recorded.
+
+Nothing fires from the live check. It reads sessions and evaluates conditions; no action runs, and no run is recorded.
+
+### Conditions
+
+Conditions define what the automation looks for. Each condition has three parts:
+
+- **Field** — What you're checking (like "concurrent streams" or "country")
+- **Operator** — How to compare (like "greater than" or "equals")
+- **Value** — What to compare against (like "3" or "United States")
+
+For example: `Concurrent Streams` `is greater than` `3`
+
+#### Combining Conditions
+
+You can add multiple conditions using AND/OR logic:
+
+- **Conditions in the same group** use OR logic — any one of them can match
+- **Different groups** use AND logic — all groups must have at least one matching condition
+
+**Example:** You want to detect users streaming from outside the US, but only if they're also on a mobile device:
+
+| Group 1 | Group 2 |
+|---------|---------|
+| Country is not US | Device Type is mobile |
+| | Device Type is tablet |
+
+This matches when the country isn't US **AND** the device is mobile **OR** tablet.
+
+### Available Fields
+
+Here are all the fields you can use in conditions, grouped by category.
+
+#### Session Behavior
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Concurrent Streams | Number of active streams from the same user | 1, 2, 3... |
+| Active Session Distance | Distance in kilometers between simultaneous sessions | 100, 500, 1000... |
+| Travel Speed | Calculated speed between consecutive sessions (km/h) | 500, 1000... |
+| Unique IPs in Window | Number of different IP addresses used within a time period | 3, 5, 10... |
+| Unique Devices in Window | Number of different devices used within a time period | 2, 3, 5... |
+| Inactive Days | Days since the user last streamed | 30, 90, 180... |
+| Current Pause Duration | How long the session has been continuously paused (minutes) | 5, 15, 30... |
+| Total Pause Duration | Total accumulated pause time across all pause/resume cycles (minutes) | 15, 30, 60... |
+
+<Callout type="info">
+Fields with "in Window" let you specify a time window (in hours) to check. For example, "more than 5 unique IPs in the last 24 hours."
+</Callout>
+
+<Callout type="info">
+**Current vs Total Pause Duration:** Current Pause Duration measures how long the session has been paused *right now* — it resets when the user resumes playback. Total Pause Duration tracks all pause time across the entire session, including multiple pause/resume cycles. Use Current Pause Duration to catch users who walk away mid-stream. Use Total Pause Duration to detect sessions with excessive overall pausing.
+</Callout>
+
+<Callout type="warning">
+Inactive Days can't be combined with session fields. An account that hasn't streamed in 90 days has no session to check concurrent streams or resolution against, so the field picker hides the incompatible choices once you add either kind.
+</Callout>
+
+##### Concurrent Streams Options
+
+The Concurrent Streams field has two modifier checkboxes:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| Exclude same device | On | Don't double-count if the same device appears multiple times. Usually leave this enabled. |
+| Unique IPs | Off | Only count sessions from different IP addresses. Enable this to detect account sharing while allowing same-household usage (multiple devices on the same network). |
+
+For example, if a user has 3 active sessions — 2 from the same home IP and 1 from a mobile network:
+- With **Unique IPs off**: Concurrent Streams = 3
+- With **Unique IPs on**: Concurrent Streams = 2 (only counts distinct IPs)
+
+#### Stream Quality
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Source Resolution | Original media quality | 4K, 1080p, 720p, 480p, SD |
+| Output Resolution | What the user is actually receiving | 4K, 1080p, 720p, 480p, SD |
+| Is Transcoding | Whether the server is converting the stream | Yes / No |
+| Is Transcode Downgrade | Output quality is lower than source | Yes / No |
+| Source Bitrate | Original media bitrate in Mbps | 5, 10, 20... |
+
+#### User Attributes
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| User | Specific user(s) to target | Select from dropdown |
+| Trust Score | The user's current trust score (0-100) | 50, 75, 90... |
+| Account Age | Days since the account was created | 7, 30, 90... |
+
+#### Device & Client
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Device Type | Category of device being used | Mobile, Tablet, TV, Desktop, Browser |
+| Client Name | The media player application | Plex for iOS, Jellyfin Web, Infuse... |
+| Platform | Operating system or platform | iOS, Android, Windows, macOS, Roku, Apple TV... |
+
+#### Network & Location
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Is Local Network | Whether streaming from your home network | Yes / No |
+| Country | Geographic location based on IP address | Select from dropdown |
+| IP in Range | Check if IP falls within a CIDR range | 192.168.1.0/24, 10.0.0.0/8... |
+
+<Callout type="info">
+Country detection uses IP geolocation, which may not be accurate for users on VPNs or certain mobile networks.
+</Callout>
+
+#### Scope
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Server | Which media server the session is on | Select from dropdown |
+| Media Type | Type of content being played | Movie, Episode, Music Track, Photo, Live TV |
+
+#### Media
+
+These fields read the library item a media trigger is about, so they only appear on an automation with one.
+
+| Field | Description | Example Values |
+|-------|-------------|----------------|
+| Item Type | What kind of library item it is | Movie, Show, Season, Episode, Artist, Album, Track, Photo |
+| Library | Name of the library it's in, typed as the server spells it | Movies, 4K Movies |
+| Resolution | Resolution the item ends up at | 8K, 4K, 1440p, 1080p, 720p, 480p, SD |
+| Dynamic Range | HDR format the item ends up with | SDR, HDR, HDR10, HDR10+, HLG, Dolby Vision |
+| Video Codec | Video codec the item ends up with | HEVC, H264, AV1 |
+| Audio Channels | Channel count of the best copy | 2, 6, 8 |
+| File Size | Size across every copy, in GB | 8, 40 |
+
+Resolution compares by tier, so "Resolution is at least 4K" also matches 8K. A value the server never reported (an unknown codec or HDR format) never matches, not even for "is not".
+
+### Operators
+
+Operators determine how the field is compared to your value. The available operators depend on the field type.
+
+#### Comparison Operators
+
+Used with numeric fields like concurrent streams, trust score, or travel speed.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| equals | Exactly matches | Trust Score equals 100 |
+| not equals | Anything except this value | Concurrent Streams not equals 1 |
+| greater than | More than (not including) | Travel Speed greater than 500 |
+| at least | This value or more | Concurrent Streams at least 3 |
+| less than | Fewer than (not including) | Trust Score less than 50 |
+| at most | This value or fewer | Account Age at most 7 |
+
+<Callout type="warning">
+**Common mistake:** When limiting something like concurrent streams or unique IPs, use **"greater than"** or **"at least"** — not "at most".
+
+For example, to match when a user has too many unique IPs:
+- Correct: `Unique IPs in Window greater than 3` — matches at 4+ IPs
+- Wrong: `Unique IPs in Window at most 3` — matches at 1, 2, or 3 IPs (the opposite)
+
+Think of it as: "match when the value **exceeds** my limit" — use **greater than** or **at least**.
+</Callout>
+
+#### Selection Operators
+
+Used with dropdown fields like country, device type, or platform.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| equals | Matches the selected value | Country equals United States |
+| not equals | Anything except this value | Device Type not equals Desktop |
+| is one of | Matches any in a list | Country is one of US, Canada, UK |
+| is not one of | Doesn't match any in a list | Platform is not one of iOS, Android |
+
+#### Text Operators
+
+Used with text fields like client name.
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| contains | Includes this text anywhere | Client Name contains "Plex" |
+| does not contain | Doesn't include this text | Client Name does not contain "Web" |
+
+### Severity
+
+Policy automations carry a severity level that classifies the violations they produce. In the builder it's **How serious?**, beside the kind at the end of **Then do…**; on an existing automation's page it's a row under **This automation**.
+
+| Severity | Use For |
+|----------|---------|
+| **Low** | Informational events you want to track but aren't urgent |
+| **Warning** | Potentially suspicious activity that should be reviewed (default) |
+| **High** | Serious matters that need immediate attention |
+
+Severity affects how prominently violations are displayed and helps you decide what to investigate first. Notification automations have no severity, since their runs never become violations.
+
+### Scope
+
+The **Scope** field decides who an automation covers:
+
+| Scope | Covers |
+|-------|--------|
+| Global | Every server you've connected (default) |
+| Specific server | One media server |
+| Specific account | One account on one server |
+| Person (all their servers) | One identity across every server their accounts are linked to |
+
+Scoping to a person also adds **Enforce across servers**, which lets the automation act on that person's sessions on every one of their servers, whichever server triggered it. It's off by default.
+
+### Actions
+
+Actions are optional. A new automation starts with none, and an automation with no actions is valid: the run is still recorded, and for a policy automation the violation is still created. Add actions when you want a side effect on top of that record.
+
+You can add several actions to one automation. They all run when the conditions match.
+
+#### Send Notification
+
+Sends an alert to the notification destinations you pick.
+
+| Setting | Description |
+|---------|-------------|
+| Destinations | Which destinations receive it; pick from Settings → Notifications |
+| Cooldown | Minutes to wait before sending another notification for the same trigger |
+
+#### Trust Score
+
+Changes the user's trust score. Pick a mode, and the field below it changes to match:
+
+| Mode | Setting |
+|------|---------|
+| Adjust by amount | Amount from -100 to +100 (negative decreases, positive increases) |
+| Set to value | The score to set, 0-100, regardless of the current one |
+| Reset to default (100) | Nothing to configure |
+
+<Callout type="info">
+Dismissing a violation reverses whatever trust the automation adjusted. That's what makes dismiss mean "false positive, undo it" rather than "hide it".
+</Callout>
+
+#### Terminate Stream
+
+Immediately stops the user's active stream.
+
+| Setting | Description |
+|---------|-------------|
+| Target | Which session(s) to terminate (see options below) |
+| Message | Optional message to display to the user when their stream is terminated (1-500 characters) |
+| Cooldown | Minutes to wait before terminating another stream from the same user |
+| Sustain window | Wait this many seconds, then terminate only if the conditions still match. 0 terminates immediately after a final re-check. |
+
+**Target options:**
+
+| Target | Behavior |
+|--------|----------|
+| Triggering session | Only the session that matched (default) |
+| Oldest session | The user's longest-running active session |
+| Newest session | The user's most recently started session |
+| All except one (keep oldest) | Terminates all sessions except the oldest, bringing the user down to 1 stream |
+| All user sessions | Terminates every active session for the user |
+
+<Callout type="warning">
+Use this action carefully. Terminating streams can frustrate legitimate users if your conditions are too broad. The "All user sessions" target is especially aggressive.
+</Callout>
+
+#### Send Message to Client
+
+Displays a message on the user's media player. Useful for warnings before taking stronger action.
+
+| Setting | Description |
+|---------|-------------|
+| Message | Text to display (1-500 characters) |
+| Target | Which session(s) to message — same options as Terminate Stream (defaults to triggering session) |
+
+<Callout type="info">
+This action only works with Jellyfin and Emby. Plex doesn't support sending messages to clients except when terminating a stream.
+</Callout>
+
+#### If… Otherwise…
+
+Runs some steps only when an extra check passes. The check is written like any condition group, and both branches hold actions of their own:
+
+```
+If the country is not US
+  → stop the stream
+Otherwise
+  → send to team-discord
+```
+
+Leave **Otherwise** empty and nothing happens on that side; the automation carries on to whatever follows.
+
+Branching decides what happens, never whether the automation matched. A policy automation that reaches its actions has already recorded its violation, whichever branch it takes. Use **And only if…** at the top for the decision that flags someone.
+
+## Triggers
+
+Triggers are what you pick under **When…**. Nothing else starts an automation. Any one of them is enough; several of them are an "or". Before this release Tracearr worked triggers out from your conditions, which meant an automation could only ever watch for things its conditions mentioned. Now you say so.
+
+The picker groups them the way they're grouped here. Search it by what you want to happen. Typing "afk" finds the paused-stream trigger.
+
+### Sessions
+
+| Trigger | Fires when |
+|---------|------------|
+| A stream starts | Someone presses play |
+| A stream stops | Playback ends, however it ended |
+| Transcoding starts or stops | The server switches a stream between direct play and transcoding |
+| A stream is paused | The moment someone pauses |
+| A stream sits paused | A stream has been paused longer than the minutes you set |
+
+**A stream sits paused** carries its own settings: the number of minutes, and whether that's counted **this time** or **in total**. This time resets when the user resumes; in total adds up every pause in the session.
+
+A stream that stops because its server was deleted mid-play doesn't fire the stop trigger. There's no server left to say it happened on.
+
+### Accounts
+
+| Trigger | Fires when |
+|---------|------------|
+| An account goes quiet | An account has watched nothing for the days you set |
+| An account plays from a new device | An account starts a stream on a device it has never streamed from before |
+| An account's trust score changes | A trust score is written to a different value, by an automation or by hand |
+
+The days live on the trigger, and Tracearr sweeps for quiet accounts hourly.
+
+A device is new per account, so the same phone announces itself again the first time a different account plays on it, and the message can name `{{device.name}}`, `{{device.platform}}`, `{{device.product}}` and `{{device.location}}`. A trust change carries `{{trust.previous}}`, `{{trust.new}}` and `{{trust.reason}}`, and an automation that watches for one can't also change a trust score, which is what stops a score from walking itself down.
+
+Neither of these two can sit on an automation that records a violation. Picking up a new phone or having a score adjusted isn't something a person did wrong, so both only ever send.
+
+### Servers
+
+| Trigger | Fires when |
+|---------|------------|
+| A server goes down | A media server stops answering |
+| A server comes back up | It answers again |
+
+### Updates
+
+| Trigger | Fires when |
+|---------|------------|
+| A plugin update is available | The Tracearr plugin on one of your servers has a newer release |
+| A server update is available | Plex, Jellyfin or Emby has published a release newer than what that server runs |
+| A Tracearr update is available | Tracearr itself has a newer release |
+
+These three are checked every six hours, and both outbound checks have a switch: see [Update checks](#update-checks). The message can name `{{installedVersion}}` and `{{latestVersion}}`.
+
+### Library
+
+| Trigger | Fires when |
+|---------|------------|
+| Media is added | A library item is stored for the first time |
+| Media is upgraded | An item that was already there changes resolution, dynamic range, video codec, audio codec, audio channels or file size |
+
+Both come out of the library sync. When your server pushes library events they arrive about 30 seconds later; otherwise they wait for the next scheduled sync. The first sync of a library announces nothing, since every item in it would be new, and one sync run announces at most 20 changes before it goes quiet.
+
+An upgrade fires on any change to those six values, a drop included. To hear about improvements only, add a condition such as "Resolution is at least 4K". An upgrade message can name both sides: `{{media.title}}: {{media.from.resolution}} → {{media.to.resolution}}`.
+
+### What a Trigger Decides
+
+The triggers you pick decide what the rest of the builder will offer you.
+
+A condition can only read what its trigger supplies. Pick "A server goes down" and the field list has the server in it and nothing about a person, because there's no session and no account to ask about. Pick two triggers and you get the fields both of them supply. A condition that stops being available turns amber and names the trigger that orphaned it, and Save stays disabled until you fix it.
+
+Actions run into the same limit. Stopping a stream, messaging a player and changing a trust score all need somebody to do it to, so they're unavailable on an automation whose triggers don't supply one. A violation is about a person too, which is why a policy automation needs a stream or account trigger; server, update and library triggers are notification-only.
+
+The same goes for a `{{variable}}` in a message body: every trigger you picked has to supply it, since any one of them can be the one that fires.
+
+<Callout type="warning">
+A condition can be stricter than its own trigger, but it can't be looser. "A stream sits paused for 30 minutes" plus a condition "the current pause is at least 15" never adds anything, and "at most 15" can never pass at all, since the trigger only fires at 30. The builder says so on the row.
+</Callout>
+
+## The Automation Page
+
+Clicking a row opens the automation's own page, one centered column. The header carries the name, a **Violation** or **Alert** badge, the scope, a line saying where the automation came from, and a line counting what it has done: *12 runs · last run about 25 minutes ago*, or **No runs yet** until there's been one. The active switch and **Export** sit opposite them, and an automation built in the builder also has **Edit**.
+
+Below the header is one form:
+
+| In the form | What it holds |
+|-------------|---------------|
+| Name, Description | Fields here, not read-only text. The name in the header is the one in the list. |
+| In plain words | The sentence, the same one the row shows |
+| The blanks | Only on an automation built from a ready-made one: the answers it was set up with |
+| This automation | **At most once every** minutes, **Severity** on a policy automation, **Keep runs for** days |
+| What this will do | The consequence lines, read off the steps themselves: whether it can stop a stream, whether it records a violation, which servers it runs on |
+
+Both numbers under **This automation** are optional. An empty cooldown fires on every match, and an empty retention keeps runs for the kind's default, which is the number the placeholder shows. One **Save changes** at the bottom writes the whole form, and an automation that follows a ready-made one has **Open in the builder** beside it. The active switch is the only control on the page that writes by itself.
+
+### Activity
+
+**Activity** sits under the form and lists the runs, newest first. Four tabs, each carrying its count:
+
+| Tab | What it holds |
+|-----|---------------|
+| **Ran** | The conditions matched. Actions fired, and a policy run became a violation. The page opens on this tab. |
+| **No match** | A trigger fired and the automation was evaluated, but a condition didn't match. Nothing else happened. |
+| **Failed** | Something failed during the run. |
+| **All** | Every run, whichever way it went. |
+
+A row reads: the outcome, what the run did, who it was about, where they were, the severity, and when it started. A **Ran** row's summary names the consequences in order, as *Recorded a violation · Stopped the stream*. A **No match** row names the check that failed instead, as *Travel speed was not above 500 km/h*.
+
+**Who** is a person: avatar, display name, and a link through to their profile. The column is there only on automations whose triggers can carry a person. A library automation gets an **Item** column with the item instead, and a server or update automation gets neither column, because nothing it watches is about anybody.
+
+Recording the no-match runs is the point of the list. It answers "did this automation even look at that session?", which the violation list can't, because a violation only exists when everything matched. An empty **Ran** tab says how many checks ran without matching, so silence and inactivity don't look the same.
+
+Click a run to see its steps: which trigger fired, which conditions were evaluated with which values, which branch an **If…** took and what it read, which actions ran, were skipped or failed, and when it finished.
+
+A run that was about a session has **Open in the builder with this run** on it. That takes the automation into the builder with the live check pinned to that session instead of to whatever is playing now, so you can change a threshold and see what it would have done to the run you're looking at. **Back to what's playing now** returns it. An automation built from a ready-made one doesn't offer the button until you've taken it into the builder.
+
+Folded under the table is **Matches that did not start a run**, with its own count. These are trigger matches that recorded nothing at all, each with the reason:
+
+| Reason | Meaning |
+|--------|---------|
+| Cooldown was active | The automation fired recently for this same subject |
+| Same edge already handled | A notification automation already handled this threshold crossing |
+| An open run already covers this | An unacknowledged violation already exists for this session |
+| Trigger threshold not reached | A paused stream woke the automation before its own minutes were up |
+
+Only the last 50 are kept. They explain silence; they're not an audit trail.
+
+## Retention
+
+Runs are pruned on a schedule so the history doesn't grow without bound.
+
+| Runs | Kept for |
+|------|----------|
+| Ran, on a policy automation | 365 days |
+| Ran, on a notification automation | 30 days |
+| No match and Failed, either kind | 30 days |
+
+**Keep runs for** on the automation's own page overrides the default for its Ran runs. The 30-day window on the other two is fixed; they exist to explain one evaluation and are cleared once that's stale.
+
+<Callout type="info">
+Only runs tied to a session are pruned. Account-level runs, like the ones an Inactive Days automation produces, are kept indefinitely, because there's no session whose deletion would take them along.
+</Callout>
+
+## Violations
+
+A violation is a policy run that ran. The **Violations** page, the violation detail page, and every link and bookmark you already have keep working exactly as before: same list, same acknowledge and dismiss buttons, same condition evidence.
+
+What changed is what sits behind it. Notification runs and no-match runs are not violations and never appear there; they live on the automation's Activity list.
+
+## Managing Automations
+
+### Viewing Your Automations
+
+The Automations page lists everything you've set up. Each row shows the name, its scope, and either your description or the automation's sentence in plain words, plus a **Kind** badge and an active/disabled switch. Under that sits a meta line: where the automation came from, whether it reaches across servers, and **Records runs only** when it has no actions.
+
+The filter bar carries seven facets, in the order an admin reaches for them:
+
+| Filter | Choices |
+|--------|---------|
+| Search | Free text, read against the name and the description |
+| Where it came from | Built-in, Imported, Saved here, Built in the builder |
+| Server | Any server, then each connected server |
+| Status | Active, Inactive |
+| Kind | Violation, Alert |
+| What starts it | Sessions, Accounts, Library, Servers, Updates |
+| Severity | High, Warning, Low |
+
+Each filter set from the panel shows as a chip you can drop; the search text stays in the box and gets no chip of its own. The filters live in the URL, so a filtered list is a link.
+
+### Enabling and Disabling
+
+You can toggle automations on and off without deleting them. This is useful for:
+
+- Testing a new automation before fully enabling it
+- Temporarily disabling one during maintenance
+- Keeping automations you might want again later
+
+Click the switch on a row, or the one in the page header. Select several rows and the bulk toolbar offers **Enable** and **Disable**.
+
+### Editing
+
+An automation you built yourself opens in the builder from **Edit**, on its page or on the pencil button on its row. There you can change the kind, name, description, severity, scope, triggers, conditions, and actions. Changes take effect immediately after saving. Every saved change is versioned, and a run records which version of the definition produced it, so old runs still make sense after you've edited the automation.
+
+An automation that follows a ready-made one has neither button, because its steps aren't yours to edit. Its name, description, answers and limits are all on its own page; **Open in the builder** is the way to the rest, and it ends the link.
+
+### Deleting
+
+Use the trash button on the automation's row, or select several rows and choose **Delete** from the bulk toolbar.
+
+<Callout type="warning">
+Deleting an automation takes its runs with it, including the violations they produced. This has always been how deleting worked; the runs are children of the automation row.
+</Callout>
+
+## Ready-Made Automations
+
+**New automation** opens a gallery of automations that are already built. Twenty-one ship with Tracearr, in four groups:
+
+| Group | What's in it |
+|-------|--------------|
+| Notifications | Tell a destination something happened: a stream started or stopped, a stream is transcoding, a stream sat paused too long, media was added or upgraded, an account played from a new device, an account's trust score changed |
+| Server health | A server went down or came back, and the three update triggers |
+| Limits and rules | The six sharing-detection policies (too many streams, impossible travel, two places at once, many IPs in a window, blocked countries, inactive account), plus one for stopping 4K transcodes |
+| Housekeeping | Stop paused streams |
+
+There's a search box over the cards. Each card shows the automation's sentence in plain words and whether it records **A violation** or **An alert**.
+
+### Use This, or Open in the Builder
+
+Picking one opens a form with no headings on it, because each part says what it is by what it holds: the sentence in plain words, then the blanks, then a quiet block naming what the automation will do once it exists. Under a hairline is the name it will be saved under.
+
+A number carries its unit inside the box, so the label completes into the control: *Top speed* `500` *km/h*, *Paused for* `30` *minutes*. A ready-made automation asks for as little as it can, usually a server (**Any server** watches all of them) and the destinations to send to. Anything left blank falls back to the default the sentence is already showing.
+
+The footer holds **Turn it on now**, and then two ways forward with a line under them saying what each one governs.
+
+**Use this** creates the automation still linked to the ready-made one. The answers you filled in stay editable on its own page, and when Tracearr ships a newer version of that ready-made automation you're offered the update.
+
+**Open in the builder** makes a copy that you edit step by step, like any automation you built yourself. It stops following the ready-made one, gets none of its updates, and there is no way back. Tracearr asks you to confirm, in those words, before it does it.
+
+Either way, the name, description, severity, active switch, cooldown and retention belong to your automation from then on. An update to the ready-made version never overwrites them.
+
+### Updates to a Ready-Made Automation
+
+When a Tracearr release changes one of the built-in automations, the automations built from it show **An update is available**. Open one and you get **Now** and **After the update** side by side, so you can read what changes before you take it. Your answers come along; check them and press **Save changes**.
+
+A release that changes only the wording of a blank asks nothing. Tracearr compares what the new version's blanks are called internally against the version an automation is bound to, and when those match it moves the automation over at the first boot after the upgrade. That is how 2.2.0 renames six labels without a prompt on every install: *Top speed in km/h* became **Top speed**, *Distance in km* became **Distance apart**, *Minutes paused* became **Paused for** on both templates that had it, *Days idle* became **Idle for**, and *Window* became **Within**. In each case the unit moved into the control, which also fixes a wrong reading: the label was fixed text while the box converts to the unit system you picked, so an imperial install used to show mph beside a label saying km/h.
+
+If a ready-made automation is dropped from a release, the automations built from it keep working. Their page says the automation they came from is no longer on this server, and they behave from then on like automations you built yourself.
+
+## Sharing an Automation
+
+An automation can be turned into a code you send to someone else. Open it and choose **Export**.
+
+### The Share Code
+
+The dialog opens on the automation's sentence and the code itself, a string starting `tracearr1.` with **Copy the share code** beside it. Under the code is the line that says what travels: the code carries the steps only, and destinations, servers and accounts are filled in by whoever receives it.
+
+Two things sit below that. **Put this in the community gallery** opens onto what a gallery entry needs: an **Author** field, free text that Tracearr never fills in from your account and that goes into the code as written; a **Section** select, which decides where the entry is listed; the same envelope as JSON with its own copy button; and links to the gallery and to the repository. Setting an author adds a line under the code saying so, because a name in a code is a thing worth being told about. **Save as ready-made** is the other one: it puts this automation in your own server's list of ready-made automations, which is how you build more from something you already have.
+
+A code is the automation's steps, deflate-compressed and base64url-encoded. A typical one is five to eight hundred characters. It carries:
+
+| In the code | Not in the code |
+|-------------|-----------------|
+| Name, description, group, kind | Destination ids, webhook URLs, API tokens |
+| The triggers, conditions and actions | The names of your servers, accounts or people |
+| The blanks whoever imports it will fill in | Anything identifying your install |
+| Optional author, and the Tracearr version it needs | |
+| A fingerprint over the steps | |
+
+Anything that named something in your install is lifted into a question before the code is made: the scope, the destinations a Send Notification action pointed at, a condition on a specific user or IP range. That's why an imported automation asks you to fill things in.
+
+The per-step ids do travel. They're random identifiers for the rows inside the definition and mean nothing anywhere else.
+
+### Importing One
+
+**Import** on the Automations page, or the last row of the New automation dialog, opens a paste box. Paste the code and press **Check it**. Tracearr fetches nothing: everything it needs is in what you pasted, and there is no way to import from a URL. A line under the box says where shared automations are listed and links to the gallery.
+
+The review that comes back opens with what Tracearr checked. Usually that is **Tracearr can read this code**, followed by the caveat that nothing in a code says who wrote it or whether it is safe. The one case that earns a green tick is a code whose fingerprint matches an automation Tracearr ships, and there the line names it: *This is Impossible travel, one of the automations Tracearr ships.* Under either line sits **Author: Jane, as written in the code**, when the code carries one, and a short fingerprint (`Code 8fff…f61`, the first and last characters of the full hash, so two codes compare by eye).
+
+The rest of the review is the automation itself, in the same three parts the binding form uses and with the same absence of headings: the sentence in plain words, the block of what it will do, and the blanks it needs answered. The consequences are read off the steps rather than off the description, so a code that can stop someone's stream says so whatever the sender called it. **Show the JSON** at the bottom opens the whole envelope.
+
+**Start paused** is on by default, and its helper says to turn the automation on from the list after review. Then **Add it**. If you already have the same automation the review says so and offers to use the one you have; if you have a different one with the same name, you choose **Keep both** or **Replace mine**.
+
+<Callout type="warning">
+A share code carries no claim about who wrote it or whether anyone checked it. The author is whatever the sender typed; Tracearr repeats it as written and vouches for nothing. That's the reason for the review screen and the paused switch: read what it does, add it paused, turn it on when you're satisfied.
+</Callout>
+
+### Codes That Won't Read
+
+| What Tracearr says | Usually means |
+|--------------------|---------------|
+| That doesn't look like a Tracearr share code | It's missing the `tracearr1.` prefix, or it's something else entirely |
+| This code looks cut off | Chat apps break long codes across lines. Copy the whole thing again. |
+| That's too big to be a Tracearr automation | Codes are a few thousand characters at most |
+| This needs Tracearr 2.2.0 or newer | The automation uses something your version doesn't have |
+| That's a lot of codes in one minute | The import endpoints allow 60 a minute |
+
+The server is what decides: it rejects codes over 64 KB, refuses to decompress more than 1 MB out of one, and caps how deeply nested the JSON may be. The browser checks the length of what you pasted before sending it, which is a courtesy; the limit is the server's.
+
+## The Community Gallery
+
+There's a gallery of shared automations at [docs.tracearr.com/templates](https://docs.tracearr.com/templates), built from the [Tracearr/automation-templates](https://github.com/Tracearr/automation-templates) repository.
+
+It lives entirely on the docs site. Your Tracearr never reads it, never checks it for updates, and has no setting that points at it. Using one means copying its share code and pasting it into your own install, exactly as you would a code someone sent you privately.
+
+Contributions go through pull requests. CI validates every envelope against the same schema the app uses and recomputes its fingerprint, so a hand-edited definition fails before a human reads it. The pages render the envelope's own fields (name, description, sentence, blanks) and never anything else a contributor writes, and the consequence lines are read off the definition the same way the import review reads them.
+
+Two badges appear on those pages:
+
+- **Verified** means a Tracearr maintainer read the template and its definition. That is all it claims. Nothing about a share code is signed, and nothing is checked cryptographically.
+- **Built-in** means the slug and the fingerprint both match one of the automations Tracearr ships, so importing it gives you exactly what's already in your gallery.
+
+Neither badge travels with a code, and a page saying Built-in is an assertion by the gallery. The app makes that claim for itself: paste a code whose fingerprint matches something Tracearr ships and the import review says which one, computed from the code you pasted. Reactions on the gallery come from GitHub Discussions and need a GitHub account. One account, one vote, and nothing stops someone with several. Read them as rough interest.
+
+## Update Checks
+
+Tracearr looks for new releases every six hours: its own, the Tracearr plugin on your Jellyfin and Emby servers, and the media servers themselves. The three update triggers are how you hear about it. A check on its own only records what it found.
+
+**Settings → General → Update checks** has a switch for each of the two outbound checks:
+
+| Switch | What it checks |
+|--------|----------------|
+| Realtime plugin | New releases of the Tracearr plugin your Jellyfin and Emby servers stream events through |
+| Media servers | What each Plex, Jellyfin and Emby server runs, against the newest release its makers publish |
+
+Both are on by default. The media server check reads the installed version from the server itself and the latest from plex.tv, the Jellyfin GitHub releases API, or Emby's release feed; **Settings → Servers** shows both versions once it has them. A version it can't parse is skipped; nothing is guessed.
+
+## Classic Rules
+
+If you used Tracearr before version 1.4.13, you may have had **Classic Rules** — predefined types with fixed logic:
+
+- **Impossible Travel** — Detects physically impossible movement between sessions
+- **Simultaneous Locations** — Flags concurrent sessions from distant locations
+- **Device Velocity** — Watches for excessive IP changes in a time window
+- **Concurrent Streams** — Limits how many streams a user can have at once
+- **Geo Restriction** — Blocks or allows streaming from specific countries
+- **Account Inactivity** — Detects accounts that haven't streamed recently
+
+Those were converted to editable conditions and actions on upgrade, and converted again into automations when you upgraded to this release. Both conversions happen once, at startup, and need nothing from you. Your existing rules kept their behavior, their history, and their violation counts; they're now on the Automations page as policy automations.
+
+## Upgrade Notes
+
+The rename and everything else on this page happen in one startup. Skipping a version doesn't skip a conversion: the migrations run in order and stop where you are.
+
+**Your rules got triggers.** Nothing had explicit triggers before, so the upgrade writes them from what each automation was already listening for. An automation with a pause condition gets the paused-stream trigger with the same threshold, one with an inactivity condition gets the account trigger with its days, and everything else gets "a stream starts". The conditions stay where they are. If a threshold was outside what the trigger accepts, the trigger is written and left switched off, which stops the automation from acting on something you didn't ask for.
+
+**Paused streams re-announce once.** The way a paused-stream automation remembers which threshold crossing it already handled changed shape. Every session that's paused right now when you upgrade can produce one more notification.
+
+**Destination event checkboxes became automations.** A destination used to subscribe to events itself. Those subscriptions are converted into up to seven automations, one per event, which then send to the destinations that were subscribed. The 2.1 **New Device** and **Trust Score Changed** checkboxes convert the same way, into the two automations this release adds. Destinations keep one checkbox, **Receive violations**. Browser toasts and mobile push follow the same automations, and mobile still honours each device's own preferences.
+
+**A fresh install seeds five automations.** Four of them cover the alerts that used to be on by default, and New device joins them in this release. An install that already has rules gets its conversions instead.
+
+**Stream-start alerts arrive a little later.** They fire once Tracearr has confirmed the session, about thirty seconds after it first sees it.
+
+**`rule.type` is null everywhere.** The `/api/v1/violations` responses and every `/api/v1/public/*` shape keep their exact field names, `rule` and `ruleId` included. `rule.type` is in them and is always `null`. It has been null on every row since the 2.x conversion; this release stops pretending otherwise.
+
+**Creating an automation through the API now needs triggers.** `POST /api/v1/automations` requires a `triggers` array with at least one enabled entry, and returns 400 without one. Existing automations were backfilled at startup; only scripts that create new ones are affected.
+
+**`status` is gone from run payloads.** A run says what happened in `outcome`, which is `completed`, `stopped_by_condition` or `error`. Those three are the wire names behind Ran, No match and Failed, and they haven't changed.
+
+## Examples
+
+Here are some common automations to get you started.
+
+### Limit Concurrent Streams
+
+Prevent users from streaming on more than 2 devices at once.
+
+**Record it as:** A violation · **Severity:** Warning
+
+| Conditions | Actions |
+|------------|---------|
+| Concurrent Streams is greater than 2 | Send Notification (Discord destination) |
+
+<Callout type="info">
+**Tip:** Enable the "Unique IPs" checkbox to only count streams from different IP addresses. This lets household members share an account on multiple devices at home while still limiting external sharing.
+</Callout>
+
+### Terminate Idle Paused Streams
+
+Free up server resources by terminating streams that have been paused for too long.
+
+**Record it as:** A violation · **Severity:** Low
+
+| Conditions | Actions |
+|------------|---------|
+| Current Pause Duration is at least 15 | Terminate Stream (message: "Stream terminated due to inactivity") |
+
+<Callout type="info">
+**Tip:** Pause automations are re-evaluated while a session stays paused, so the stream is terminated shortly after the threshold is crossed. You can also use Total Pause Duration to catch users who repeatedly pause and resume throughout a long session.
+</Callout>
+
+### Detect Account Sharing
+
+Flag users streaming from multiple distant locations at the same time.
+
+**Record it as:** A violation · **Severity:** High
+
+| Conditions | Actions |
+|------------|---------|
+| Active Session Distance is greater than 500 | Send Notification (Mobile push destination) |
+| Is Local Network is No | |
+
+<Callout type="info">
+The "Is Local Network is No" condition keeps you from flagging someone streaming at home on multiple devices.
+</Callout>
+
+### Block Streaming From Specific Countries
+
+Restrict streaming to only your allowed countries.
+
+**Record it as:** A violation · **Severity:** High
+
+| Conditions | Actions |
+|------------|---------|
+| Country is not one of US, Canada, UK | Terminate Stream |
+
+### Nudge New Users About Quality
+
+Send a message to new accounts if they're causing transcoding. This is housekeeping, so make it a notification automation and keep it out of your violation queue.
+
+**Record it as:** An alert
+
+| Conditions | Actions |
+|------------|---------|
+| Account Age is less than 7 | Send Message to Client: "Direct play is preferred when possible" |
+| Is Transcoding is Yes | |
+
+### Detect Suspicious New Accounts
+
+Flag new accounts showing multiple signs of potential abuse — streaming from an unusual country AND using multiple devices or IPs quickly.
+
+**Group 1 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Account Age is less than 14 |
+
+**Group 2 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Country is not one of US, Canada, UK |
+
+**Group 3 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Unique IPs in Window is greater than 3 (24 hours) |
+| Unique Devices in Window is greater than 2 (24 hours) |
+
+**Record it as:** A violation · **Severity:** Warning
+
+**Actions:** Send Notification (Discord destination), Trust Score → Adjust by amount (-10)
+
+This matches when: Account is new **AND** country is unusual **AND** (too many IPs **OR** too many devices).
+
+### Restrict Heavy Transcoding for Remote Users
+
+Limit resource-heavy transcoding to local network or trusted users only.
+
+**Record it as:** A violation · **Severity:** High
+
+**Group 1 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Is Transcoding is Yes |
+| Is Transcode Downgrade is Yes |
+
+**Group 2 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Is Local Network is No |
+
+**Group 3 (AND)**
+
+| Conditions (OR within group) |
+|------------------------------|
+| Trust Score is less than 80 |
+
+**Actions:** Send Message to Client: "Please try a lower quality or direct play", Terminate Stream
+
+This matches when: (Transcoding **OR** downgrading) **AND** remote user **AND** not highly trusted.
+
+## Condition Evidence
+
+Every run records **condition evidence**: the values that were evaluated and whether each condition matched. It's how you find out why an automation fired, or why it stopped.
+
+For policy runs, the evidence is on the violation's detail page under **Condition Evidence**. Each condition group shows:
+
+- Whether the group as a whole matched
+- Each individual condition with its **actual value**, the **operator and threshold**, and whether it matched
+- How many **related sessions** contributed to the result (for conditions like concurrent streams or session distance)
+
+The violation detail page also lists the **related sessions** — if a concurrent streams automation fires at 5 streams, you'll see the triggering session plus the 4 others that caused the match. Conditions like travel speed and session distance link to the sessions involved, along with details like calculated distance or location data.
+
+The same evidence appears in the run detail on the Activity list, which is where you'll find it for runs that stopped short of a violation.
+
+## API
+
+If you drive Tracearr from scripts or another service, the rename reaches the API:
+
+| Endpoint | Status |
+|----------|--------|
+| `/api/v1/rules` | Removed |
+| `/api/v1/automations` | Replaces it, with `kind`, `triggers` and the run history |
+| `/api/v1/runs` | New: runs across every automation |
+| `/api/v1/runs/counts` | New: how many runs each outcome holds, under the same filters |
+| `/api/v1/templates` | New: the ready-made automations, and adding one from an envelope |
+| `/api/v1/templates/preview` | New: what a share code says, without adding it |
+| `/api/v1/violations` | Unchanged |
+| `/api/v1/public/*` | Unchanged, and frozen |
+
+The public API is the one third-party integrations use, and its violation responses keep their exact field names and shapes, including `rule` and `ruleId`. That won't change. See the [API reference](https://docs.tracearr.com/api) for the full specification.
+
+## Troubleshooting
+
+### An automation isn't firing
+
+- **Check that it's enabled** — Look for the toggle switch in the automations list
+- **Check the No match tab** — Runs in that tab mean the automation is being evaluated and a condition is failing. The row names the check, and the run detail shows the value it read.
+- **Check Matches that did not start a run** — Folded under the Activity table. An entry there with nothing in Ran means a cooldown or an open violation is holding it back.
+- **Verify your conditions** — Make sure the field, operator, and value match what you expect. "greater than 3" won't match when the value is exactly 3.
+- **Check condition grouping** — Groups use AND logic. All groups must have at least one matching condition.
+
+### An automation is firing too often
+
+- **Add a cooldown** — Set **At most once every** on the automation's page to put a floor between firings for the same user or session
+- **Add more conditions** — Narrow it down with additional condition groups
+- **Increase an action's cooldown** — The Send Notification and Terminate Stream actions have their own cooldowns
+- **Exclude local network** — Add "Is Local Network is No" to ignore activity from your home network
+
+### Country detection seems wrong
+
+IP-based geolocation isn't perfect. It can be inaccurate when users are on:
+
+- VPNs or proxy services
+- Mobile networks (especially while traveling)
+- Corporate networks that route traffic through another location
+
+<Callout type="info">
+If you're seeing unexpected countries, check if the user might be using a VPN. The IP address shown in the session details can help you investigate.
+</Callout>

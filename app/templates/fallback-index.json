@@ -1,0 +1,665 @@
+[
+  {
+    "slug": "account-inactivity",
+    "name": "Inactive account",
+    "description": "Raise a violation when an account goes unused for the days you allow.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "days",
+        "kind": "duration",
+        "unit": "days",
+        "label": "Idle for",
+        "required": false,
+        "default": 30,
+        "min": 1,
+        "max": 3650
+      }
+    ],
+    "sentence": "When an account has been inactive for 30 days. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.ZZLdjtsgEIVfBR31kkSQHyf2G-ztVupNtarGMHbQ2uBik9SK_O4V-VtV5QY0oxnmfGeusNw47yYXPKoryOTX-M_z58ciYYK37pVrY0jDM_XpvEWFIXTOzJAYTRgY1XWRGPnM0U0zKlwoeudbSEzRtS3HXH4Fe6o7tqimmFjC5U660UbVBa9Ko2m1qze8OtoDrdTj6L3SkBgoUn8bx9J8u785P6QJ1T2wLBLTnEcBGROSn9bOZ1Vn_tWEiCUPb3k00Q13_XgnN7IgcXahoxwTlxN7QV48Oog28CiSTyNb0YQophOL_JuYQxLUdeGyhkTjfMtxiM7naUxNqlDlkVSzr7VqeKObQtX1VrEqbGGt2mlNm6PVdnsgU-4aU2zL8rCvD5YLKiHvwJ-QHY-QuGm9Q7TcUOomVFsl8cnzk8DLG5viTQ4kOqq5Q4U323FWAIme_qDaFnsl0TuPSktE_p1czL401I0skbz7Avvxv-m98985njn-4DjeYW7Wm7WChKc-e_D2YP9EeduUE_f0qtASY5faL79WD7_yBi1_AQ",
+    "fingerprint": "cba06098a0f5b10fe21f60bb30e06d6dd0411a28d1d37ac94fc639975b7de6a9",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "concurrent-streams",
+    "name": "Too many streams at once",
+    "description": "Raise a violation when an account plays more streams at once than you allow.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "max",
+        "kind": "number",
+        "label": "Streams allowed",
+        "required": false,
+        "default": 3,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "ignoreSameDevice",
+        "kind": "boolean",
+        "label": "Ignore extra streams from one device",
+        "required": false,
+        "default": true
+      }
+    ],
+    "sentence": "When a stream starts, and only if the stream count is above 3. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.jVPLbtswEPwVYtEjbejhxqnOvfTaFL0EQbAiVwoRaqkuKSeCoX8vaMVGnPYQngjOLmc5MzyCpc6xSy4wNEdAk3fxanv_sGgwga27YL2EaczQ8Qq4PwIxtp4sNEkm0tA58haaXGUmEeL0GJMQDhE0uIyUXWmK9oY230yJm11b0ebW7nFTvK2yKGrQEEYSTEGggT6BhhElX9IcgV6Nnyw9Rhzo0dLBGcrHXxyPU4IGXM9B6A4H-r6Cy6LhgH66LhvwFZblQX98wWeHrGDJOj07zg1j8M7MoCGaMGaiRUOkA4lLMzTwgsKOe9CQxPU9yX_F-yx1me-ZMw1EitEF3saEksiuM1mKRty4egw_0UVSqA4ueMxn6uWJWCErNCZMnNTocY5qCELqzSyFSQU2pNITsprDpND78LKF7DD3JKM4zipWWNSm6ExtaI9VZWhvaPe17na3FVX7zuzw5pZqU9Rduzdt11qsbXljDNkCd23bgV6zdZbQ0Sko2aNVIksdTj5BU2t4pvnNuIvuPA0tCWjw2JKHBu7OD8jzkgV9qm_KotAwOIam1CD0Z3KSde_QR1r0O5rViZXpnyRdaNsQPCG_4_1xqlX0mgQvKnYSBhWYlD33f6R--DdBg-M7kgPJb5K4Wlhtq20BGhiHbPqvENSAPH906xS_Jxrw0llqiH7qrz7k5vwhl78",
+    "fingerprint": "2a03c0fc3ce7a22ce7ce453f482e27fc4a68e3c03fb7cbfbda3d16cced0a4bbf",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "device-velocity",
+    "name": "Many IPs in a window",
+    "description": "Raise a violation when an account streams from more IP addresses in a window than you allow.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "ips",
+        "kind": "number",
+        "label": "IP addresses allowed",
+        "required": false,
+        "default": 5,
+        "min": 1,
+        "max": 100
+      },
+      {
+        "key": "hours",
+        "kind": "duration",
+        "unit": "hours",
+        "label": "Within",
+        "required": false,
+        "default": 24,
+        "min": 1,
+        "max": 168
+      }
+    ],
+    "sentence": "When a stream starts, and only if the number of IP addresses is above 5. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.jVPbitswFPwVceijEuI4V__BPhSWFtqHJYRj6dg5rCx5dUkagv-9KN4NSS-w8oukQZrxzOgCmhq2HNlZqC6AKs_Cw_RlN0hQzmq-Ya13qc_Q5QF4uQBZrA1pqKJPJKFhMhoqSJbfEu25D3u2-xNb7U4ggTNWNIWa1SuabFWBk0U9p8lGr3Eyex9FOStBguvJY3QeKmgjSOjRY3dVM163P7jkr-svbPsUoYJxZxgkHNEkesC4z8hO_qn4s5LmMGRfXtnmA70zrM4gISjXZ6JBQqAjeY5nqOCE3rJtQUL03Lbk_2nWZ6mLfM8500CgENjZaYjoI-lRk6agPPdjpvANOZBAcWRnMO-J04GsQCtQKZdsFCF6wi6IxrtOdM6TeHoWqLWnECgItgLF6LGIB7Ti7JJAY9xpCjlh25LvPdvs6nJRL3St1kTNsl4tNOVvtS3mzaZUpMtyWavVeqO35boslCKkzbpEjYjlZr3SBHLs1oelTCHXJGc2WqapwWQiVEsJr3R-D_KWg01dTR4kGKzJQAUPf3IVTRokdPgLqmI2k9CxhaqQ4Oktsc9hNGgCDfKOa774IBsbdaPTyV8tvSP8yfHA9kax2vyXQuZXcVfT3d9t6th-J38k_4N8GOOcT-fTGUiw2OUCfEV7Fk_PDylda3igDm-nCgnBpDYrpiMrmhzJOJW7OfwG",
+    "fingerprint": "54b4dbc7eef5b64dedede6912f83ced335bc678d93731cceae873adaaa3876de",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "geo-restriction",
+    "name": "Blocked countries",
+    "description": "Raise a violation when a stream comes from a country you block.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "countries",
+        "kind": "field_value",
+        "field": "country",
+        "label": "Blocked countries",
+        "required": true
+      },
+      {
+        "key": "ignoreLan",
+        "kind": "boolean",
+        "label": "Ignore local network sessions",
+        "required": false,
+        "default": true
+      }
+    ],
+    "sentence": "When a stream starts, and only if the country is one of those chosen; and also the user is not on the local network. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.lVRNj9sgEP0raNQjiWxv4jg-9lapp1bqZbWKxjB4UTB4ASeKIv_3ijjxbratlPqEGWYe70OcQZLSVkftLNRnQJFW4W75_DJyEM5KPdda74Y-lc53heczkMXGkIQ6-oE4KE1GQg3CDTb6E3DQ6TdXuciakhZbkeNi1RS0qOQGF9n1y1fZE3BwPXmMzkMN2gKHA5qBEv4XbfshznM1BRjHF_4Z_VGsAkb-KBMddsYJNDtL8ej8_j8ore8p0ds7JYUm0B2DDyR1a52n72hhfBxsBWPyba9tauid0SLJH4Trk4Qjh0AH8jqeoIYjeqttCxyi121L_q8SPAqdpzmnBAOBQtDOLkNEH0lOd5IUhNf9lDn4gToQQ3bQzmDaY8dXsgxZiJ6wY8J1FJjyrmPIrjliJzewxjixX0Kyxrbke69tUqsiJVFtCrWRZVU0W6qabY6ilEW13jzhSpWiUsWmWGersimqbJtV60blVErcqqISwKd431RL4eJw8WJS5c9M7-l0l8VZ9svR3eQxB4MNGajha7o4SfaxwdPboP1N6xRHSQoHE2_iTxjvUZgxGucMXTZu879dDrFLTNk1puzqxD3WHLvPMem0_Un-QP4X-TD5VCyLZQYcLHb0DxJBvFKHc0vOIZihhRpacgtPIXp9eVRg_A0",
+    "fingerprint": "8efdaf72f7d682b9e8b91ac6d28573a4f6c8f2725046b2809085bf1e6da9f28c",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "impossible-travel",
+    "name": "Impossible travel",
+    "description": "Raise a violation when two sessions sit further apart than anyone could travel between them.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "kmh",
+        "kind": "number",
+        "label": "Top speed",
+        "required": false,
+        "default": 500,
+        "min": 0,
+        "unit": "km/h"
+      }
+    ],
+    "sentence": "When a stream starts, and only if the travel speed is above 500 km/h. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.jZLPjpswEMZfxRr16ERAEkh4g722VS-rVTTYA4xibGob0iji3SsvaaRd9bA-jeaPv9HvmztoatlyZGehvgOqFIUP4evbIkE5q_lZ67ybxlS6fyi83oEsNoY01NFPJKFlMhpqiB5nMucwEunzZehBAqd83uYqa0ranFSOm31T0OaoK9xkj5fn2Q4kuJE8Ruehhi6ChBE9Du-b0B9lJk3ngAOdNc2saNVeJMxoJkpN39iOU4QakvKyvMnPa351lwKWBOPCNg2MzrC6gYSg3JiEFgmBZvIcb1DDFb1l24GE6LnryP-X0Fel8_TPLclAoBDY2W2I6CPpdSdNQXkeVyPhO3IggWJmZzDlxLUnK-LVicd0EIGjaCcfe_ICR_RRxB6tQHtzloRyk9Fi9U00FK-U5nsatpBstR350bNNVI_tgUoqdjorc9zhjlS103tSJ7Uvi2PeVHlT7jM85qdK62NWtrqsDm1VNiUeFGYK5HpQ_5AyhXQfybMVmaYWJxOhPmSZhAvdHlY-nbDT0JAHCQYbMlDDTzeK92MDCQNbqDMJnn5P7BP5Fk2gdAafjRzY_iA_k_9FPqwki22xzUCCxSGxfxlGFwI3hh5s3u3vacDnSC4hmKmDGvjZvHk0L38B",
+    "fingerprint": "8f5e6e23d061a3a3ec73d4ec9c46281b71b640a8197dd806fd675f76b6a5ca0c",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "kill-paused-streams",
+    "name": "Stop paused streams",
+    "description": "Stop a stream that has sat paused past the minutes you allow.",
+    "group": "housekeeping",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "minutes",
+        "kind": "duration",
+        "unit": "minutes",
+        "label": "Paused for",
+        "required": false,
+        "default": 30,
+        "min": 1,
+        "max": 1440
+      },
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "message",
+        "kind": "text",
+        "label": "Message shown to the viewer",
+        "required": false,
+        "default": "Your stream was stopped because it was paused for too long",
+        "maxLength": 500
+      }
+    ],
+    "sentence": "When a stream has been paused for 30 minutes, stop the stream.",
+    "effects": [
+      "kill",
+      "allServers"
+    ],
+    "code": "tracearr1.pVPbitswEP0VMfRRCVacxI7_oNBCYaFQyrJMrLEtYkuqLpsNIf9eZDvupkuf6id5JM25ja4gqVFaBWU0VFfAOq38w_LnFUjjsScJVXCROCgJFYhG1NlxT6tDLXC1PW5oVcoCV9n8iSLbAIeBvMeWUsdPStsYoFpqNw7hYgkqOKm-f_HBEQ5we75xqI2WauHSOhNtopK2TkonfG2CalSNI3UOvjZ2RPHkXsl9lg-IUxFuCdGptiX3X8IEcLDocBjZDYQ-uiSjjs6RDkm20jGQf5Q9125_dHvyXhm97qiXL41xk3hJvnbKTqHAUzCWIZvcYaHDwDr0zGNgFqMnySz6wEJHbEZgFxMZ9r05r4FDo3RLzjqlE4k6w11ZNPlW7HZYoJRFUTaizOqGtmWBh1zucVOWQtRFvskacaB8X-dNnmdSNMVhC3xKAyroTPR0IrJKt8BhlDnZKqnB2Aeo8ozDiS7vxC_5yeju2fV4pB4q-DbJST5wGPANKrHdZqOZUAkOjn5F5VJcDfaeOEStHozl1xltznsBW_7vUE_3wl89U4uFPfww0d2NPyfPg7GWJDtSnagyFcayXXizYAzrzejHrHue9YVKoLfwjsjXaZ_5zpw1C2bM8VXRmWYTvpBuQwfVLss-sn3-13MYlJ4kfifnpznarDfrDDhoHOg-VjPzSaIfn1FHAy6XBAffx3Z-oavp-Op-_PYb",
+    "fingerprint": "c0a587f34155a7add778f180cfe487a93d6a28811c7320f19e36c3f330d1f794",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "media-added",
+    "name": "New media added",
+    "description": "Tell a destination when a library item shows up for the first time.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When media is added, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLNrpswEIVfxRp1aSJMwu8bdNPNrbqp7sIwAxldMFzbNIoi3r0yJKSp1FW98hh8zsx3fAOklg17Hg1UN9BN2LmX7c8bkNF1TwiVtzNJYIQKVKuauM4oKhulo1OdUFRgrqP4vlQRJyDBj0HsC5tp9lCFcpHgrxNBBY4MwvK-SGhGg7xbd3acp-AcPn2wCXZm9Nxyo9dOJbhmDBI3cGR_kf2KLy7bISzBynLXkf2vORTsLQ-ErA8ake6dI7nG8rQBhO_U90ILJOfZrL2Ky5mM0KLn2mp7FexpEO48XpyYJ9GOVvgziZat88LzQAeQ0LLpyE6WTRhGJ5Q2mGKZlupY0_F0SlGnOeUFoTqmuk3LrChC3ZDOFOZplmDZ1iqjY5yfYpAb0L8gOpCw8trQfND1CW6nvte9rqmHCt4eB5Y-Z7aBZat7R4t8SPjxef0PDu5FxKBY_3uqhESW93_FPbDZnH-QdRvq5JAcwmxGDyGYb3QRazhiCyc8kTMNer-gJLh-7h4ZRvcMfwM",
+    "fingerprint": "a2e5cd5d95913be3445da57e78ed135af596887e78cea61d7562d9fb16e30740",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "media-upgraded",
+    "name": "Media upgraded",
+    "description": "Tell a destination when a library item changes quality.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When media is upgraded, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZJBj5swEIX_ijXq0UQY6Ab4B3voqateqj0M9piMFgxrm62iiP9eOWxIU6mncrKNee_N97iAIcuOI08O2gugTqvwsPx5AXLYDWSgjX4hCWygBWWVzrsnyhqtMKu6grLaHDHLPx_V5AVIiFMS-8JuXiK0abtKiOeZoIVAzsD6ukrQkzO8W_d-WubknF69sUt2bopsWeM1qYSgpyRxgUD-g_yzeXDZDmFNVp77nvx_zaFgjzySYTwsc-_R0Gd4Q0F7njeG8ELDIFAYCpHdNa74dSInUAzcefRnwZFGoU_oegrifcGB4_kAEiy7nvzs2aUZKoPKNF_LFK5QddmUmix1VKuKajpWljTWTV7r4ulYWyxNUeWk8jIv666wtgS5cfyLXQAJV0wbkTc633ntsPf9gB0N0ML324Gn94V9QmhxCLTKm0Sc7p__MXt4EHFGXO_dVVIR6-u_Wh7Zbc4_yIcNb3EoDjlIcDimPr6lPsTeR_oxTjTifl9JCMPS35rL7s39Bg",
+    "fingerprint": "4da1d953c0b6218393cefebe814e8e74feca8908c2678fa3d240e103038b2ff3",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "new-device",
+    "name": "New device",
+    "description": "Tell a destination the first time an account streams from a device you have not seen.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When an account plays from a new device, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "everyServer"
+    ],
+    "code": "tracearr1.pZHLjtswDEV_RSC6lAPLzcv-iG5mMJtiUOhBOcTYlCvJCYIg_17IzgRtga6qFQVSl1fn3sChJ6ZMgaG7gbalSn-U32-ArM2ADrocZ5RADjpQXtna7LFqrdLV1jRYHd1BV_XjNHXdgIQcitgX4mnO0JXrXUK-TggdJGQH9_e7BBvY0XN1H8M8lc2l9UFc1nHI5MnqxamEZEORuBWxSH2P8b-cKnia0taGmfOG8fLD4ZksrhYdJhtpWknBKw6D0MJhysSLKZFPKDzFlEWmEYVm8ZASKUfUYxI-hnF5VFTFNczipM8oOGSREHkDEjxxj3GKxIXWzmNra_T7o7attt7brdmi083W7A9W6daoVlmHx91OHVpbK9viEZu9sTvffDUO5MryL34JJCyBrMw-8Lom84T927fK7KANDtDBC7ITy1zEnzPFT87393_FNBK_YDxjfMOYVnLNptnUIIH1WHB_w8sDyJLqCUf9nFUS0jD3RRYv1WcYvwA",
+    "fingerprint": "5fe9c0ef68ac9acffc4b4eda24b67c1a9b191cde855179c01c9e8e26bc5f23bd",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "no-4k-transcodes",
+    "name": "No 4K transcodes",
+    "description": "Stop a stream that transcodes 4K source video.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "message",
+        "kind": "text",
+        "label": "Message shown to the viewer",
+        "required": false,
+        "default": "4K transcoding is not allowed on this server",
+        "maxLength": 500
+      }
+    ],
+    "sentence": "When a stream starts or transcoding starts or stops, and only if the source resolution is 4K (2160p); and also the stream is transcoding video. Flag it, then stop the stream.",
+    "effects": [
+      "kill",
+      "violation",
+      "allServers"
+    ],
+    "code": "tracearr1.pVTNjpswEH4Va9SjE_GXQHiDatteKvVSrSKDB7Di2KzHJButePfK0LBZRaq2u5zMGM98f-YFJDbKKK-sgfIFRB1W9Gb5-wXQiEqjhNK7ATkoCSXETVxH1RZXuzoWq6xKcFXIXKyiv0-8jXLgcEQi0WLo-EWZfvBQLrWRg7_0CCUclNZ78g7FEcbHkUNtjVQLltbZoZ-h3G7cI2sU6gCO7OBq3Dskq4eJ3PtRZ8DB9uiEtw5KwCfgcBJ6CDizBxgf-Uf1SGHk72WgaO-dMFRbqUz7H_C3_4B_UhLtZxhsZncOyoQDvdWqvgAHqm0_WUzoTui-yjd2z0UYRw6EJ3TKX6CEs3BmZuadalt0n4paDEuWCImUNWvywnmUk-Yf7Jrcd72agvu6E6YN_YMiEql2qp_vEfz0tmeCzYFmvhOeLeeIZQ9szieb_FhDcN206HqnTBAsSaoC82IXF_Fug0Wab6om3-ZJlTRpISOM8zRNZV7UUSbyNI-wSTZFlG1RbpJ4l6fA5xtztUghhQAFO2aRD3h59WWxc3nXokIdaFwLDp8G5YJ-jdCEQVGJjRi0n-4Eu0kqU8SM9Uxobc8omTXMd4rY67Bp9vUXsAz3-OxvRn-f9xl19myYt8x3QS48Tz2O4vkbmtZ3UG6i6B7f431Ej8rMdH6ho9mlZJ2sI-BgxDE4_MOyGyqTZFR3eBTLiZgD6aGFEoxdZYfVzbfjHw",
+    "fingerprint": "22b8e78918195e8375bf7672b2f38d0e17333d78c04a7370ef258046ed521973",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "paused-too-long",
+    "name": "Paused too long",
+    "description": "Tell a destination when a stream sits paused past the minutes you allow.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "minutes",
+        "kind": "duration",
+        "unit": "minutes",
+        "label": "Paused for",
+        "required": false,
+        "default": 30,
+        "min": 1,
+        "max": 1440
+      },
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a stream has been paused for 30 minutes, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pVLLjtsgFP0VdNUljoxDXv6D7iq16qYaVTdw7aDB4PLoNIr87xV2HpORuqpXcMHnyQU0dcaZZLyD9gKoyio-LX9cgBweLWloU8jEwWhoQXRC1cctVQclsJLHhqq93mFV3z5ZN8Ah-QL2ybgxJ2jLduKQziNBC5Gchull4qC80-ZO3Qefx8Jcjl6NK3TOJ9MZhbNSDlH5AnGBSOE3hc_6iWUZwlSogul7Cv_lQwCHEQMOs7qBMOZQ9KscArkEHAbjcqL4JOI2m94bjtF4tzqR1T87HxbzmqIKZlw6gG9kLUOmKSbjZrvs7USOIYspEA4smhTZiDmSZiPGxNKJ2JWMnX1maK1_WwGHzriewhiMK3pQboU6aKnUvlk3u61q5AZRUq2E1GJX79YC94Qbta6Pe7k5iIM-kNitJUl1bIQGvhTzoYwIHGbLS8SaOsw2QbuuObzS-V0Q9y51DrceLR7JQgtfFj8lEw4D_oFWSFnPwUIrOAT6lU0o1XVoI3HIzjyFzC9Xtmv3d7L7_kb19Tb4gPmASP6d1kcP8QnEaTbfe6CURzW9_OvFDsYtzN8pxKXqZtWsauDgcKBHBsl7Zr3r51d-ogHvPwgO0eYeWljqr5L31Xx1-gs",
+    "fingerprint": "a461c9d4cc823276c245aa4e0c14d170731a8ea5c30b845919d9e1734e4cb21d",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "plugin-update",
+    "name": "Tracearr plugin update",
+    "description": "Tell a destination when a server has a newer Tracearr plugin to install.",
+    "group": "server_health",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a plugin update is available, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLLbtswEEV_hRh0SRl62rL-oOsG2RRBMCKHEhGaUkgqQWDo3wuKtVwX6Kpc8XnvzLm8giSlrQ56stBdAUWc-YfpzyuQxd6QhC64hThoCR0UqhB5f6TsLArM6r6krJUnzPLbOOUlcAhTFPum7bwE6OJy5RC-ZoIOPFkJ68vKQUxW6t16cNMyR-d49KZttLNT0EoL3Crl4MUUJa7gyX2Q-y4fXNImrNHK6WEg9199FLCXPJtl0PawzBIDveIHahMlUxeSvHB6TjDhiYxhyCT5oO1WN_scyTJkqTw2omfILH2SY08OBaFzLBmwMDFtfUBjDsBBaTuQm522sTtV4Un2Z5X3fVHLIzZtLgtq61LhsalzVGdVyjavaiHKSjWFaOqmqCt5KoVqG6yAJ8I7qNeR0IQROGwAE6s3-rqT3GPY1wZ7MtDBj9uGo_dFuwhXofG08ptEmO7P_4DhH0SsZNu9u0qMaH35V_4XbZPzMzmfeJeH8pADB4uXmNTfRFNk29cZ6YL7u4KDN8uwZ5v9vrj-Ag",
+    "fingerprint": "f3a7db9f0bb14d6a580d1e842fa6540af9f2d8034cc23f51c545143d72cf85a3",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "server-down",
+    "name": "Server down",
+    "description": "Tell a destination when a media server stops answering.",
+    "group": "server_health",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a server goes down, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pVLLjtswDPwVgehRDmwnG8f-g5676KVYFHpQDrEO5ZXkBovA_17IRpzNoafqRFLUzHCoG1h0xJTIM3Q3UCZH8Sn8dQNkpQe00KUwoQSy0EHlKlPqIxatqVRx0DUWJ9uooryfl7IGCclnsG_E45Sgy-ksIX2OCB1EZAvz2yzBeLa0UffBT2NmzlfvxJmOfSJHRi1KJUTjM8QNIoY_GL7bJ5a1CHOmCtT3GP5rjgq-SM7IO-uvvCq3GE2gcTUQXnEYhBIWYyJetIrrGVkocUFLSqzPRUx-jEJxvGIg7ncgwRH3GMZAnAc4OefQOa3Nvm5Ma48NVna_P1THuj20p7Yu8aU0jTkY3Rh9Ura12rhGl5Vt0B2z4MXETfHvM6ohnUHC4tFqxzt-PszanN7yQWkcoIMf90LAj4lC9s-pIeIs7xDJP55_mT0-gbAVS98DJW9hfvvXii_EK_NPDHG1t97VuxIksLrgJkwsy8hf4owXtTVXEuIw9dtAxbqzvw",
+    "fingerprint": "8fffeffbbc327c9d67e1d3341629498920e50c7c4cb7cb8ad9dbcf7b01d7ef61",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "server-up",
+    "name": "Server back up",
+    "description": "Tell a destination when a media server answers again.",
+    "group": "server_health",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a server comes back up, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLPbqMwEMZfxRrt0USYBkh4gz1v1UtVVYM9JqMQQ23Tqop495VBIc1hT-uT_37fN7_xFQxZdhx5cNBcAXWahYfp6xXIYduTgSb6iSSwgQaUVTpvK8qOWmG2bwvKDqbGLL-NKi9AQhyS2C924xShSctZQvweCRoI5AzMb7MEPTjDm3Xnh2lMzunozC7ZuSGyZY1LUglBD0niCoH8J_nf5sFl3YQ5WXnuOvL_VYeCH5GT8m4a19yGgvY8rvjgmfpeoDAUIrslqfg6kRMoLmQYxfpYoAtf5IPADtntQIJl15EfPbsUvlSHVrVaFVVZFcrqonw6otm3-cGSfapqJKuUKmut6gqN3re2smSPJdW2LE2RoC8At7TvJ8I-nkDCwmdFcabvO6iN8rbusaUeGvhz2_D0MbFP7Cz2gWZ5k4jD_fmPysODiDNiuXdXSR2Y3_7V3gu71fmFfFjhFrtil4MEhxfagokW9VlM4_IjTnTB7b6SEPqp22rKUsv-Ag",
+    "fingerprint": "518b1bc1265621fc2539ad4b08fef367aef11157c176adc4bf6fef95e7f55d22",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "server-update",
+    "name": "Media server update",
+    "description": "Tell a destination when a media server has an update available.",
+    "group": "server_health",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a server update is available, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLNjtsgFIVfBV11iSOwm8T2G3TRVatuqtHoAhcbjYNdwFONIr97hd04yaKrsuL3nHu-yxUMWeddcqOH9gqo8yw-TX9egTyqgQy0KczEwRloQVqphTpR0WiJxWdVUlGbMxbiNmpRAoc0ZrFPzk9zgjYvFw7pYyJoIZI3sLwsHPTojdutuzDOU3bOR2_OZzs_JmedxrVSDlGPWeIKkcI7hS_myWXbhCVbBdd1FP4rh4SHkrPyYZ4MJnrFd3RDltxSGIo6uGmDCd9pGBgyQzE5v9bNfvfkGbILGYdsk2I9RoaebYpsVzwAB-t8R2EKzudQJamz1NWJZF2LSqi6kYLKc3USwhppGiuEsFhpaVWlBFl5VLbB6lib5nxqjrkZK9g9xWtPOKQeOKzcNkRv9HEHuNPf1wMqGqCFb7eNQL9mFzJTi0Okhd8k0nh__sAgPol4w9Z7d5XcmeXlX22_OL85_6AQN8zloTwI4ODxkhv09ZHtBnX9Lj1dcH8kOcRh7vZgxd-Lyx8",
+    "fingerprint": "2eb71c36e188030b8910e273600fd1d9f000fa3c1fb3b0ef15bf9a358d976952",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "simultaneous-locations",
+    "name": "Two places at once",
+    "description": "Raise a violation when one account streams from two distant places at the same time.",
+    "group": "policies",
+    "kind": "policy",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "km",
+        "kind": "number",
+        "label": "Distance apart",
+        "required": false,
+        "default": 100,
+        "min": 0,
+        "unit": "km"
+      }
+    ],
+    "sentence": "When a stream starts, and only if the distance between streams is at least 100 km. Flag it.",
+    "effects": [
+      "violation",
+      "everyServer"
+    ],
+    "code": "tracearr1.jZPLjtswDEV_RSC6VALbedrrfkFbdDMYBLREO0T0cCXZaRD43wvF6aAz6GK8EkxJvDiHuoOmjh0n9g6aO6DKq_hu-fI6S1DeaX6r9cGPQy7d3xVe7kAOW0MamhRGktAxGQ3N47KJTpFiZO9OmmNCp-h0sSCB846yK1XR7mlVqxJX27ai1VEfcFU8v7IqNiDBDxQw-QAN9IlAwoAB7SMU_VZm1HSKaOmkaWJFS4xZwoRmpLzpC7thTNDAxcI8v8qPgT-bpYI5Y7mwywcGb1jdQEJUfsh9ZgmRJgqcbtDAFYNj14OEFLjvKfyX1Wdbl_meW24DT57rmDAk0ksmTVEFHhal8A05kkAxsTeY_4nrmZzwjgQq5UeXREyB0EbRBW9Funqx6EliMKgoCkwinUlkriKxpTVksa6nMAR2GaYq991-X1WH4rjDulXlBsu62GG904cjtcdC47HYqk1Vl4TtZrdVNequpoIOmg67FuQyUn9RMsU8F1nVgkpTh6NJ0JRFIeFCt8XgmwA32pYCSDDYkoEGvj4nTOCAIYEEyw6aQkKgXyOHTL1DEymPwEeJlt13ChOFnxTiQrFaV-sCJDi0mfuPq_8HjneKHu7PZPHtTCkhmrHPltiOJqEjP8aV8QqX5zL_AQ",
+    "fingerprint": "c16f66227085a9bc13a1905a95d78eb80da804c3291eab354c9adf9e0e7de75b",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "stream-ended",
+    "name": "Stream ended",
+    "description": "Tell a destination every time a stream stops.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a stream stops, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLLbsMgEEV_xRp1iSNwHL_-oOtW3VRdYDO4o9jgAq4URf73CrtJmkpdlRWP4d47B86gUJOhQNZAcwbZxZm_m76eAY1sB1TQBDcjA1LQgNCi422Bad0JmeZthmmlSpnyy8h4BgyCjWIPZKY5QBOXC4NwmhAa8GgULG8Lg84aRVfr3tl5is7x6Egm2hkbSFMn16QMfGejxBk8uk90j-rOZduEJVo56nt0_-pDwI_I3pM1Ox_sNOF3eoW-czRtEOEZhyGRiUIfyKx5E_xEd0oCjZjIxAeHckyigt8BA02mRzc5MjF6q-tCibzm_KAPutMlF7zNdVll1X6PQu-LXO9LjSUKXuV1WbS5Kg-iUAWXqjrUwDZ8v5B5YLDS2UAc8XTDdGV8XQ-yxQEaeLpsOPyYyUVyWg4eF3aRCPZ2_UfH_k7EqGStu6lE_svbX487ktmcX9D5DWq2y3YcGBg5xmd42hiiUajW3_COo7xWCwZ-mPvY0VqXbnXLFw",
+    "fingerprint": "bf96d149005f5fcf7010b4f782833e1f364f37fe7e1084976b4d7516d60ad859",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "stream-started",
+    "name": "Stream started",
+    "description": "Tell a destination every time a stream starts.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a stream starts, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZLBbqMwEIZfBY16NBEYEgxvsOdWvaxyMPaYjgqGtU2lKOLdV4aGJJX2tD7ZZvz__3zDFTQashRotNBcQaq480_b31dAK9seNTTBzciANDSQm1xl7QnTWuUyLVuOqdCVTLPbyjMODMIYxV7ITnOAJh4XBuEyITTg0WpYzgsDNVpNu3XnxnmKzvHTJ9loZ8dAhpRckzLwaowSV_DovtD90k8u2yUs0cpR16H7rz5yeIjsPY324IN0Ab_Ta_TK0bRBhDfs-0QmGn0gu-ZN8AvdJQk0YCITHxzKIVkV_AEYGLIdusmRjdlVnVVHfiyV5pVRphSiKE7K1EIUPBOF5nmtiro1WSUqbAXWtTiVwghsS55xnQHb-P1g5oHBimcj8YmXO6cd8n7uZYs9NPB6u3D4ZyYX0RnZe1zYTSKM9-cPLfsnEauTte6uEgewnP813YHs5vyOzm9U-YEfYm9WDnEOrw8QUa8_xAcOcq_PGfh-7mJPa2W6D-wv",
+    "fingerprint": "c9075254cd27fcf488336cf98832083d219c39bf0787eb8e998648f8eb4202d0",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "tracearr-update",
+    "name": "Tracearr update",
+    "description": "Tell a destination when a new Tracearr release is out.",
+    "group": "server_health",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a Tracearr update is available, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "everyServer"
+    ],
+    "code": "tracearr1.pZHBbuQgEER_BbX2iEeGGcce_0aiXKIoajdtDwqDHcCJopH_PcJOrOxhT8upEU1V6dUNDPfW22RHD-0NkPIU_xqfbsAeO8cG2hRmlmANtKB6RWV3x8WZFBanTnPRmBqL8uecSw0S0pjF_lg_zQnafF0kpM-JoYXI3sDyvEig0Ru7Ww9hnKfsnJ9erc92fky2t4RrUgmRxixxy2LBDgOH_0qqYA-VAhJjCId5Mpj4Bd_Ruiy6JTUcKdhpAwYP7JxAYTgm69ds4uPCXqDw_CEevqVEYMcYWdgoxjkdQEJv_cBhCtZnKjV1pqT-rOuOqaL6xMdT1bOpiJqypGOFVdX0ZaPPmupGH-lONSelSGlC1dVHkBuzlWl45_ByYXTpAhJW8BubV_7cGtih_sodQYLDjh20cM_eiHUv8Ntsww_P5flfdVytv1-NHznEDY0-6EMJEjxeM9adxYZ1rfDCV9w_KAnRzcOvBorv1eUL",
+    "fingerprint": "7cbd0cf927bec5c74e345fed5cc800c35a558f08292c7823c618411c12ca1b73",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "transcode-started",
+    "name": "Stream is transcoding",
+    "description": "Tell a destination when a stream transcodes video or audio.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "server",
+        "kind": "server",
+        "label": "Server",
+        "required": false
+      },
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When a stream starts or transcoding starts or stops, and only if the stream is transcoding; send a notification.",
+    "effects": [
+      "tellsOnly",
+      "allServers"
+    ],
+    "code": "tracearr1.pZPBjpswEIZfxRr1aCIMZBN4g5636qVaRcYeyGiJzdom1Sri3SvjhiTdHqotJ9vg3-PvGy6gsSNDgayB5gJSxZF_GP64ABrZDqihCW5CDqShAdEJlbdPmNVKyKxqC8z2eiez_PqU-RY4BBvDvpAZpwBNnM4cwvuI0IBHo2F-mTkoazStR_fOTmM6-f7Fx0I6wiHWQv4QnDReWU2mh3-vsAIOdkQng3XQAL4Bh7McpljdmTTag3UHOWmyML_wz3Io0yVfycQNxgbqSMmFOQevbIRxAY_ujO6rfuCVFmGO0Bz1Pbr_MiLgDr73ZM3GB-kCapj5p1OLj6lXHXhQR2l6_O1Zo1eOxtRu8A2HgUmm0QcyCw_284iGSeaDQ3lia4pniw1mHVtsbCDKNz260ZGJoKptW-fd_qktu7aqVNGqstruSo1l3daV6nCndN6JFoVUdaWEFmW5w1rUapeLutoDT233hyAfmym6SNhf8f0mZTW6zgfZ4gANPF8XHL5N5CLRTg4eI-MUEext-939_UOI0Wz57pYSvcRG_Hsrncikk7-j8wlxsSk2OXAw8hT1PCeu5Nnj_-LVEU9y3SY4-GHqY51XA9naJ78A",
+    "fingerprint": "45b90f86b3fb44c2bc34573de39b94cfe7cd0f1be1ac94c1d1337e919c701948",
+    "builtin": true,
+    "verified": true
+  },
+  {
+    "slug": "trust-score-changed",
+    "name": "Trust score changed",
+    "description": "Tell a destination when an account's trust score changes.",
+    "group": "notifications",
+    "kind": "notification",
+    "minServerVersion": "2.2.0",
+    "inputs": [
+      {
+        "key": "to",
+        "kind": "destinations",
+        "label": "Send to",
+        "required": true
+      }
+    ],
+    "sentence": "When an account's trust score changes, send a notification.",
+    "effects": [
+      "tellsOnly",
+      "everyServer"
+    ],
+    "code": "tracearr1.pZFRS-wwEIX_Shgu-JIubbpr2v4NxRcRmSbTbrA7rUmqyLL_XdLuLVfFp5unCTk5c_jOGSx1jl10I0NzBjRpCl_GxzMQYzuQhSb6mSQ4Cw0UXWHy9pay2hSY7VtFWWU1Zvn1qCJXICGOyeyP42mO0KTrRUL8mAgaCMQWLk8XCWZk67bVvR_nKW1OTy-O0zoeo-ucwSWphGDGZHFOZt71Pfn_SlrAFgqNGWeOu-jnEJ_NEbmna0pLwXg3rbDgnoZBoLAUouMll3g_EgtkcfW4CWJxEcGMnsTqFXYgoXPck5-84wRF27yu9WGvOlXkpemwQ1MgotVqr_dU6lKpg77VinTVVdbYQ1XWZVvruqxMVZUgV2TfMAWQsHBf0bzQx1rAxvSf6Ek7YEsDNHBHbMWi8_Q6O_8X5-XptzZOju_Iv5F_IB9WOmqndjlIYDwlqvc_ONilxSOdcPtUSAjD3KeUSZ4t8myr4BM",
+    "fingerprint": "7d0997542f2103cfafac1aaad72474e3732257672e78f8dcd58393b97938c883",
+    "builtin": true,
+    "verified": true
+  }
+]

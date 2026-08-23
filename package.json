@@ -11,11 +11,13 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@giscus/react": "^3.1.0",
     "@next/third-parties": "^16.1.5",
     "@scalar/api-reference-react": "^0.9.60",
     "@vercel/analytics": "^1.6.1",
     "lucide-react": "^0.563.0",
     "next": "^15.5.23",
+    "next-themes": "^0.4.6",
     "nextra": "^4.6.1",
     "nextra-theme-docs": "^4.6.1",
     "react": "^19.2.4",

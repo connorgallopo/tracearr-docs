@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { statSync } from "fs";
 import { join } from "path";
+import { getTemplates } from "./templates/data";
 
 function getLastModified(filePath: string): Date {
   try {
@@ -12,8 +13,18 @@ function getLastModified(filePath: string): Date {
   }
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://docs.tracearr.com";
+
+  // One entry per template in the community index, so a new template is
+  // reachable without editing this file.
+  const templates = await getTemplates();
+  const templatePages: MetadataRoute.Sitemap = templates.map((template) => ({
+    url: `${baseUrl}/templates/${template.slug}`,
+    lastModified: getLastModified("templates/page.tsx"),
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
 
   return [
     {
@@ -97,8 +108,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/configuration/rules`,
-      lastModified: getLastModified("configuration/rules/page.mdx"),
+      url: `${baseUrl}/configuration/automations`,
+      lastModified: getLastModified("configuration/automations/page.mdx"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
@@ -186,5 +197,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/templates`,
+      lastModified: getLastModified("templates/page.tsx"),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...templatePages,
   ];
 }

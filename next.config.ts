@@ -21,7 +21,12 @@ export default withNextra({
       },
       {
         source: "/rules",
-        destination: "/configuration/rules",
+        destination: "/configuration/automations",
+        permanent: true,
+      },
+      {
+        source: "/configuration/rules",
+        destination: "/configuration/automations",
         permanent: true,
       },
       {
