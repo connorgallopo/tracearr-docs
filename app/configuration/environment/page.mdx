@@ -39,6 +39,8 @@ Tracearr uses environment variables for core configuration.
 | `BASE_PATH` | Base path when served under a subpath | none |
 | `DNS_CACHE_MAX_TTL` | DNS cache maximum TTL in seconds | disabled |
 | `GZIP_ENABLED` | Enable server-side gzip compression | `false` |
+| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10` |
+| `IMAGE_CACHE_MAX_MB` | Hard ceiling on the poster cache size in MB | none |
 | `BACKUP_DIR` | Directory for storing database backups | `/data/backup` |
 
 ## Database Configuration
@@ -185,6 +187,14 @@ GZIP_ENABLED=true
 Most deployments sit behind a reverse proxy (e.g. Nginx, Caddy, Traefik) that already handles compression. Only enable this if Tracearr is serving traffic directly without a compressing proxy in front of it. \
 Enabling gzip will slightly increase CPU usage on the server.
 </Callout>
+
+## Poster Cache
+
+Tracearr keeps one 360×540 copy of every poster under `data/image-cache` and keeps it until the
+poster changes or its item leaves the library. Nothing is evicted to make room. When free disk on
+that volume would fall under `IMAGE_CACHE_MIN_FREE_PERCENT` the cache stops growing, the precache
+pass reports disk-limited in Settings → General, and posters that are not cached are fetched from
+the media server on request. A library of 100k posters needs about 2 GB.
 
 ## Backup Directory
 
