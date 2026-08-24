@@ -1,0 +1,217 @@
+---
+title: Troubleshooting Tracearr - Symptom and Error Index
+description: Find the page that explains your problem, either by the symptom in your own words or by the exact error text on your screen.
+---
+
+import { Callout } from "nextra/components"
+
+# Troubleshooting
+
+Two ways in. Scan the symptom index for a line that sounds like what you are seeing, or search the error index for the text on your screen. Every entry points at the page that explains it.
+
+The rest of this section is procedure rather than pointers. [Collecting Logs](/troubleshooting/logs) has the log commands for each install path. [Reporting a Bug](/troubleshooting/reporting) covers what belongs in a report.
+
+<Callout type="info">
+72 of 479 Tracearr issues needed a request for more information, and those threads run a median of 6 comments against 2 for everything else. Collect logs before you open one.
+</Callout>
+
+---
+
+## Symptom Index
+
+### Connecting a Media Server
+
+- [Tracearr can't connect to my media server](/faq#tracearr-cant-connect-to-my-media-server)
+- [Jellyfin stopped working right after I upgraded it to 12](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin)
+- [Adding a server fails with a fetch error inside Docker](/faq#disabling-ipv6-in-docker)
+- [Check Plugin says Playback Reporting isn't installed when it is](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error)
+- [Migrations fail against a PostgreSQL server I run myself](/faq#can-i-run-tracearr-without-docker)
+
+### Sessions and Real-Time Updates
+
+- [Sessions aren't being tracked](/faq#sessions-arent-being-tracked)
+- [Jellyfin or Emby sessions are slow to appear](/faq#jellyfin-or-emby-sessions-are-slow-to-appear)
+- [The real-time badge never shows up on my server card](/sse-plugin/troubleshooting#tracearr-doesnt-show-the-real-time-badge)
+- [The stream connects and then nothing arrives](/sse-plugin/troubleshooting#connected-hello-arrives-then-nothing)
+- [Events stall behind my reverse proxy](/sse-plugin/troubleshooting#events-stall-behind-a-reverse-proxy)
+- [My client keeps getting disconnected](/sse-plugin/troubleshooting#client-keeps-getting-disconnected)
+- [I can't tell whether to use webhooks, the WebSocket API, or SSE](/sse-plugin/comparison#which-one-should-you-use)
+- [Server Resources is empty](/faq#server-resources-is-empty)
+
+### Locations and Geolocation
+
+- [I don't see any location data and everything shows as local](/faq#i-dont-see-any-location-data--everything-shows-as-local)
+- [The location data is wrong](/faq#the-location-data-is-wrong--ip-geolocation-is-inaccurate)
+- [Country detection looks wrong on an automation](/configuration/automations#country-detection-seems-wrong)
+
+### Signing In
+
+- [I forgot my Tracearr password](/faq#how-do-i-reset-my-tracearr-password)
+- [I used to sign in with Jellyfin credentials and now I can't](/configuration/recovery#common-lockout-scenarios)
+- [Local login is disabled and my SSO is broken](/configuration/recovery#enable-local-login)
+- [I don't know which account is which any more](/configuration/recovery#list-users)
+- [Login works on the local address but not through my reverse proxy](/configuration/environment#reverse-proxy)
+- [Everyone got signed out after an upgrade](/upgrading#authentication-changes)
+- [The setup page is asking me for a claim code](/configuration/environment#claim-code)
+
+### The Mobile App
+
+- [The QR code won't pair](/configuration/mobile#invalid-qr-code-or-pairing-failed)
+- [The app can't connect to my server](/configuration/mobile#app-cant-connect-to-server)
+- [I'm not getting push notifications](/configuration/mobile#not-receiving-push-notifications)
+- [A device shows "Last seen" a long time ago](/configuration/mobile#device-shows-last-seen-a-long-time-ago)
+- [I can't add another device](/configuration/mobile#cant-add-more-devices)
+- [My phone had to pair again after sitting idle](/configuration/mobile#session-expiry)
+
+### Automations
+
+- [An automation isn't firing](/configuration/automations#an-automation-isnt-firing)
+- [An automation is firing too often](/configuration/automations#an-automation-is-firing-too-often)
+- [A share code someone sent me won't import](/configuration/automations#codes-that-wont-read)
+
+### Importing History
+
+- [Records were skipped during a Tautulli import](/getting-started/import#import-from-tautulli)
+- [Records were skipped during a Jellystat import](/getting-started/import#import-from-jellystat)
+- [Records were skipped during a Playback Reporting import](/getting-started/import#import-from-playback-reporting-plugin)
+- [My imported sessions have no location or stream details](/getting-started/import#import-from-playback-reporting-plugin)
+- [My imported Tautulli sessions show 0% progress](/faq#my-imported-tautulli-sessions-show-0-progress)
+- [The plugin is already gone from my server](/getting-started/import#falling-back-to-jellystat)
+
+### Jobs and Data
+
+- [A job says "already running" and nothing is progressing](/faq#a-job-says-already-running-but-i-dont-see-any-progress)
+- [I see inconsistent device names](/faq#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
+- [I see both "US" and "United States" in my country data](/faq#i-see-both-us-and-united-states-in-my-country-data)
+- [Users show "Never" for last activity](/faq#users-show-never-for-last-activity-even-though-they-have-watch-history)
+- [My Library Growth charts are empty](/faq#my-library-growth-charts-are-empty-or-missing-historical-data)
+- [My analytics numbers look wrong or my charts show gaps](/faq#my-analytics-numbers-look-wrong-or-charts-show-gaps)
+- [I want to clear violations, rules, or sessions and start over](/configuration/debug#danger-zone)
+
+### Backups and Restores
+
+- [The restore option is disabled on my backups](/configuration/backup#superuser-requirement)
+- [Restoring a large database runs the container out of memory](/configuration/backup#restoring-from-a-backup)
+- [My backups aren't on the host filesystem](/configuration/backup#backup-directory)
+- [Tracearr can't write to my backup directory](/configuration/backup#permissions)
+
+### Installing and Upgrading
+
+- [My stack deploys from a Docker UI but Tracearr never starts](/getting-started/installation/docker-ui#things-to-know)
+- [My container names don't match the ones in the documentation](/getting-started/installation/docker-ui#things-to-know)
+- [PostgreSQL refuses to start after I switched between standard and supervised](/getting-started/installation/supervised#how-it-differs-from-standard)
+- [The supervised container restarts in a loop and never turns healthy](/getting-started/installation/supervised#why-named-volumes-matter-here)
+- [The supervised container gets killed with exit code 137](/getting-started/installation/supervised#requirements)
+- [Real-time updates die after 60 seconds on Kubernetes](/getting-started/installation/kubernetes#ingress)
+- [Job queues corrupt on the Redis I brought myself](/getting-started/installation/kubernetes#using-an-external-redis)
+- [I don't know how to update my Proxmox VE LXC](/upgrading#proxmox-ve)
+
+### Performance
+
+- [Pages are slow to load on Unraid](/faq#pages-are-slow-to-load-on-unraid)
+- [Database writes are slow on a path under `/mnt/user`](/getting-started/installation/supervised#why-named-volumes-matter-here)
+
+### Remote Access
+
+- [Tracearr can't reach other devices on my tailnet](/configuration/tailscale#what-you-cannot-do)
+- [Tracearr won't act as an exit node or a subnet router](/configuration/tailscale#limitations)
+
+### Logs and Diagnostics
+
+- [I don't know where my logs are](/troubleshooting/logs)
+- [The log command I was given returns nothing useful](/troubleshooting/logs)
+- [I need version, memory, and database numbers for a report](/configuration/debug)
+- [My issue was closed for missing information](/troubleshooting/reporting)
+
+---
+
+## Error Message Index
+
+Match the text on your screen against the strings below.
+
+### Media Server Connections
+
+```
+cannot reach [Plex/Emby/Jellyfin] server ... fetch failed
+```
+
+This comes up while adding a media server, usually from IPv6 resolution inside the container. See [Disabling IPv6 in Docker](/faq#disabling-ipv6-in-docker).
+
+```
+jellyfin request failed: 500 Internal Server Error
+```
+
+```
+System.MissingMethodException: Method not found: 'System.Collections.Generic.IEnumerable`1<...User> MediaBrowser.Controller.Library.IUserManager.get_Users()'.
+```
+
+The first appears on the Import page after **Check Plugin**. The second is the matching entry in the Jellyfin log. Both point at [Playback Reporting on Jellyfin 10.11.9+](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error).
+
+### The SSE Plugin
+
+```
+401 Unauthorized
+```
+
+The token isn't reaching the server in a form it accepts. See [401 Unauthorized](/sse-plugin/troubleshooting#401-unauthorized).
+
+```
+404 Not Found
+```
+
+Either the path is wrong for your server type or the plugin isn't loaded. See [404 Not Found](/sse-plugin/troubleshooting#404-not-found).
+
+```
+disconnected on buffer overflow
+```
+
+Your client is reading slower than events arrive. See [Client Keeps Getting Disconnected](/sse-plugin/troubleshooting#client-keeps-getting-disconnected).
+
+### Logs and the Debug Page
+
+```
+No such file or directory
+```
+
+The supervised log paths under `/var/log/supervisor/` do not exist on a standard image. Pick your own install path in [Collecting Logs](/troubleshooting/logs).
+
+```
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+```
+
+```
+PostgreSQL init process complete; ready for start up
+```
+
+A captured database log that ends on one of these lines and holds nothing else is missing its stderr. PostgreSQL writes almost everything there. [Collecting Logs](/troubleshooting/logs) has the redirect that keeps it.
+
+```
+Log explorer is only available in supervised mode
+```
+
+The Log Explorer switches on the image tag, so a pinned digest or a retagged image loses it even when the files are present. See the [Debug Page](/configuration/debug).
+
+### Messages in the Web UI
+
+```
+That doesn't look like a Tracearr share code
+This code looks cut off
+That's too big to be a Tracearr automation
+This needs Tracearr 2.2.0 or newer
+That's a lot of codes in one minute
+```
+
+All five come from pasting a share code. See [Codes That Won't Read](/configuration/automations#codes-that-wont-read).
+
+```
+already running
+```
+
+A job in **Settings** → **Jobs** that says this without progressing has stale state from a previous crash. See [the FAQ entry](/faq#a-job-says-already-running-but-i-dont-see-any-progress).
+
+```
+Invalid QR code
+Pairing Failed
+```
+
+Pairing tokens last 15 minutes and work once. See [Mobile App troubleshooting](/configuration/mobile#invalid-qr-code-or-pairing-failed).

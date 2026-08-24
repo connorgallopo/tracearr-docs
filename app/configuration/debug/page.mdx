@@ -13,6 +13,10 @@ Tracearr includes a debug page at `/debug` for troubleshooting and advanced main
 http://your-tracearr:3000/debug
 ```
 
+<Callout type="warning">
+The debug page is owner only. The server checks the role on every `/debug` request, and nothing blocks the route in the browser, so anyone else who opens the URL gets the page with every panel failing to load.
+</Callout>
+
 ## System Information
 
 The debug page displays real-time system stats:
@@ -30,51 +34,45 @@ View database health and size information:
 - **Database size** — total storage used
 - **Table sizes** — breakdown by table and TimescaleDB aggregates
 
-## Logs (Supervised Only)
+## Logs
 
-If running the `supervised` image, the debug page includes a Log Explorer for viewing PostgreSQL, Redis, and application logs directly in the browser.
+Where Tracearr's logs live depends on how you installed it. The retrieval commands for every platform are on [Collecting Logs](/troubleshooting/logs). This page covers what the debug page itself gives you.
 
-You can also access logs via CLI:
-
-```bash
-docker exec tracearr cat /var/log/supervisor/tracearr-error.log
-```
-
-Available log files in `/var/log/supervisor/`:
-
-| Log File | Contents |
-|----------|----------|
-| `tracearr.log` | Application stdout |
-| `tracearr-error.log` | Application errors |
-| `postgres.log` | PostgreSQL stdout |
-| `postgres-error.log` | PostgreSQL errors |
-| `redis.log` | Redis stdout |
-| `redis-error.log` | Redis errors |
-| `supervisord.log` | Supervisor process manager |
-
-<Callout type="info">
-Set `LOG_LEVEL=debug` in your environment for verbose application output.
+<Callout type="warning">
+`LOG_LEVEL` is read once when the server starts. Raising it to `debug` takes an environment edit and a restart, and the restart throws away the `docker logs` history you were about to collect. Capture your logs first, then raise the level and reproduce.
 </Callout>
 
 ### Standard Docker Logs
 
-If running the standard `latest` image with separate containers, use standard Docker log commands:
-
-```bash
-docker logs tracearr          # Application logs
-docker logs tracearr-db       # Database logs
-docker logs tracearr-redis    # Cache logs
-```
+The standard `latest` image runs `tracearr`, `tracearr-db` and `tracearr-redis` as separate containers, and each one keeps its own log. [Collecting Logs](/troubleshooting/logs) has the `docker logs` commands, including the redirect that keeps stderr.
 
 ### Proxmox VE LXC Logs
 
-If running in a Proxmox VE LXC, use standard systemd journal commands:
+In a Proxmox VE LXC the three services run under systemd, but only Tracearr keeps its real log in the journal. PostgreSQL and Redis write theirs to files under `/var/log`, and [Collecting Logs](/troubleshooting/logs) covers both sources.
 
-```bash
-journalctl -u tracearr   # Application logs
-journalctl -u postgresql # Database logs
-journalctl -u redis      # Cache logs
-```
+### Supervised Logs
+
+The `supervised` image runs everything in one container under supervisord, which sends each program's two streams to its own file in `/var/log/supervisor/`. The debug page reads those files in a Log Explorer panel.
+
+| Log File | What it holds |
+|----------|---------------|
+| `tracearr.log` | Application stdout |
+| `tracearr-error.log` | Application stderr |
+| `postgres.log` | PostgreSQL stdout |
+| `postgres-error.log` | PostgreSQL stderr |
+| `redis.log` | Redis stdout |
+| `redis-error.log` | Redis stderr |
+| `supervisord.log` | Supervisor process manager |
+
+Take both halves of a pair. A service picks its own stream, and the file named for errors is regularly the substantive one: supervisord routes stderr to the `-error.log` file, and PostgreSQL sends its entire server log to stderr. Tracearr runs the other way. On a measured install it wrote 19,110 lines to stdout against 24 to stderr.
+
+**Download All** packages every file that exists into `tracearr-logs-<timestamp>.zip`, through `GET /debug/logs/download`. That zip is what you attach to a bug report.
+
+<Callout type="warning">
+The Log Explorer returns at most 1000 lines and 256 KiB per file, newest first, and it cannot reach the rotated backups. Read it in the browser, and attach the zip from **Download All** instead.
+</Callout>
+
+The panel is gated on the running image tag containing `supervised`, not on what is installed in the container. A pinned digest or a retagged image reads `Log explorer is only available in Docker environments` in the browser, and the endpoints answer `Log explorer is only available in supervised mode`.
 
 ## Snapshot Management
 

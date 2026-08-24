@@ -32,3 +32,6 @@ npm-debug.log*
 
 # Vercel
 .vercel
+
+# ~/.gitignore_global ignores logs/ — this is a docs route, not a log directory
+!app/troubleshooting/logs/

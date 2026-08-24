@@ -1,0 +1,55 @@
+---
+title: Bug Reports - What to Collect Before Filing
+description: The checklist for a Tracearr bug report. Two unauthenticated endpoints, logs from every service, the owner-only pastes that fill the template, and what happens after you file.
+---
+
+import { Callout } from "nextra/components"
+
+# Filing a Bug Report
+
+Work down this page before you [open the issue](https://github.com/connorgallopo/tracearr/issues). Reports that need a follow-up question run a median of 6 comments. The rest run 2.
+
+## Start With Two Endpoints
+
+Neither one needs a login. Run them from any machine that can reach Tracearr, and paste both responses into the report.
+
+```bash
+curl http://your-tracearr:3000/health
+curl http://your-tracearr:3000/api/v1/version
+```
+
+`/health` reports the state of the database, Redis, GeoIP and Tailscale in a single response. When Tracearr has not finished starting, it returns `initStep` and `migrationError`. That pair is what separates a failed migration from a connectivity outage.
+
+`/api/v1/version` fills the Tracearr Version field. The version also sits at the bottom of the left-hand navigation, but reading it there needs a dashboard that loads. The endpoint answers when the dashboard does not, which is exactly the report where the field matters.
+
+## Logs From Every Service
+
+The retrieval commands for each install path are on the [logs page](/troubleshooting/logs). Two rules decide whether what you attach is usable.
+
+- Every service, not one. Tracearr, the database and the cache each write a separate log, and a report with one of the three comes back with a question instead of a fix.
+- The full window you reproduced the fault in, not a slice. Capture from before you started through to after the fault appeared.
+
+<Callout type="warning">
+Capture the logs you already have before you set `LOG_LEVEL=debug`. The level is read once when the server starts, so the change needs a restart, and the restart discards the `docker logs` history you were about to attach.
+</Callout>
+
+## Two More Pastes for Owners
+
+Signed in as the owner, open these two paths in your browser and paste the JSON:
+
+- `/debug/env` returns the Node version, platform, architecture, cgroup memory and CPU limits, free space on `/data`, and the PostgreSQL, TimescaleDB and Redis versions. That covers most of the Host System field in one paste.
+- `/api/v1/servers` returns each connected server's `version` and `latestVersion`. That is the Media Server Version(s) field, which is blank on 47 of 272 reports.
+
+<Callout type="info">
+Everything under `/debug` is owner-only. A non-owner who opens it gets a rendered page whose every panel returns 403.
+</Callout>
+
+## After You File
+
+A report that gets labelled `needs-information` is waiting on you. It goes stale after 14 days and closes as `not_planned` after 21.
+
+A closed report is not a verdict on the bug. Reply on the thread with what was missing and a maintainer reopens it. Do not file a second issue.
+
+## What the Logs Contain
+
+Logs are safe to attach. Tracearr logs request URLs with their query strings, and the parameter keys that have appeared in production logs are ordinary UI state: page number, sort order, time period, server id. No tokens, no secrets. If you want certainty before you attach a file, grep it for `token=` first.

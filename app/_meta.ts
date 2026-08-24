@@ -4,6 +4,7 @@ export default {
   configuration: 'Configuration',
   templates: 'Automation Templates',
   'sse-plugin': 'SSE Plugin',
+  troubleshooting: 'Troubleshooting',
   upgrading: 'Upgrading',
   api: {
     title: 'API Reference',

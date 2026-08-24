@@ -1,0 +1,179 @@
+---
+title: Collecting Logs for a Bug Report
+description: Capture Tracearr, PostgreSQL, and Redis logs from standard Docker, a Docker UI, the supervised image, a Proxmox VE LXC, or Kubernetes.
+---
+
+import { Callout } from "nextra/components"
+
+# Collecting Logs
+
+Two mistakes account for most of the logs attached to Tracearr issues, and both produce a file that cannot contain the answer.
+
+The first is one service instead of three. Tracearr, PostgreSQL and Redis each keep their own log. The line that explains a failure is often in the one that was not sent, so capture all three every time.
+
+The second is a slice instead of a window. Of 270 reports, 115 pair a screenshot with five or fewer log lines. Five lines around the moment you noticed something is rarely enough. Capture the whole period you reproduced in.
+
+## Which Install Do You Have?
+
+The commands below diverge by install, and following the wrong branch costs a round trip. One command settles it:
+
+```bash
+docker ps
+```
+
+| `docker ps` shows | Your install is |
+|---|---|
+| Three containers | Standard Docker |
+| One container | Supervised |
+| Nothing, or `docker` is not a command | Proxmox VE LXC, or a manual install |
+
+If you deployed with the Helm chart, skip to [Kubernetes](#kubernetes). If you administer Docker through a web interface rather than a shell, read [No Terminal?](#no-terminal) after the section for your install.
+
+## Standard Docker
+
+Three containers, three commands. Run all three, even when you are confident which service is at fault.
+
+```bash
+docker logs tracearr       --since 2h > tracearr.log       2>&1
+docker logs tracearr-db    --since 2h > tracearr-db.log    2>&1
+docker logs tracearr-redis --since 2h > tracearr-redis.log 2>&1
+```
+
+<Callout type="warning">
+`2>&1` is not decoration. PostgreSQL writes its server log to stderr: one measured host produced 12,604 stdout lines from the database container against 136,062 on stderr. Redirect stdout alone and you throw away almost the entire database log.
+</Callout>
+
+A database log that was captured without `2>&1` ends at the initialization banner. The last line is one of these:
+
+```
+PostgreSQL init process complete; ready for start up
+```
+
+```
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+```
+
+The entrypoint prints that banner on stdout. Every server log line after it goes to stderr, so a redirect that catches only stdout stops right there. The reporter on [issue #1081](https://github.com/connorgallopo/Tracearr/issues/1081) sent an 89-line database log, then a 97-line one, each ending at one of those two lines with zero server output in either.
+
+`--since 2h` is what turns a tail into a window. On a live host the same command returned 19,589 lines unbounded and 711 lines with `--since 2h`. Change `2h` to cover the period you reproduced in.
+
+Container names come from the `container_name` keys in `docker-compose.pg18.yml`. Stacks deployed through a UI that drops those keys get a compose prefix instead, such as `tracearr-timescale-1`. Run `docker ps` first and use the names it prints.
+
+## No Terminal?
+
+This is the largest single failure mode in the issue tracker, and it belongs to people running Tracearr from Unraid's Docker tab, Synology Container Manager, Portainer or the TrueNAS Docker UI. Each of those shows a container's log. What none of them shows by default is enough of it.
+
+They open on the tail. The last screenful loads, and the lines that explain your problem are usually above it. Controls differ between tools and move between versions, so instead of hunting for a particular button, check the result:
+
+1. Open the log view for the `tracearr` container.
+2. Scroll to the top of what loaded, or raise whatever line limit the tool offers, until the first line you can see is older than the moment you started reproducing.
+3. Select all of it, copy it into a text file, then do the same for the database and Redis containers.
+
+If your tool has an export or download control, use that instead. It writes the whole file rather than the part that happened to be on screen.
+
+If it cannot reach back far enough, attach what it gave you and say so in the report. A short log with that note is worth more than a long one that starts in the wrong place.
+
+<Callout type="warning">
+Attach log text, not a picture of it. A screenshot holds one screenful, cannot be searched, and silently drops everything scrolled off the top. Where your tool offers an export or download, use it.
+</Callout>
+
+## Supervised
+
+Go to `/debug` on your Tracearr instance and click **Download All** in the Logs panel. It returns a file named `tracearr-logs-<timestamp>.zip`, through `GET /debug/logs/download`. That zip is the thing to attach.
+
+The Log Explorer on the same page is for looking, not for attaching. It caps a response at 1000 lines and 256 KiB, returns newest first, and cannot reach rotated backup files at all. A reproduction window wider than that is cut off before you see it. For what each supervised log file holds, see the [Debug Page](/configuration/debug).
+
+<Callout type="warning">
+All of `/debug` is owner-only, enforced on the server with no client-side guard. Sign in as the owner account first, otherwise you get a rendered page whose every panel returns 403.
+</Callout>
+
+If the log endpoints answer with this instead of content:
+
+```
+Log explorer is only available in supervised mode
+```
+
+then Tracearr does not believe it is running the supervised image. The check reads the image tag and looks for the substring `supervised` in it, so it tests a string rather than the actual capability. Pinning the image by digest or retagging it turns the feature off while the files themselves are still there. Pull the image by its `supervised` tag to restore it, or read the files under `/var/log/supervisor/` inside the container.
+
+## Proxmox VE LXC
+
+Only Tracearr logs to the journal. PostgreSQL and Redis both write to files, and their journal units carry systemd lifecycle lines and nothing else, which is the part that surprises people. On one live LXC the `tracearr` journal held 6,033 lines of application log while the `redis-server` journal held start and stop messages.
+
+The installer enables `postgresql`, `redis-server` and `tracearr`. There is no `redis` unit on this install, so a `journalctl -u redis` targets something that does not exist.
+
+Capture both sources for each service:
+
+```bash
+journalctl -Iu tracearr > tracearr.log 2>&1
+
+{ journalctl -u 'postgresql@*' --no-pager
+  pg_lsclusters | awk '$4=="online" {print $7}' | while read -r f; do
+    echo "--- $f ---"; cat "$f"
+  done
+} > tracearr-db.log 2>&1
+
+{ journalctl -u redis-server --no-pager
+  RLOG=$(redis-cli CONFIG GET logfile 2>/dev/null | tail -1)
+  [ -n "$RLOG" ] && { echo "--- $RLOG ---"; cat "$RLOG"; }
+} > tracearr-redis.log 2>&1
+```
+
+`-Iu` limits the output to the unit's latest invocation, which keeps the file to the run you care about: on one test unit `-u` returned 457,999 lines against 234,218 for `-Iu`. Use it on `tracearr` only. The other two journals are lifecycle records, and restricting them to the current run would discard the restart history that is the entire reason to read them.
+
+When the symptom is a crash, the run you want has already ended. Add `--invocation=-1` to reach the previous one:
+
+```bash
+journalctl -u tracearr --invocation=-1 > tracearr-previous.log 2>&1
+```
+
+Both log files rotate weekly, with roughly 11 to 12 weeks retained. The `cat` in the block above reads the live file only. On one LXC the current `postgresql-18-main.log` was 85KB while `.1`, rotated at 00:03 that morning, was 371KB. If your incident predates the last rotation, attach the matching `.1` or `.gz` as well.
+
+The log directories carry no world-read bit: `drwxr-s--- redis adm` on Redis, `-rw-r----- postgres adm` on the PostgreSQL file. Run the block as root or as a member of `adm`. The Proxmox console gives you root, so it works there. Over SSH as an ordinary user, the `journalctl` lines succeed and the `cat` lines fail with permission denied, and you end up with a file holding lifecycle messages only.
+
+<Callout type="info">
+The `while read -r` loop matters after a `pg_upgradecluster`, when `pg_lsclusters` lists two online clusters. Collapsing it into a single `cat "$(...)"` fails on the embedded newline and captures neither cluster.
+</Callout>
+
+## Kubernetes
+
+The Helm chart derives its workload names from the release name. After the quick start's `helm install tracearr`, the Deployment is `tracearr` and the two StatefulSets are `tracearr-timescale` and `tracearr-redis`. Another release name prefixes all three.
+
+```bash
+kubectl logs -n tracearr deploy/tracearr > tracearr.log
+kubectl logs -n tracearr statefulset/tracearr-timescale > tracearr-db.log
+kubectl logs -n tracearr statefulset/tracearr-redis > tracearr-redis.log
+```
+
+If the Tracearr pod never leaves `Init`, its logs are in the init containers rather than the `tracearr` container. They are named `wait-db` and `wait-redis`; pass one to `-c` to see which dependency it is still waiting on.
+
+## The Container Will Not Start
+
+`docker logs` reads a container. When the container died before it printed anything, there is nothing to read and the file comes out empty. Empty output here is not evidence that nothing is wrong, and pasting it into an issue reads as an empty log field.
+
+Do both of these:
+
+1. Bring the stack up in the foreground with `docker compose up`, leaving off `-d`. Startup output goes to your terminal, including whatever the container prints before it dies. Copy the whole run, from the command you typed to the point it stops.
+2. Run `docker compose config` and read the rendered `environment` block. `JWT_SECRET` and `COOKIE_SECRET` must each have a value. Most Docker UIs do not load a `.env` file the way the CLI does, which leaves those two empty; see [Docker UI](/getting-started/installation/docker-ui) for how to set them in your tool.
+
+## Before You Raise the Log Level
+
+`LOG_LEVEL` is read once, when Tracearr builds its logger at startup. Changing it takes an environment edit and a restart, and the restart is the trap: it destroys the `docker logs` history you were about to capture.
+
+Order the work so the restart costs you nothing:
+
+1. Capture the logs you already have, using the section for your install.
+2. Set `LOG_LEVEL=debug` and restart Tracearr.
+3. Reproduce the problem.
+4. Capture again, and attach both sets.
+
+## Attaching Logs Safely
+
+Tracearr's request logs record the full URL, query string included. Every query-parameter key that has ever appeared in one live host's request logs is ordinary application state: `page`, `pageSize`, `period`, `scope`, `serverIds`, `sort`, `timezone` and the like. No tokens, no passwords. Logs are safe to attach.
+
+Two routes do accept a credential in a query string, `/backup/download/:filename?token=` and the image route `/:id/image/*?token=`. Neither appeared once in 8,552 request lines on that host. If you want certainty before you upload, check first:
+
+```bash
+grep -n 'token=' tracearr.log
+```
+
+Attach all three files to your issue. If `grep` finds a `token=` line, delete that line and attach the rest.
