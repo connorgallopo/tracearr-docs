@@ -1,39 +1,36 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
-import { useTheme } from "next-themes";
-import Giscus from "@giscus/react";
-import { Check, Copy } from "lucide-react";
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useTheme } from 'next-themes';
+import Giscus from '@giscus/react';
+import { Check, Copy } from 'lucide-react';
 import {
   GROUP_LABELS,
   GROUP_ORDER,
   KIND_LABELS,
   type TemplateEntry,
   type TemplateGroup,
-} from "./data";
+} from './data';
 
 export const VERIFIED_TOOLTIP =
-  "A Tracearr maintainer read this template and its definition. That is a human review; nothing here is signed.";
+  'A Tracearr maintainer read this template and its definition. That is a human review; nothing here is signed.';
 export const BUILTIN_TOOLTIP =
-  "The slug and fingerprint match a template Tracearr already ships, so this is the ready-made one.";
+  'The slug and fingerprint match a template Tracearr already ships, so this is the ready-made one.';
 
 export function Badge({
   children,
-  tone = "plain",
+  tone = 'plain',
   title,
 }: {
   children: React.ReactNode;
-  tone?: "plain" | "verified" | "builtin";
+  tone?: 'plain' | 'verified' | 'builtin';
   title?: string;
 }) {
   const tones = {
-    plain:
-      "border-gray-300 text-gray-600 dark:border-gray-700 dark:text-gray-400",
-    verified:
-      "border-cyan-500/40 text-cyan-700 dark:text-cyan-300 bg-cyan-500/5",
-    builtin:
-      "border-gray-400/40 text-gray-700 dark:text-gray-300 bg-gray-500/5",
+    plain: 'border-gray-300 text-gray-600 dark:border-gray-700 dark:text-gray-400',
+    verified: 'border-cyan-500/40 text-cyan-700 dark:text-cyan-300 bg-cyan-500/5',
+    builtin: 'border-gray-400/40 text-gray-700 dark:text-gray-300 bg-gray-500/5',
   } as const;
   return (
     <span
@@ -47,8 +44,8 @@ export function Badge({
 
 export function CopyCode({
   code,
-  label = "Copy the share code",
-  className = "",
+  label = 'Copy the share code',
+  className = '',
 }: {
   code: string;
   label?: string;
@@ -67,12 +64,8 @@ export function CopyCode({
       }}
       className={`inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-2.5 py-1.5 text-sm transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 ${className}`}
     >
-      {copied ? (
-        <Check className="size-4 text-cyan-500" />
-      ) : (
-        <Copy className="size-4" />
-      )}
-      {copied ? "Copied" : label}
+      {copied ? <Check className="size-4 text-cyan-500" /> : <Copy className="size-4" />}
+      {copied ? 'Copied' : label}
     </button>
   );
 }
@@ -100,18 +93,14 @@ function TemplateCard({ template }: { template: TemplateEntry }) {
         <Badge>{KIND_LABELS[template.kind]}</Badge>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        {template.description}
-      </p>
-      <p className="text-sm text-gray-500 dark:text-gray-500">
-        {template.sentence}
-      </p>
+      <p className="text-sm text-gray-600 dark:text-gray-400">{template.description}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-500">{template.sentence}</p>
 
       <div className="mt-auto flex flex-wrap items-center gap-3 pt-1">
         <CopyCode code={template.code} label="Copy the share code" />
         <span className="text-xs text-gray-500 dark:text-gray-500">
           {GROUP_LABELS[template.group]}
-          {template.author ? ` · ${template.author}` : ""}
+          {template.author ? ` · ${template.author}` : ''}
         </span>
       </div>
     </div>
@@ -119,28 +108,23 @@ function TemplateCard({ template }: { template: TemplateEntry }) {
 }
 
 export function Gallery({ templates }: { templates: TemplateEntry[] }) {
-  const [query, setQuery] = useState("");
-  const [group, setGroup] = useState<TemplateGroup | "all">("all");
+  const [query, setQuery] = useState('');
+  const [group, setGroup] = useState<TemplateGroup | 'all'>('all');
 
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return templates.filter((template) => {
-      if (group !== "all" && template.group !== group) return false;
+      if (group !== 'all' && template.group !== group) return false;
       if (!needle) return true;
-      return [
-        template.name,
-        template.description,
-        template.sentence,
-        template.author ?? "",
-      ]
-        .join(" ")
+      return [template.name, template.description, template.sentence, template.author ?? '']
+        .join(' ')
         .toLowerCase()
         .includes(needle);
     });
   }, [templates, query, group]);
 
   const groups = GROUP_ORDER.filter((candidate) =>
-    templates.some((template) => template.group === candidate),
+    templates.some((template) => template.group === candidate)
   );
 
   return (
@@ -155,18 +139,18 @@ export function Gallery({ templates }: { templates: TemplateEntry[] }) {
           className="min-w-52 flex-1 rounded-md border border-gray-300 bg-transparent px-3 py-1.5 text-sm dark:border-gray-700"
         />
         <div className="flex flex-wrap gap-1.5">
-          {(["all", ...groups] as const).map((candidate) => (
+          {(['all', ...groups] as const).map((candidate) => (
             <button
               key={candidate}
               type="button"
               onClick={() => setGroup(candidate)}
               className={`rounded-full border px-3 py-1 text-sm transition-colors ${
                 group === candidate
-                  ? "border-cyan-500 text-cyan-700 dark:text-cyan-300"
-                  : "border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                  ? 'border-cyan-500 text-cyan-700 dark:text-cyan-300'
+                  : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800'
               }`}
             >
-              {candidate === "all" ? "All" : GROUP_LABELS[candidate]}
+              {candidate === 'all' ? 'All' : GROUP_LABELS[candidate]}
             </button>
           ))}
         </div>
@@ -174,8 +158,7 @@ export function Gallery({ templates }: { templates: TemplateEntry[] }) {
 
       {shown.length === 0 ? (
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Nothing matches that. Try a word from what the automation does: discord,
-          offline, paused.
+          Nothing matches that. Try a word from what the automation does: discord, offline, paused.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -212,7 +195,7 @@ export function Comments({ discussionNumber }: { discussionNumber: number }) {
       reactionsEnabled="1"
       emitMetadata="0"
       inputPosition="bottom"
-      theme={resolvedTheme === "light" ? "light" : "dark"}
+      theme={resolvedTheme === 'light' ? 'light' : 'dark'}
       lang="en"
       loading="lazy"
     />

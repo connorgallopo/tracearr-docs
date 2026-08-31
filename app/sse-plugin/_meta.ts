@@ -5,4 +5,4 @@ export default {
   consuming: 'Consuming the Stream',
   comparison: 'Webhooks vs WebSocket vs SSE',
   troubleshooting: 'Troubleshooting',
-}
+};

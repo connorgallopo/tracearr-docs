@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  // House style lives in the shared preset. Only docs-site rules belong here.
+  // Rules here are evaluated after the preset's, so a group declared here wins.
+  "extends": ["github>Tracearr/renovate-config"],
+
+  "packageRules": [
+    // typescript-eslint throws outright on TS 7 and has no supported release for it
+    // (typescript-eslint#10940). This repo lints through it, so hold TypeScript below
+    // the 6.1 peer ceiling. Lift it only alongside a move off typescript-eslint.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
+    },
+
+    // Next and its first-party packages release in lockstep. eslint-config-next
+    // tracks the Next minor, so it moves with them.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "next",
+        "@next/*",
+        "eslint-config-next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Next.js",
+      "labels": ["dep-next"]
+    },
+
+    // Nextra owns the theme and the MDX pipeline; the theme package is built
+    // against the exact nextra version, so they never move apart.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["nextra", "nextra-theme-docs"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Nextra"
+    },
+
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "tailwindcss",
+        "@tailwindcss/*",
+        "lucide-react",
+        "react-icons",
+        "next-themes"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "UI",
+      "labels": ["dep-ui"]
+    },
+
+    // Nextra majors rewrite the content pipeline. Review by hand.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["nextra", "nextra-theme-docs", "next"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "description": "Next and Nextra majors rewrite config and content conventions"
+    },
+
+    // pagefind ships a platform binary per release and the postbuild step calls it
+    // directly; a bad bump breaks search with a green build.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["pagefind"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+
+    // The API reference renders the server's OpenAPI document. A major here can
+    // change how that document is interpreted.
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@scalar/api-reference-react"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}

@@ -8,4 +8,4 @@ export default {
   recovery: 'Account Recovery',
   mobile: 'Mobile App',
   debug: 'Debug Page',
-}
+};

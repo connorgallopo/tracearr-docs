@@ -3,7 +3,7 @@ title: Set Up Real-Time Updates in Tracearr
 description: Get instant Jellyfin and Emby session updates in Tracearr with the SSE plugin. Setup guide for the Jellyfin repository and the Emby plugin DLL.
 ---
 
-import { Callout, Steps, Tabs } from "nextra/components"
+import { Callout, Steps, Tabs } from 'nextra/components';
 
 # Real-Time Updates
 
@@ -12,7 +12,8 @@ Plex streams session updates to Tracearr instantly over Server-Sent Events (SSE)
 The **Tracearr SSE plugin** closes that gap. Once installed on your Jellyfin or Emby server, sessions push to Tracearr instantly, just like Plex. Without it, Tracearr keeps working through polling.
 
 <Callout type="info">
-The plugin is optional. Everything works without it — the plugin only removes the short polling delay for Jellyfin and Emby.
+  The plugin is optional. Everything works without it — the plugin only removes the short polling
+  delay for Jellyfin and Emby.
 </Callout>
 
 ## Install the Plugin
@@ -67,7 +68,8 @@ Restart Emby to load the plugin.
 Once the plugin is running, Tracearr detects it automatically — no restart of Tracearr needed. The server card in **Settings** → **Servers** shows the live connection status, so you can confirm the real-time link is active.
 
 <Callout type="info">
-The plugin is open source. You can review or build it yourself at [github.com/Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE).
+  The plugin is open source. You can review or build it yourself at
+  [github.com/Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE).
 </Callout>
 
 ## Beyond Tracearr

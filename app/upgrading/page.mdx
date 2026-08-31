@@ -3,7 +3,7 @@ title: Upgrading Tracearr
 description: How to upgrade Tracearr to the latest version. Covers Docker Compose, Docker UI, Supervised, Railway, Proxmox VE, and Unraid.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout } from 'nextra/components';
 
 # Upgrading
 
@@ -12,7 +12,10 @@ Tracearr uses the `latest` Docker image tag by default, so upgrading is straight
 TimescaleDB and Redis are persisted in a volume, so your database and configuration will be preserved during the upgrade process.
 
 <Callout type="warning" title="Jellyfin 12">
-If you run Jellyfin and plan to upgrade it to version 12, upgrade Tracearr to **1.4.29 or newer** at the same time. Jellyfin 12 disables legacy authorization, and older Tracearr versions can no longer connect to it. Tracearr 1.4.29+ works with both Jellyfin 12 and 10.11. See the [FAQ](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin) for details.
+  If you run Jellyfin and plan to upgrade it to version 12, upgrade Tracearr to **1.4.29 or newer**
+  at the same time. Jellyfin 12 disables legacy authorization, and older Tracearr versions can no
+  longer connect to it. Tracearr 1.4.29+ works with both Jellyfin 12 and 10.11. See the
+  [FAQ](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin) for details.
 </Callout>
 
 ## Authentication Changes
@@ -30,7 +33,9 @@ The latest release replaces Tracearr's authentication system. The upgrade itself
 3. **Mobile devices paired after upgrading use a 30-day rolling session.** Any use within 30 days extends it; a device idle for more than 30 days pairs again. Devices paired before the upgrade keep working on their existing tokens until they are re-paired; nothing expires them at 30 days.
 
 <Callout type="info" title="Reverse proxies">
-Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set `CORS_ORIGIN` to the public URL) for cookie login to work. See [Reverse Proxy](/configuration/environment#reverse-proxy).
+  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set
+  `CORS_ORIGIN` to the public URL) for cookie login to work. See [Reverse
+  Proxy](/configuration/environment#reverse-proxy).
 </Callout>
 
 ## Docker Compose
@@ -45,12 +50,13 @@ docker compose -f docker-compose.pg18.yml up -d
 ```
 
 This will:
+
 1. Download the latest Tracearr image
 2. Recreate the container with the new image
 3. Preserve your database and configuration
 
 <Callout type="info">
-If you are using a different compose file, make sure to update the commands accordingly.
+  If you are using a different compose file, make sure to update the commands accordingly.
 </Callout>
 
 ---
@@ -107,5 +113,6 @@ docker image prune
 ```
 
 <Callout type="warning">
-Make sure to review the images being removed before confirming, as this will delete all dangling images.
+  Make sure to review the images being removed before confirming, as this will delete all dangling
+  images.
 </Callout>

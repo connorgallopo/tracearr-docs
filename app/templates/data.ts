@@ -7,17 +7,13 @@
  * is also what happens if GitHub is down while a deploy runs.
  */
 
-import fallback from "./fallback-index.json";
+import fallback from './fallback-index.json';
 
 const INDEX_URL =
   process.env.TEMPLATES_INDEX_URL ??
-  "https://raw.githubusercontent.com/Tracearr/automation-templates/main/index.json";
+  'https://raw.githubusercontent.com/Tracearr/automation-templates/main/index.json';
 
-export type TemplateGroup =
-  | "notifications"
-  | "server_health"
-  | "policies"
-  | "housekeeping";
+export type TemplateGroup = 'notifications' | 'server_health' | 'policies' | 'housekeeping';
 
 export interface TemplateInput {
   key: string;
@@ -39,7 +35,7 @@ export interface TemplateEntry {
   name: string;
   description: string;
   group: TemplateGroup;
-  kind: "policy" | "notification";
+  kind: 'policy' | 'notification';
   minServerVersion: string;
   inputs: TemplateInput[];
   sentence: string;
@@ -54,22 +50,22 @@ export interface TemplateEntry {
 
 /** The app's own labels, so the gallery and the New automation screen agree. */
 export const GROUP_LABELS: Record<TemplateGroup, string> = {
-  notifications: "Notifications",
-  server_health: "Server health",
-  policies: "Limits and rules",
-  housekeeping: "Housekeeping",
+  notifications: 'Notifications',
+  server_health: 'Server health',
+  policies: 'Limits and rules',
+  housekeeping: 'Housekeeping',
 };
 
 export const GROUP_ORDER: TemplateGroup[] = [
-  "notifications",
-  "server_health",
-  "policies",
-  "housekeeping",
+  'notifications',
+  'server_health',
+  'policies',
+  'housekeeping',
 ];
 
-export const KIND_LABELS: Record<TemplateEntry["kind"], string> = {
-  policy: "A violation",
-  notification: "An alert",
+export const KIND_LABELS: Record<TemplateEntry['kind'], string> = {
+  policy: 'A violation',
+  notification: 'An alert',
 };
 
 /**
@@ -81,17 +77,17 @@ export const KIND_LABELS: Record<TemplateEntry["kind"], string> = {
  * nothing is picked on this site, so no template here can earn it.
  */
 export const EFFECT_LINES: Record<string, string> = {
-  kill: "Can stop a stream that is playing.",
-  trust: "Changes trust scores.",
-  message: "Puts a message on a player.",
-  violation: "Records a violation against the matched person.",
-  tellsOnly: "Only notifies. Never stops a stream or changes an account.",
-  allServers: "Runs on every server unless one is chosen.",
-  everyServer: "Runs on every server.",
+  kill: 'Can stop a stream that is playing.',
+  trust: 'Changes trust scores.',
+  message: 'Puts a message on a player.',
+  violation: 'Records a violation against the matched person.',
+  tellsOnly: 'Only notifies. Never stops a stream or changes an account.',
+  allServers: 'Runs on every server unless one is chosen.',
+  everyServer: 'Runs on every server.',
 };
 
 /** The two lines that name harm, which the app marks and so does this page. */
-export const HARM_EFFECTS = ["kill", "violation"];
+export const HARM_EFFECTS = ['kill', 'violation'];
 
 /** first4…last3, the same shape the import review shows, so codes compare by eye. */
 export function shortFingerprint(fingerprint: string): string {
@@ -114,9 +110,7 @@ export async function getTemplates(): Promise<TemplateEntry[]> {
   }
 }
 
-export async function getTemplate(
-  slug: string,
-): Promise<TemplateEntry | undefined> {
+export async function getTemplate(slug: string): Promise<TemplateEntry | undefined> {
   const templates = await getTemplates();
   return templates.find((template) => template.slug === slug);
 }

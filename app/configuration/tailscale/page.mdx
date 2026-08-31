@@ -3,7 +3,7 @@ title: Tailscale VPN
 description: Access your Tracearr instance over your Tailscale network. Understand how the built-in userspace integration works, its limitations, and how to configure it.
 ---
 
-import { Callout, Steps } from "nextra/components"
+import { Callout, Steps } from 'nextra/components';
 
 # Tailscale VPN
 
@@ -51,7 +51,9 @@ Click the **Authorize in Tailscale** button to open the Tailscale consent page i
 </Steps>
 
 <Callout type="info">
-After the initial authentication, Tracearr persists your Tailscale session state in the database. This means your connection will survive container restarts without needing to re-authenticate — as long as the session hasn't expired in your Tailscale admin console.
+  After the initial authentication, Tracearr persists your Tailscale session state in the database.
+  This means your connection will survive container restarts without needing to re-authenticate — as
+  long as the session hasn't expired in your Tailscale admin console.
 </Callout>
 
 ## Architecture
@@ -78,23 +80,25 @@ The daemon is monitored with a health check every 30 seconds. If it crashes or b
 Tailscale's connection state (machine identity, session keys, etc.) is stored in a temporary directory. Since container filesystems are ephemeral, Tracearr watches this state file and automatically syncs it to the database. On startup, the persisted state is restored — allowing the connection to resume without re-authentication.
 
 <Callout type="warning">
-If you **reset** Tailscale from the settings page, all persisted state is wiped. You will need to re-authenticate the device, and the old device entry may remain in your Tailscale admin console until you manually remove it.
+  If you **reset** Tailscale from the settings page, all persisted state is wiped. You will need to
+  re-authenticate the device, and the old device entry may remain in your Tailscale admin console
+  until you manually remove it.
 </Callout>
 
 ## Limitations
 
 Because Tracearr runs Tailscale in userspace mode, there are meaningful differences compared to a full system-level Tailscale installation:
 
-| Capability | Full Install | Tracearr (Userspace) |
-|---|---|---|
-| Join a tailnet (incoming connections) | Yes | Yes |
-| Outbound connections to tailnet peers | Yes | **No** [<sup>1</sup>](#outbound-connections) |
-| Use exit nodes | Yes | **No** |
-| Act as an exit node | Yes | **No** |
-| Act as a subnet router | Yes | **No** |
-| Kernel-level performance | Yes | **No** |
-| Requires NET_ADMIN | Yes | **No** |
-| Requires TUN device | Yes | **No** |
+| Capability                            | Full Install | Tracearr (Userspace)                         |
+| ------------------------------------- | ------------ | -------------------------------------------- |
+| Join a tailnet (incoming connections) | Yes          | Yes                                          |
+| Outbound connections to tailnet peers | Yes          | **No** [<sup>1</sup>](#outbound-connections) |
+| Use exit nodes                        | Yes          | **No**                                       |
+| Act as an exit node                   | Yes          | **No**                                       |
+| Act as a subnet router                | Yes          | **No**                                       |
+| Kernel-level performance              | Yes          | **No**                                       |
+| Requires NET_ADMIN                    | Yes          | **No**                                       |
+| Requires TUN device                   | Yes          | **No**                                       |
 
 ### What You Can Do
 
@@ -103,7 +107,10 @@ Because Tracearr runs Tailscale in userspace mode, there are meaningful differen
 
 ### What You Cannot Do
 
-- <span id="outbound-connections">**Make outbound connections over the tailnet**</span> — Userspace networking only supports incoming connections. Tracearr cannot use its Tailscale interface to reach other devices on your tailnet. Tailscale's userspace mode does provide a SOCKS5 proxy that could enable outbound connections, but this is not currently implemented in Tracearr. <sup>1</sup>
+- <span id="outbound-connections">**Make outbound connections over the tailnet**</span> — Userspace
+  networking only supports incoming connections. Tracearr cannot use its Tailscale interface to
+  reach other devices on your tailnet. Tailscale's userspace mode does provide a SOCKS5 proxy that
+  could enable outbound connections, but this is not currently implemented in Tracearr. <sup>1</sup>
 - **Use exit nodes** — Routing outbound traffic through an exit node requires kernel-level networking that userspace mode does not have.
 - **Act as a subnet router** — Tracearr cannot advertise local routes to your tailnet. Userspace networking doesn't have the kernel-level access needed to forward packets between networks.
 - **Act as an exit node** — For the same reason, Tracearr cannot serve as an exit node for other devices on your tailnet.

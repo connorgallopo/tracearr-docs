@@ -1,5 +1,8 @@
 node_modules
-.next
 dist
 build
-public
+.turbo
+.next
+coverage
+package-lock.json
+public/_pagefind

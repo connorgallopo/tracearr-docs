@@ -3,7 +3,7 @@ title: Deploy with a Docker UI
 description: Deploy Tracearr using Portainer, Dockge, Dockhand, Komodo, or any Docker stack manager. Paste the compose file, add your secrets, and deploy.
 ---
 
-import { Callout, Steps } from "nextra/components"
+import { Callout, Steps } from 'nextra/components';
 
 # Docker UI
 
@@ -34,10 +34,10 @@ Open the [docker-compose.pg18.yml](https://github.com/connorgallopo/Tracearr/blo
 
 Most tools have an environment variables section below the compose editor — or a separate `.env` editor. Add the following:
 
-| Name | Value |
-|------|-------|
-| `JWT_SECRET` | A 64-character hex string |
-| `COOKIE_SECRET` | A different 64-character hex string |
+| Name                 | Value                                     |
+| -------------------- | ----------------------------------------- |
+| `JWT_SECRET`         | A 64-character hex string                 |
+| `COOKIE_SECRET`      | A different 64-character hex string       |
 | `BETTER_AUTH_SECRET` | Optional: another 64-character hex string |
 
 You'll need to generate these values first. See [Generating Secrets](/getting-started/installation#generating-secrets-without-the-cli) for how. The online generator is the easiest option if you don't have a terminal. `BETTER_AUTH_SECRET` is recommended but optional; when you leave it out, Tracearr derives it from `JWT_SECRET` automatically.
@@ -51,6 +51,7 @@ Click **Deploy**, **Start**, or the equivalent button. Your tool will pull the i
 {<h3>Access Tracearr</h3>}
 
 Once the stack is running, open `http://your-server-ip:3000` in your browser to reach the setup wizard.
+
 </Steps>
 
 ---
@@ -64,11 +65,16 @@ To pull a newer version, go to your stack's editor and look for an option to **r
 ## Things to Know
 
 <Callout type="warning" title="Environment variables and .env files">
-Most Docker UIs do **not** auto-load `.env` files the way the `docker compose` CLI does. If your compose file references `${VARIABLE}` placeholders, you need to define those variables in your tool's UI — either through the env vars editor or by uploading a `.env` file. If the variables aren't defined, they'll be empty and Tracearr won't start properly.
+  Most Docker UIs do **not** auto-load `.env` files the way the `docker compose` CLI does. If your
+  compose file references `${VARIABLE}` placeholders, you need to define those variables in your
+  tool's UI — either through the env vars editor or by uploading a `.env` file. If the variables
+  aren't defined, they'll be empty and Tracearr won't start properly.
 </Callout>
 
 <Callout type="info" title="Container naming">
-Some tools prefix container names with the stack name (e.g. `tracearr-redis-1`). The compose file includes explicit `container_name` values to override this, so the names should match what you see in the rest of this documentation.
+  Some tools prefix container names with the stack name (e.g. `tracearr-redis-1`). The compose file
+  includes explicit `container_name` values to override this, so the names should match what you see
+  in the rest of this documentation.
 </Callout>
 
 ---

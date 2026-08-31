@@ -3,7 +3,7 @@ title: Consuming the Stream - curl, Browser, Node, Python
 description: Connect to the Jellyfin or Emby SSE endpoint from curl, a browser EventSource, Node, or Python, with reconnect and resync patterns that hold up.
 ---
 
-import { Callout, Tabs } from "nextra/components"
+import { Callout, Tabs } from 'nextra/components';
 
 # Consuming the Stream
 
@@ -39,16 +39,14 @@ curl -N -H 'X-Emby-Token: YOUR_API_KEY' \
 The browser's built-in `EventSource` can't set request headers, so on Jellyfin pass the token as a query parameter instead:
 
 ```js
-const source = new EventSource(
-  "http://your-jellyfin:8096/api/sse/events?api_key=YOUR_API_KEY"
-);
+const source = new EventSource('http://your-jellyfin:8096/api/sse/events?api_key=YOUR_API_KEY');
 
-source.addEventListener("playing", (e) => {
+source.addEventListener('playing', (e) => {
   const evt = JSON.parse(e.data);
   console.log(`${evt.userId} started playing ${evt.itemId}`);
 });
 
-source.addEventListener("server.stats", (e) => {
+source.addEventListener('server.stats', (e) => {
   const stats = JSON.parse(e.data);
   console.log(`CPU ${stats.hostCpuUtilization}%`);
 });
@@ -57,7 +55,10 @@ source.addEventListener("server.stats", (e) => {
 `EventSource` reconnects automatically after a drop, which is the behavior you want here.
 
 <Callout type="warning">
-A token in a URL lands in server access logs and browser history. Use the query parameter for local tooling and dashboards on your own network; use a header-capable client for anything else. Emby's endpoint authenticates via the `X-Emby-Token` header, so browser `EventSource` isn't an option there; use a server-side proxy or one of the clients below.
+  A token in a URL lands in server access logs and browser history. Use the query parameter for
+  local tooling and dashboards on your own network; use a header-capable client for anything else.
+  Emby's endpoint authenticates via the `X-Emby-Token` header, so browser `EventSource` isn't an
+  option there; use a server-side proxy or one of the clients below.
 </Callout>
 
 ## Node
@@ -65,14 +66,14 @@ A token in a URL lands in server access logs and browser history. Use the query 
 Node 18+ can stream the response body with plain `fetch`, headers included:
 
 ```js
-const res = await fetch("http://your-jellyfin:8096/api/sse/events", {
+const res = await fetch('http://your-jellyfin:8096/api/sse/events', {
   headers: { Authorization: 'MediaBrowser Token="YOUR_API_KEY"' },
 });
 
-let buffer = "";
+let buffer = '';
 for await (const chunk of res.body.pipeThrough(new TextDecoderStream())) {
   buffer += chunk;
-  const frames = buffer.split("\n\n");
+  const frames = buffer.split('\n\n');
   buffer = frames.pop(); // keep the partial frame
 
   for (const frame of frames) {

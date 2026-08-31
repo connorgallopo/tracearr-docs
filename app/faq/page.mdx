@@ -3,20 +3,23 @@ title: FAQ - Troubleshooting & Common Questions
 description: Frequently asked questions about Tracearr. Troubleshooting sessions, geolocation issues, reverse proxy setup, maintenance jobs, and more.
 ---
 
-import { Tabs } from "nextra/components"
+import { Tabs } from 'nextra/components';
 
 # Frequently Asked Questions
 
 **General**
+
 - [What media servers does Tracearr support?](#what-media-servers-does-tracearr-support)
 - [Is Tracearr free?](#is-tracearr-free)
 - [Can I import data from Tautulli or Jellystat?](#can-i-import-data-from-tautulli-or-jellystat)
 
 **Installation**
+
 - [What are the system requirements?](#what-are-the-system-requirements)
 - [Can I run Tracearr without Docker?](#can-i-run-tracearr-without-docker)
 
 **Troubleshooting**
+
 - [Tracearr can't connect to my media server](#tracearr-cant-connect-to-my-media-server)
 - [Jellyfin 12: Tracearr can't connect after upgrading Jellyfin](#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin)
 - [Jellyfin 10.11.9+: Playback Reporting check fails with a 500 error](#jellyfin-10119-playback-reporting-check-fails-with-a-500-error)
@@ -30,6 +33,7 @@ import { Tabs } from "nextra/components"
 - [Pages are slow to load on Unraid](#pages-are-slow-to-load-on-unraid)
 
 **Data & Maintenance Jobs**
+
 - [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
 - [I see both "US" and "United States" in my country data](#i-see-both-us-and-united-states-in-my-country-data)
 - [My imported Tautulli sessions show 0% progress](#my-imported-tautulli-sessions-show-0-progress)
@@ -174,7 +178,7 @@ Install the [Tracearr SSE plugin](/configuration/realtime) on your Jellyfin or E
 
 ### I don't see any location data / Everything shows as local
 
-> **Note:** Local streams (those originating from your home network) will never show location data — this is expected behavior. Geolocation only applies to remote streams from outside your network. If your *remote* streams are showing as "local" or missing location data, continue reading.
+> **Note:** Local streams (those originating from your home network) will never show location data — this is expected behavior. Geolocation only applies to remote streams from outside your network. If your _remote_ streams are showing as "local" or missing location data, continue reading.
 
 Tracearr uses client IP addresses reported by your media server to determine geolocation. If remote sessions show as "local" or have no location data, your media server isn't seeing the real client IPs — usually because a reverse proxy is in front of it.
 
@@ -190,6 +194,7 @@ Tracearr uses client IP addresses reported by your media server to determine geo
 See the [Jellyfin reverse proxy documentation](https://jellyfin.org/docs/general/post-install/networking/reverse-proxy/) for detailed configuration examples for Nginx, Caddy, Apache, Traefik, and more. The reverse proxy concepts apply to all media server types.
 
 **Quick checklist:**
+
 - Reverse proxy sets `X-Forwarded-For` to the client's real IP
 - Media server's "Known Proxies" includes your reverse proxy's IP address
 - For Docker setups, ensure the proxy sees real client IPs (not Docker network IPs)
@@ -216,10 +221,10 @@ By default, Tracearr uses the [MaxMind GeoLite2](https://www.maxmind.com/en/geoi
 
 In **Settings → General**, you can enable **"Enhanced GeoIP Lookup"**. When enabled, Tracearr sends IP addresses to Plex's GeoIP service (`plex.tv/api/v2/geoip`) which may return more accurate results. This works for all media servers, not just Plex. The local MaxMind database is used as a fallback.
 
-| Option | Privacy | Accuracy |
-|--------|---------|----------|
-| Default (MaxMind) | All data stays local | Good for most cases |
-| Enhanced | IPs sent to plex.tv | Potentially more accurate |
+| Option            | Privacy              | Accuracy                  |
+| ----------------- | -------------------- | ------------------------- |
+| Default (MaxMind) | All data stays local | Good for most cases       |
+| Enhanced          | IPs sent to plex.tv  | Potentially more accurate |
 
 **Bottom line:** IP geolocation will never be as accurate as GPS. It's best used for detecting general regions and impossible travel scenarios, not pinpointing exact addresses.
 
@@ -240,8 +245,10 @@ It works for any user, including accounts that only ever signed in with Plex: if
 docker exec -it tracearr node apps/server/dist/scripts/reset-password.js
 
 # Non-interactive mode (sets password to "newpassword123")
+
 docker exec -it tracearr node apps/server/dist/scripts/reset-password.js newpassword123
-```
+
+````
 </Tabs.Tab>
 <Tabs.Tab>
 ```bash
@@ -250,7 +257,8 @@ node /opt/tracearr/apps/server/dist/scripts/reset-password.js
 
 # Non-interactive mode (sets password to "newpassword123")
 node /opt/tracearr/apps/server/dist/scripts/reset-password.js newpassword123
-```
+````
+
 </Tabs.Tab>
 </Tabs>
 

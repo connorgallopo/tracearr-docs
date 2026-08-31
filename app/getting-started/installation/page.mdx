@@ -3,7 +3,7 @@ title: Installation Guide - Docker Compose Setup
 description: Install Tracearr with Docker Compose. Quick start guide with PostgreSQL, TimescaleDB, and Redis. Includes secret generation, Docker volume best practices, and database backup with pg_dump.
 ---
 
-import { Callout, Tabs } from "nextra/components"
+import { Callout, Tabs } from 'nextra/components';
 
 # Docker Compose
 
@@ -18,12 +18,15 @@ The recommended way to run Tracearr. This sets up three containers — Tracearr,
 curl -O https://raw.githubusercontent.com/connorgallopo/Tracearr/main/docker/examples/docker-compose.pg18.yml
 
 # Generate required secrets
+
 echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
 echo "COOKIE_SECRET=$(openssl rand -hex 32)" >> .env
 
 # Start Tracearr
+
 docker compose -f docker-compose.pg18.yml up -d
-```
+
+````
 </Tabs.Tab>
 <Tabs.Tab>
 ```powershell
@@ -36,14 +39,16 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/connorgallopo/Tracearr
 
 # Start Tracearr
 docker compose -f docker-compose.pg18.yml up -d
-```
+````
+
 </Tabs.Tab>
 </Tabs>
 
 Tracearr will be available at `http://localhost:3000`.
 
 <Callout type="info" title="Configuration">
-See the comments in the compose file for optional environment variables like `TZ`, `PORT`, `LOG_LEVEL`, and `DB_PASSWORD`.
+  See the comments in the compose file for optional environment variables like `TZ`, `PORT`,
+  `LOG_LEVEL`, and `DB_PASSWORD`.
 </Callout>
 
 ---
@@ -51,7 +56,8 @@ See the comments in the compose file for optional environment variables like `TZ
 ## Generating Secrets Without the CLI
 
 <Callout type="info" title="Already used the Quick Start?">
-If you ran the Quick Start commands above, your secrets are already generated and saved in your `.env` file. You can skip this section.
+  If you ran the Quick Start commands above, your secrets are already generated and saved in your
+  `.env` file. You can skip this section.
 </Callout>
 
 Tracearr requires two secrets: `JWT_SECRET` and `COOKIE_SECRET`. Both need to be 64-character hexadecimal strings (a 256-bit key). These are used internally for signing authentication tokens and encrypting session cookies — they just need to be long, random, and unique to your installation.
@@ -89,7 +95,11 @@ If you don't have terminal access, you can use [randomkeygen.com/random-string](
 Do this once per secret: you need a different value for each of `JWT_SECRET`, `COOKIE_SECRET`, and (optionally) `BETTER_AUTH_SECRET`. Don't reuse the same value.
 
 <Callout type="warning" title="Keep your secrets private">
-Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them in support channels. If you think your secrets have been exposed, generate new ones and restart Tracearr. All existing sessions will be invalidated and users will need to log in again. Note that rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates web sessions and paired mobile devices, not just legacy tokens.
+  Treat these values like passwords. Don't share them, don't commit them to Git, and don't post them
+  in support channels. If you think your secrets have been exposed, generate new ones and restart
+  Tracearr. All existing sessions will be invalidated and users will need to log in again. Note that
+  rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly,
+  which invalidates web sessions and paired mobile devices, not just legacy tokens.
 </Callout>
 
 ---
@@ -135,7 +145,10 @@ docker cp tracearr:/data/backup ./tracearr-backups
 See [Backup & Restore](/configuration/backup) for full documentation on manual backups, scheduled backups, uploads, and restoring.
 
 <Callout type="info" title="TL;DR">
-Named volumes work out of the box and keep your permissions correct. For backups, use Tracearr's [built-in backup system](/configuration/backup) — don't copy raw database files. Bind mounts give you visible files on the host, but those files aren't safe to copy while PostgreSQL is running and aren't portable across major versions.
+  Named volumes work out of the box and keep your permissions correct. For backups, use Tracearr's
+  [built-in backup system](/configuration/backup) — don't copy raw database files. Bind mounts give
+  you visible files on the host, but those files aren't safe to copy while PostgreSQL is running and
+  aren't portable across major versions.
 </Callout>
 
 ---

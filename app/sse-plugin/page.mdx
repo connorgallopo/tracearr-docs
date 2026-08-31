@@ -3,8 +3,8 @@ title: Jellyfin & Emby SSE Plugin - Real-Time Events
 description: The Tracearr SSE plugin adds a Server-Sent Events endpoint to Jellyfin and Emby. Playback, session, library, task, and server stat events over one HTTP stream.
 ---
 
-import { Callout } from "nextra/components"
-import Image from "next/image"
+import { Callout } from 'nextra/components';
+import Image from 'next/image';
 
 # SSE Plugin
 
@@ -15,7 +15,7 @@ Tracearr SSE is a free, open-source plugin that adds a Server-Sent Events (SSE) 
   alt="curl connected to the Jellyfin SSE endpoint, showing playback, session, library, and server stat events streaming in"
   width={1600}
   height={1076}
-  className="rounded-lg mt-6 shadow-md"
+  className="mt-6 rounded-lg shadow-md"
   priority
 />
 
@@ -41,7 +41,9 @@ Tracearr works without the plugin: Jellyfin and Emby sessions are detected by po
 Tracearr detects the plugin automatically once it's running, and the server card in **Settings** → **Servers** shows the live connection status. Setup takes a few minutes; see [Installation](/sse-plugin/installation).
 
 <Callout type="info">
-The plugin streams more than Tracearr currently consumes (scheduled task events, for example). New Tracearr features build on this stream, so installing the plugin now means later releases light up without another server change.
+  The plugin streams more than Tracearr currently consumes (scheduled task events, for example). New
+  Tracearr features build on this stream, so installing the plugin now means later releases light up
+  without another server change.
 </Callout>
 
 ## Using It Without Tracearr
@@ -57,14 +59,14 @@ Scrobbling scripts, Home Assistant automations, dashboards, a `curl` in a termin
 
 ## Events at a Glance
 
-| Category | Events |
-|---|---|
-| Playback | `playing`, `progress`, `paused`, `stopped` |
-| Sessions | `session.start`, `session.end` |
-| Library | `library.item.added`, `library.item.removed` |
-| Scheduled tasks | `task.started`, `task.progress`, `task.completed` |
-| Server | `server.stats` |
-| Stream | `hello` (on connect), `ping` (keepalive every 30 seconds) |
+| Category        | Events                                                    |
+| --------------- | --------------------------------------------------------- |
+| Playback        | `playing`, `progress`, `paused`, `stopped`                |
+| Sessions        | `session.start`, `session.end`                            |
+| Library         | `library.item.added`, `library.item.removed`              |
+| Scheduled tasks | `task.started`, `task.progress`, `task.completed`         |
+| Server          | `server.stats`                                            |
+| Stream          | `hello` (on connect), `ping` (keepalive every 30 seconds) |
 
 ## Requirements
 

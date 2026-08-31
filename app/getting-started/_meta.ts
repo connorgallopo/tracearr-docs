@@ -3,4 +3,4 @@ export default {
   installation: 'Installation',
   'first-server': 'Connect a Server',
   import: 'Import Data',
-}
+};

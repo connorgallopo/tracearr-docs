@@ -3,7 +3,7 @@ title: Event Reference - Jellyfin & Emby SSE Events
 description: Every event the Tracearr SSE plugin streams from Jellyfin and Emby - playback, session, library, scheduled task, and server stat payloads, field by field.
 ---
 
-import { Callout, Tabs } from "nextra/components"
+import { Callout, Tabs } from 'nextra/components';
 
 # Event Reference
 
@@ -11,10 +11,10 @@ The plugin exposes one streaming endpoint per server. Everything below applies t
 
 ## The Endpoint
 
-| Server | URL | Auth |
-|---|---|---|
+| Server   | URL                                            | Auth                                                    |
+| -------- | ---------------------------------------------- | ------------------------------------------------------- |
 | Jellyfin | `GET http://your-jellyfin:8096/api/sse/events` | Any token Jellyfin accepts for its REST API (see below) |
-| Emby | `GET http://your-emby:8096/emby/sse/events` | `X-Emby-Token: YOUR_API_KEY` header |
+| Emby     | `GET http://your-emby:8096/emby/sse/events`    | `X-Emby-Token: YOUR_API_KEY` header                     |
 
 Jellyfin accepts the token four ways, same as the rest of its API: an `Authorization: MediaBrowser Token="..."` header, an `X-Emby-Token` header, an `X-MediaBrowser-Token` header, or an `api_key` query parameter. The query parameter matters for browser `EventSource`, which can't set headers. But tokens in URLs end up in access logs, so prefer a header anywhere you control the client.
 
@@ -43,10 +43,10 @@ event: hello
 data: {"version":"0.4.0.0","server":"jellyfin"}
 ```
 
-| Field | Meaning |
-|---|---|
-| `version` | Plugin version |
-| `server` | `jellyfin` or `emby` |
+| Field     | Meaning              |
+| --------- | -------------------- |
+| `version` | Plugin version       |
+| `server`  | `jellyfin` or `emby` |
 
 ### `ping`
 
@@ -54,23 +54,23 @@ Keepalive, sent every 30 seconds with an empty `{}` payload. Useful for detectin
 
 ## Playback Events
 
-| Event | When |
-|---|---|
-| `playing` | Playback started |
+| Event      | When                            |
+| ---------- | ------------------------------- |
+| `playing`  | Playback started                |
 | `progress` | Position update during playback |
-| `paused` | Playback paused |
-| `stopped` | Playback stopped |
+| `paused`   | Playback paused                 |
+| `stopped`  | Playback stopped                |
 
 All four carry the same fields:
 
-| Field | Meaning |
-|---|---|
-| `sessionId` | Device session ID; matches what `/Sessions` returns, not the per-playback `PlaySessionId` |
-| `itemId` | ID of the item being played |
-| `userId` | User who is playing it |
-| `state` | `playing`, `paused`, or `stopped` |
-| `positionTicks` | Playback position in ticks |
-| `playedToCompletion` | `stopped` only; whether the item finished |
+| Field                | Meaning                                                                                   |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| `sessionId`          | Device session ID; matches what `/Sessions` returns, not the per-playback `PlaySessionId` |
+| `itemId`             | ID of the item being played                                                               |
+| `userId`             | User who is playing it                                                                    |
+| `state`              | `playing`, `paused`, or `stopped`                                                         |
+| `positionTicks`      | Playback position in ticks                                                                |
+| `playedToCompletion` | `stopped` only; whether the item finished                                                 |
 
 Notes:
 
@@ -80,19 +80,19 @@ Notes:
 
 ## Session Events
 
-| Event | Fields | When |
-|---|---|---|
-| `session.start` | `sessionId`, `userId` | A device session connected |
-| `session.end` | `sessionId`, `userId` | A device session disconnected |
+| Event           | Fields                | When                          |
+| --------------- | --------------------- | ----------------------------- |
+| `session.start` | `sessionId`, `userId` | A device session connected    |
+| `session.end`   | `sessionId`, `userId` | A device session disconnected |
 
 Sessions are device connections, not playback. A client can hold a session open for hours without playing anything.
 
 ## Library Events
 
-| Event | Fields | When |
-|---|---|---|
-| `library.item.added` | `itemId`, `itemType`, `parentId` | An item finished being added to a library |
-| `library.item.removed` | `itemId`, `itemType`, `parentId` | An item was removed |
+| Event                  | Fields                           | When                                      |
+| ---------------------- | -------------------------------- | ----------------------------------------- |
+| `library.item.added`   | `itemId`, `itemType`, `parentId` | An item finished being added to a library |
+| `library.item.removed` | `itemId`, `itemType`, `parentId` | An item was removed                       |
 
 Events fire once per changed item, as it happens: no batching, no scheduled-task delay. Theme media and virtual placeholder items (missing episodes, for example) are filtered out.
 
@@ -105,11 +105,11 @@ Platform differences worth knowing:
 
 ## Scheduled Task Events
 
-| Event | Fields | When |
-|---|---|---|
-| `task.started` | `taskId`, `taskName`, `taskCategory` | A scheduled task began running |
-| `task.progress` | `taskId`, `taskName`, `progress` | Progress update; throttled to 1% or 2 seconds per task, whichever comes first |
-| `task.completed` | `taskId`, `taskName`, `state` | Task finished; `state` is the completion status |
+| Event            | Fields                               | When                                                                          |
+| ---------------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| `task.started`   | `taskId`, `taskName`, `taskCategory` | A scheduled task began running                                                |
+| `task.progress`  | `taskId`, `taskName`, `progress`     | Progress update; throttled to 1% or 2 seconds per task, whichever comes first |
+| `task.completed` | `taskId`, `taskName`, `state`        | Task finished; `state` is the completion status                               |
 
 This covers library scans, metadata refreshes, and every other task in the server's scheduled task list, including a live progress percentage for a running library scan.
 
@@ -124,12 +124,12 @@ event: server.stats
 data: {"at":1786151199,"hostCpuUtilization":3.257,"processCpuUtilization":0.622,"hostMemoryUtilization":30.042,"processMemoryUtilization":0.548}
 ```
 
-| Field | Meaning |
-|---|---|
-| `at` | Unix timestamp (seconds) of the sample |
-| `hostCpuUtilization` | Whole-machine CPU use, percent |
-| `processCpuUtilization` | The media server process's CPU use, percent |
-| `hostMemoryUtilization` | Whole-machine memory use, percent |
+| Field                      | Meaning                                        |
+| -------------------------- | ---------------------------------------------- |
+| `at`                       | Unix timestamp (seconds) of the sample         |
+| `hostCpuUtilization`       | Whole-machine CPU use, percent                 |
+| `processCpuUtilization`    | The media server process's CPU use, percent    |
+| `hostMemoryUtilization`    | Whole-machine memory use, percent              |
 | `processMemoryUtilization` | The media server process's memory use, percent |
 
 Host values are read from `/proc`, so they appear on Linux hosts only and are omitted elsewhere. Inside a container, `/proc` reports the host machine, which is usually what you want. This event is what powers Tracearr's Server Resources charts for Jellyfin and Emby; neither server exposes these numbers through its own API.
@@ -141,5 +141,8 @@ Host values are read from `/proc`, so they appear on Linux hosts only and are om
 - Any disconnect means missed events. Treat the stream as a live signal, not a durable queue: on reconnect, poll once to re-establish state, then go back to listening.
 
 <Callout type="info">
-New event types get added over time (the [changelog](https://github.com/Tracearr/Media-Server-SSE/releases) lists them per release). Unknown event names are safe to ignore, so a client that only handles the events it knows about keeps working across plugin updates.
+  New event types get added over time (the
+  [changelog](https://github.com/Tracearr/Media-Server-SSE/releases) lists them per release).
+  Unknown event names are safe to ignore, so a client that only handles the events it knows about
+  keeps working across plugin updates.
 </Callout>

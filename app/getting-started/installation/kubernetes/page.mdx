@@ -3,7 +3,7 @@ title: Kubernetes (Helm)
 description: Deploy Tracearr on Kubernetes with the official Helm chart. Includes TimescaleDB, Redis, ingress configuration, and WebSocket support.
 ---
 
-import { Callout, Tabs } from "nextra/components"
+import { Callout, Tabs } from 'nextra/components';
 
 # Kubernetes
 
@@ -45,6 +45,7 @@ kubectl get secret tracearr -n tracearr -o jsonpath='{.data.COOKIE_SECRET}' | ba
 Back these up if you plan to reinstall — losing them invalidates all user sessions.
 
 The chart does not manage a `BETTER_AUTH_SECRET` value. Tracearr derives it from `JWT_SECRET` automatically, so chart installs need no extra configuration. If you want to set it explicitly, add it as an environment variable on the Tracearr deployment.
+
 </Callout>
 
 ---
@@ -56,11 +57,11 @@ To expose Tracearr outside the cluster, enable the ingress in your values overri
 ```yaml
 ingress:
   enabled: true
-  className: nginx  # or traefik, etc.
+  className: nginx # or traefik, etc.
   annotations:
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-http-version: '1.1'
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
     - host: tracearr.example.com
@@ -77,6 +78,7 @@ ingress:
 Tracearr uses WebSocket (Socket.io) for real-time updates to the dashboard and mobile app, and SSE for Plex session streaming. Your ingress controller must support HTTP connection upgrades, and timeouts need to be long enough for persistent connections. The `proxy-read-timeout` and `proxy-send-timeout` annotations above are required for nginx — without them, connections will be killed after 60 seconds and real-time features won't work.
 
 Traefik handles WebSocket upgrades by default, but you may still need to increase idle timeouts depending on your configuration.
+
 </Callout>
 
 ---
@@ -96,7 +98,7 @@ externalDatabase:
   database: tracearr
 
 secrets:
-  dbPassword: "your-database-password"
+  dbPassword: 'your-database-password'
 ```
 
 Your database must have the `timescaledb`, `timescaledb_toolkit`, and `pg_trgm` extensions enabled.
@@ -112,11 +114,13 @@ redis:
   enabled: false
 
 externalRedis:
-  url: "redis://your-redis:6379"
+  url: 'redis://your-redis:6379'
 ```
 
 <Callout type="error" title="noeviction required">
-Tracearr uses BullMQ for background job processing. BullMQ requires `maxmemory-policy noeviction` on Redis — if your Redis instance is configured to evict keys under memory pressure, job queues will silently corrupt. The bundled Redis is pre-configured with the correct policy.
+  Tracearr uses BullMQ for background job processing. BullMQ requires `maxmemory-policy noeviction`
+  on Redis — if your Redis instance is configured to evict keys under memory pressure, job queues
+  will silently corrupt. The bundled Redis is pre-configured with the correct policy.
 </Callout>
 
 ---
@@ -125,52 +129,52 @@ Tracearr uses BullMQ for background job processing. BullMQ requires `maxmemory-p
 
 ### Tracearr
 
-| Value | Default | Description |
-|---|---|---|
-| `tracearr.image.tag` | Chart appVersion | Image tag |
-| `tracearr.replicaCount` | `1` | Must be 1 (singleton poller) |
-| `tracearr.env.TZ` | `UTC` | Timezone |
-| `tracearr.env.LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
-| `tracearr.env.CORS_ORIGIN` | `*` | Set to your domain in production |
-| `tracearr.resources.limits.memory` | `1Gi` | App memory limit |
-| `tracearr.backups.enabled` | `true` | PVC for database backups |
-| `tracearr.backups.size` | `10Gi` | Backup volume size |
-| `tracearr.imageCache.enabled` | `true` | PVC for media artwork cache |
-| `tracearr.imageCache.size` | `5Gi` | Image cache volume size |
+| Value                              | Default          | Description                      |
+| ---------------------------------- | ---------------- | -------------------------------- |
+| `tracearr.image.tag`               | Chart appVersion | Image tag                        |
+| `tracearr.replicaCount`            | `1`              | Must be 1 (singleton poller)     |
+| `tracearr.env.TZ`                  | `UTC`            | Timezone                         |
+| `tracearr.env.LOG_LEVEL`           | `info`           | `debug`, `info`, `warn`, `error` |
+| `tracearr.env.CORS_ORIGIN`         | `*`              | Set to your domain in production |
+| `tracearr.resources.limits.memory` | `1Gi`            | App memory limit                 |
+| `tracearr.backups.enabled`         | `true`           | PVC for database backups         |
+| `tracearr.backups.size`            | `10Gi`           | Backup volume size               |
+| `tracearr.imageCache.enabled`      | `true`           | PVC for media artwork cache      |
+| `tracearr.imageCache.size`         | `5Gi`            | Image cache volume size          |
 
 ### Secrets
 
-| Value | Default | Description |
-|---|---|---|
-| `secrets.autoGenerate` | `true` | Generate JWT/cookie secrets if empty |
-| `secrets.jwtSecret` | `""` | Provide your own JWT secret |
-| `secrets.cookieSecret` | `""` | Provide your own cookie secret |
-| `secrets.dbPassword` | `tracearr` | Database password |
-| `secrets.existingSecret` | `""` | Use a pre-existing Kubernetes Secret |
+| Value                    | Default    | Description                          |
+| ------------------------ | ---------- | ------------------------------------ |
+| `secrets.autoGenerate`   | `true`     | Generate JWT/cookie secrets if empty |
+| `secrets.jwtSecret`      | `""`       | Provide your own JWT secret          |
+| `secrets.cookieSecret`   | `""`       | Provide your own cookie secret       |
+| `secrets.dbPassword`     | `tracearr` | Database password                    |
+| `secrets.existingSecret` | `""`       | Use a pre-existing Kubernetes Secret |
 
 ### TimescaleDB
 
-| Value | Default | Description |
-|---|---|---|
-| `timescale.enabled` | `true` | Deploy bundled TimescaleDB |
-| `timescale.image.tag` | `pg18.1-ts2.25.0` | Pinned TimescaleDB HA image |
-| `timescale.persistence.size` | `50Gi` | Database volume size |
-| `timescale.resources.limits.memory` | `4Gi` | DB memory limit |
-| `timescale.shmSize` | `512Mi` | Shared memory for PostgreSQL |
+| Value                               | Default           | Description                  |
+| ----------------------------------- | ----------------- | ---------------------------- |
+| `timescale.enabled`                 | `true`            | Deploy bundled TimescaleDB   |
+| `timescale.image.tag`               | `pg18.1-ts2.25.0` | Pinned TimescaleDB HA image  |
+| `timescale.persistence.size`        | `50Gi`            | Database volume size         |
+| `timescale.resources.limits.memory` | `4Gi`             | DB memory limit              |
+| `timescale.shmSize`                 | `512Mi`           | Shared memory for PostgreSQL |
 
 ### Redis
 
-| Value | Default | Description |
-|---|---|---|
-| `redis.enabled` | `true` | Deploy bundled Redis |
-| `redis.image.tag` | `8-alpine` | Redis image tag |
-| `redis.persistence.size` | `2Gi` | Redis AOF volume size |
-| `redis.resources.limits.memory` | `512Mi` | Redis memory limit |
+| Value                           | Default    | Description           |
+| ------------------------------- | ---------- | --------------------- |
+| `redis.enabled`                 | `true`     | Deploy bundled Redis  |
+| `redis.image.tag`               | `8-alpine` | Redis image tag       |
+| `redis.persistence.size`        | `2Gi`      | Redis AOF volume size |
+| `redis.resources.limits.memory` | `512Mi`    | Redis memory limit    |
 
 ### Network Policy
 
-| Value | Default | Description |
-|---|---|---|
+| Value                   | Default | Description                   |
+| ----------------------- | ------- | ----------------------------- |
 | `networkPolicy.enabled` | `false` | Restrict traffic between pods |
 
 When enabled, the network policy locks down TimescaleDB and Redis to only accept connections from the Tracearr pod, and restricts Tracearr's egress to DNS, its databases, and outbound TCP (for media server polling, push notifications, and GeoIP lookups).

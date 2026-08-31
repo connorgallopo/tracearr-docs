@@ -3,12 +3,13 @@ title: Backup & Restore
 description: Create, schedule, and restore database backups in Tracearr. Manual and automated backups via the web UI or CLI, with full restore and rollback support.
 ---
 
-import { Callout, Steps } from "nextra/components"
+import { Callout, Steps } from 'nextra/components';
 
 # Backup & Restore
 
 <Callout type="warning" title="Beta Feature">
-Backup & Restore is currently in **beta**. It has been tested internally but needs broader testing with real-world data. Please report any issues you encounter.
+  Backup & Restore is currently in **beta**. It has been tested internally but needs broader testing
+  with real-world data. Please report any issues you encounter.
 </Callout>
 
 Tracearr includes a full backup and restore system. Backups are `pg_dump` custom-format dumps packaged as zip files with metadata. You can create backups manually, download them for safekeeping, upload previously downloaded backups, schedule automatic backups, and restore from any backup with live progress tracking.
@@ -47,10 +48,10 @@ Tracearr supports automated backups on a schedule, configured directly in the we
 
 Available schedule types:
 
-| Schedule | Description |
-|----------|-------------|
-| **Daily** | Runs once per day at the configured time |
-| **Weekly** | Runs once per week on the configured day and time |
+| Schedule    | Description                                        |
+| ----------- | -------------------------------------------------- |
+| **Daily**   | Runs once per day at the configured time           |
+| **Weekly**  | Runs once per week on the configured day and time  |
 | **Monthly** | Runs once per month on the configured day and time |
 
 You can also configure a **retention count** — the number of scheduled backups to keep. Older backups are automatically cleaned up after each scheduled run.
@@ -58,11 +59,14 @@ You can also configure a **retention count** — the number of scheduled backups
 ## Restoring from a Backup
 
 <Callout type="error" title="Destructive Operation">
-Restoring a backup replaces your entire database. All current data will be overwritten. A rollback point is created automatically before the restore begins. If the restore fails, Tracearr will attempt to roll back to this point.
+  Restoring a backup replaces your entire database. All current data will be overwritten. A rollback
+  point is created automatically before the restore begins. If the restore fails, Tracearr will
+  attempt to roll back to this point.
 </Callout>
 
 <Callout type="warning">
-Restoring a large database can be memory intensive. Ensure your container has adequate memory allocated before starting a restore. For large databases, we recommend at least **4GB** of memory.
+  Restoring a large database can be memory intensive. Ensure your container has adequate memory
+  allocated before starting a restore. For large databases, we recommend at least **4GB** of memory.
 </Callout>
 
 Click the **Restore** button next to any backup in the history table. Tracearr will:
@@ -133,5 +137,6 @@ BACKUP_DIR=/custom/path/to/backups
 ```
 
 <Callout type="info">
-If you set `BACKUP_DIR`, make sure your Docker volume or bind mount targets the same path. For example, if you set `BACKUP_DIR=/backups`, your compose mount should be `/path/on/host:/backups`.
+  If you set `BACKUP_DIR`, make sure your Docker volume or bind mount targets the same path. For
+  example, if you set `BACKUP_DIR=/backups`, your compose mount should be `/path/on/host:/backups`.
 </Callout>

@@ -3,7 +3,7 @@ title: Bug Reports - What to Collect Before Filing
 description: The checklist for a Tracearr bug report. Two unauthenticated endpoints, logs from every service, the owner-only pastes that fill the template, and what happens after you file.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout } from 'nextra/components';
 
 # Filing a Bug Report
 
@@ -30,7 +30,9 @@ The retrieval commands for each install path are on the [logs page](/troubleshoo
 - The full window you reproduced the fault in, not a slice. Capture from before you started through to after the fault appeared.
 
 <Callout type="warning">
-Capture the logs you already have before you set `LOG_LEVEL=debug`. The level is read once when the server starts, so the change needs a restart, and the restart discards the `docker logs` history you were about to attach.
+  Capture the logs you already have before you set `LOG_LEVEL=debug`. The level is read once when
+  the server starts, so the change needs a restart, and the restart discards the `docker logs`
+  history you were about to attach.
 </Callout>
 
 ## Two More Pastes for Owners
@@ -41,7 +43,8 @@ Signed in as the owner, open these two paths in your browser and paste the JSON:
 - `/api/v1/servers` returns each connected server's `version` and `latestVersion`. That is the Media Server Version(s) field, which is blank on 47 of 272 reports.
 
 <Callout type="info">
-Everything under `/debug` is owner-only. A non-owner who opens it gets a rendered page whose every panel returns 403.
+  Everything under `/debug` is owner-only. A non-owner who opens it gets a rendered page whose every
+  panel returns 403.
 </Callout>
 
 ## After You File

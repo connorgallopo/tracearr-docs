@@ -3,7 +3,7 @@ title: Import Watch History - Tautulli & Playback Reporting
 description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, or Jellystat. Step-by-step guide for migrating Plex, Jellyfin, and Emby session data.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout } from 'nextra/components';
 
 # Import Watch History
 
@@ -12,7 +12,9 @@ Tracearr can import your existing watch history from **Tautulli** (for Plex), th
 Access the import feature at **Settings** → **Import**.
 
 <Callout type="warning" title="Sync Your Server First">
-Before importing, make sure you've synced your media server in **Settings → Servers**. Tracearr matches imported sessions to existing users by their media server user ID. Sessions for users that don't exist in Tracearr will be skipped.
+  Before importing, make sure you've synced your media server in **Settings → Servers**. Tracearr
+  matches imported sessions to existing users by their media server user ID. Sessions for users that
+  don't exist in Tracearr will be skipped.
 </Callout>
 
 ## Import from Tautulli
@@ -30,11 +32,11 @@ Tautulli import connects directly to your Tautulli instance via API — no file 
 
 Once connected, you'll see import options:
 
-| Option | Description |
-|--------|-------------|
-| **Target Server** | Select which Plex server to import sessions to |
-| **Overwrite friendly names** | Replace existing user nicknames with names from Tautulli |
-| **Include detailed stream data** | Fetch codec, bitrate, and resolution data for each session. Enables bandwidth/quality stats but significantly increases import time. *(Beta)* |
+| Option                           | Description                                                                                                                                   |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Target Server**                | Select which Plex server to import sessions to                                                                                                |
+| **Overwrite friendly names**     | Replace existing user nicknames with names from Tautulli                                                                                      |
+| **Include detailed stream data** | Fetch codec, bitrate, and resolution data for each session. Enables bandwidth/quality stats but significantly increases import time. _(Beta)_ |
 
 ### Step 3: Start Import
 
@@ -47,7 +49,8 @@ Click **Start Import** to begin. You'll see real-time progress showing:
 - **Errors** — Records that failed to import
 
 <Callout type="info">
-Tautulli import fetches data in pages via the API. Large libraries may take several minutes depending on your history size and network speed.
+  Tautulli import fetches data in pages via the API. Large libraries may take several minutes
+  depending on your history size and network speed.
 </Callout>
 
 ### Why Records Are Skipped
@@ -74,13 +77,15 @@ Jellystat import uses a JSON backup file that you export from Jellystat.
 5. Return to **Settings** → **Backup** — you should see a new backup with the current timestamp in the file name
 
 <Callout type="info">
-The **Date** column in Jellystat's backup list is a known bug and always shows an incorrect date. Use the **File Name** timestamp to identify your backup.
+  The **Date** column in Jellystat's backup list is a known bug and always shows an incorrect date.
+  Use the **File Name** timestamp to identify your backup.
 </Callout>
 
 6. On the far right of your new backup, click **Actions** → **Download** to save the JSON file
 
 <Callout type="error" title="Activity Backup Only">
-You must export an **Activity** backup specifically. Full backups are not supported — only the Activity backup contains the playback history needed for import.
+  You must export an **Activity** backup specifically. Full backups are not supported — only the
+  Activity backup contains the playback history needed for import.
 </Callout>
 
 ### Step 2: Upload and Configure
@@ -91,13 +96,15 @@ You must export an **Activity** backup specifically. Full backups are not suppor
 4. Configure import options:
 
 <Callout type="warning" title="Large File Uploads">
-For large backup files, it's recommended to access Tracearr directly via local IP or through a WireGuard/Tailscale connection. Reverse proxies may impose upload size limits that cause the import to fail.
+  For large backup files, it's recommended to access Tracearr directly via local IP or through a
+  WireGuard/Tailscale connection. Reverse proxies may impose upload size limits that cause the
+  import to fail.
 </Callout>
 
-| Option | Description |
-|--------|-------------|
-| **Enrich with media metadata** | Fetches season/episode numbers and artwork from your server. Slower but provides better data quality. *(Recommended)* |
-| **Update existing records** | Updates previously imported sessions with codec, bitrate, and transcode data from the backup. Useful when re-importing to backfill new fields. |
+| Option                         | Description                                                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Enrich with media metadata** | Fetches season/episode numbers and artwork from your server. Slower but provides better data quality. _(Recommended)_                          |
+| **Update existing records**    | Updates previously imported sessions with codec, bitrate, and transcode data from the backup. Useful when re-importing to backfill new fields. |
 
 ### Step 3: Start Import
 
@@ -117,7 +124,8 @@ Records may be skipped for these reasons:
 - **Duplicate session** — The session was already imported in a previous run.
 
 <Callout type="info">
-If many records are skipped due to "user not found", ensure you've synced your server recently in **Settings → Servers**.
+  If many records are skipped due to "user not found", ensure you've synced your server recently in
+  **Settings → Servers**.
 </Callout>
 
 ## Import from Playback Reporting Plugin
@@ -125,7 +133,8 @@ If many records are skipped due to "user not found", ensure you've synced your s
 Tracearr can import history directly from the [Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting), available in the official plugin catalog for both Jellyfin and Emby. No file export and no separate Jellystat installation are needed. Tracearr talks to the plugin's API directly, using the server connection already configured in **Settings → Servers**.
 
 <Callout type="info">
-The plugin only records history from the point it was installed onward. Sessions from before that aren't recoverable through this import.
+  The plugin only records history from the point it was installed onward. Sessions from before that
+  aren't recoverable through this import.
 </Callout>
 
 ### Step 1: Check the Plugin
@@ -137,23 +146,31 @@ The plugin only records history from the point it was installed onward. Sessions
 Tracearr queries the plugin's admin SQL endpoint with that server's existing connection details. A successful check reports how many records the plugin holds and the date range they span. If the plugin isn't detected, either it isn't installed or Tracearr can't reach it with the server's current connection settings.
 
 <Callout type="warning" title="Jellyfin 10.11.9 or newer: check fails with a 500">
-If the check says the plugin isn't installed and shows `500 Internal Server Error`, but Playback Reporting is installed and working, your Jellyfin has a plugin build that predates an API change in 10.11.9. Uninstall and reinstall the plugin from the catalog; the updater won't offer the fix on its own. See the [FAQ entry](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error) for why.
+  If the check says the plugin isn't installed and shows `500 Internal Server Error`, but Playback
+  Reporting is installed and working, your Jellyfin has a plugin build that predates an API change
+  in 10.11.9. Uninstall and reinstall the plugin from the catalog; the updater won't offer the fix
+  on its own. See the [FAQ
+  entry](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error) for why.
 </Callout>
 
 <Callout type="info" title="The plugin trims its own history">
-Playback Reporting runs a scheduled "Trim Db" task that deletes records older than its Max Data Age setting. History the plugin has already trimmed cannot be imported. If the check reports fewer records than you expect, look at the plugin's settings on your media server before importing.
+  Playback Reporting runs a scheduled "Trim Db" task that deletes records older than its Max Data
+  Age setting. History the plugin has already trimmed cannot be imported. If the check reports fewer
+  records than you expect, look at the plugin's settings on your media server before importing.
 </Callout>
 
 ### Step 2: Configure Import
 
-| Option | Description |
-|--------|-------------|
-| **Server Timezone** | The timezone of the machine running Jellyfin or Emby. Defaults to your browser's timezone, which is often not the same machine. |
-| **Enrich with media metadata** | Fetches season/episode numbers, year, artwork, and runtime from your server. *(Recommended)* |
+| Option                         | Description                                                                                                                                                                                                                                                                            |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Server Timezone**            | The timezone of the machine running Jellyfin or Emby. Defaults to your browser's timezone, which is often not the same machine.                                                                                                                                                        |
+| **Enrich with media metadata** | Fetches season/episode numbers, year, artwork, and runtime from your server. _(Recommended)_                                                                                                                                                                                           |
 | **Import the full date range** | By default, rows whose timestamps fall inside the range Tracearr already tracks for this server are skipped as overlapping. Enable this to re-scan the entire plugin history regardless of overlap, for a Tracearr history that has gaps. Duplicate rows are still skipped either way. |
 
 <Callout type="warning" title="Timezone matters">
-The plugin stores every timestamp in the media server host's local time, with no timezone marker attached. If **Server Timezone** doesn't match the host, every imported session shifts by the difference between the two zones.
+  The plugin stores every timestamp in the media server host's local time, with no timezone marker
+  attached. If **Server Timezone** doesn't match the host, every imported session shifts by the
+  difference between the two zones.
 </Callout>
 
 ### Step 3: Start Import
@@ -180,6 +197,7 @@ Records may be skipped for these reasons:
 Emby's Playback Reporting plugin also logs client IP addresses and pause duration, so Emby imports carry location data and pause time alongside each session. Jellyfin's plugin records neither field, so Jellyfin imports have no IP or location data.
 
 Neither plugin records codec or bitrate. Imported sessions have no stream-detail data on either server, and it can't be backfilled later since the plugin never captured it.
+
 </Callout>
 
 ### Falling Back to Jellystat
@@ -194,19 +212,21 @@ If the plugin has already been removed from your server, or you'd rather not rei
 This is a one-time migration path. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if you'd like.
 
 <Callout type="warning">
-Some users have reported issues with TV show metadata when importing from the Playback Reporting plugin to Jellystat. Movies typically import cleanly, but TV episodes may show incomplete data. This is a limitation of the plugin's data format, not Tracearr.
+  Some users have reported issues with TV show metadata when importing from the Playback Reporting
+  plugin to Jellystat. Movies typically import cleanly, but TV episodes may show incomplete data.
+  This is a limitation of the plugin's data format, not Tracearr.
 </Callout>
 
 ## After Importing
 
 After import completes, you may want to run some maintenance jobs in **Settings → Jobs**:
 
-| Job | When to Run |
-|-----|-------------|
-| **Normalize Players** | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV") |
-| **Fix Imported Progress** | If imported sessions show 0% progress |
-| **Backfill User Dates** | If users show "Never" for last activity despite having history |
-| **Full Aggregate Rebuild** | If charts or statistics look incorrect |
+| Job                        | When to Run                                                             |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Normalize Players**      | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV") |
+| **Fix Imported Progress**  | If imported sessions show 0% progress                                   |
+| **Backfill User Dates**    | If users show "Never" for last activity despite having history          |
+| **Full Aggregate Rebuild** | If charts or statistics look incorrect                                  |
 
 See the [FAQ](/faq) for more details on these jobs.
 

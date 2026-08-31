@@ -3,8 +3,8 @@ title: Environment Variables Reference
 description: Configure Tracearr with environment variables. Database, Redis, port, logging, and session settings for Docker and self-hosted deployments.
 ---
 
-import { Callout } from "nextra/components"
-import Image from "next/image"
+import { Callout } from 'nextra/components';
+import Image from 'next/image';
 
 # Environment Variables
 
@@ -12,36 +12,36 @@ Tracearr uses environment variables for core configuration.
 
 ## Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL/TimescaleDB connection string | `postgres://user:pass@host:5432/tracearr` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
-| `JWT_SECRET` | Signing key for authentication tokens | 64-character hex string |
-| `COOKIE_SECRET` | Cookie signing key | 64-character hex string |
+| Variable        | Description                              | Example                                   |
+| --------------- | ---------------------------------------- | ----------------------------------------- |
+| `DATABASE_URL`  | PostgreSQL/TimescaleDB connection string | `postgres://user:pass@host:5432/tracearr` |
+| `REDIS_URL`     | Redis connection string                  | `redis://localhost:6379`                  |
+| `JWT_SECRET`    | Signing key for authentication tokens    | 64-character hex string                   |
+| `COOKIE_SECRET` | Cookie signing key                       | 64-character hex string                   |
 
 ## Optional Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | HTTP server port | `3000` |
-| `NODE_ENV` | Environment mode | `production` |
-| `LOG_LEVEL` | Logging verbosity | `info` |
-| `BETTER_AUTH_SECRET` | Session signing/encryption key | derived from `JWT_SECRET` |
-| `TZ` | Timezone | `UTC` |
-| `CORS_ORIGIN` | Allowed CORS origin for API requests | reflects the request origin |
-| `TRUST_PROXY` | Trust `X-Forwarded-*` headers from a reverse proxy | `false` |
-| `OIDC_ISSUER_URL` | OIDC issuer base URL | none |
-| `OIDC_CLIENT_ID` | OIDC client ID | none |
-| `OIDC_CLIENT_SECRET` | OIDC client secret | none |
-| `OIDC_PROVIDER_NAME` | Label for the SSO login button | `SSO` |
-| `REDIS_PREFIX` | Redis key prefix for namespacing | no prefix |
-| `CLAIM_CODE` | Claim code for first time setup | none |
-| `BASE_PATH` | Base path when served under a subpath | none |
-| `DNS_CACHE_MAX_TTL` | DNS cache maximum TTL in seconds | disabled |
-| `GZIP_ENABLED` | Enable server-side gzip compression | `false` |
-| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10` |
-| `IMAGE_CACHE_MAX_MB` | Hard ceiling on the poster cache size in MB | none |
-| `BACKUP_DIR` | Directory for storing database backups | `/data/backup` |
+| Variable                       | Description                                                 | Default                     |
+| ------------------------------ | ----------------------------------------------------------- | --------------------------- |
+| `PORT`                         | HTTP server port                                            | `3000`                      |
+| `NODE_ENV`                     | Environment mode                                            | `production`                |
+| `LOG_LEVEL`                    | Logging verbosity                                           | `info`                      |
+| `BETTER_AUTH_SECRET`           | Session signing/encryption key                              | derived from `JWT_SECRET`   |
+| `TZ`                           | Timezone                                                    | `UTC`                       |
+| `CORS_ORIGIN`                  | Allowed CORS origin for API requests                        | reflects the request origin |
+| `TRUST_PROXY`                  | Trust `X-Forwarded-*` headers from a reverse proxy          | `false`                     |
+| `OIDC_ISSUER_URL`              | OIDC issuer base URL                                        | none                        |
+| `OIDC_CLIENT_ID`               | OIDC client ID                                              | none                        |
+| `OIDC_CLIENT_SECRET`           | OIDC client secret                                          | none                        |
+| `OIDC_PROVIDER_NAME`           | Label for the SSO login button                              | `SSO`                       |
+| `REDIS_PREFIX`                 | Redis key prefix for namespacing                            | no prefix                   |
+| `CLAIM_CODE`                   | Claim code for first time setup                             | none                        |
+| `BASE_PATH`                    | Base path when served under a subpath                       | none                        |
+| `DNS_CACHE_MAX_TTL`            | DNS cache maximum TTL in seconds                            | disabled                    |
+| `GZIP_ENABLED`                 | Enable server-side gzip compression                         | `false`                     |
+| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10`                        |
+| `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                 | none                        |
+| `BACKUP_DIR`                   | Directory for storing database backups                      | `/data/backup`              |
 
 ## Database Configuration
 
@@ -68,7 +68,8 @@ REDIS_URL=redis://:password@localhost:6379
 To enable Redis key prefixing:
 
 <Callout type="warning">
-Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensure proper namespacing and avoid key collisions in shared Redis instances.
+  Redis key prefixes must end with a delimiter (we recommend a colon ":") to ensure proper
+  namespacing and avoid key collisions in shared Redis instances.
 </Callout>
 
 ```bash
@@ -91,7 +92,10 @@ BETTER_AUTH_SECRET=<64-character hex string>  # optional, recommended
 ```
 
 <Callout type="warning">
-Rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly, which invalidates all web sessions and paired mobile devices. If you run multiple Tracearr instances against the same database, every instance must share the same `BETTER_AUTH_SECRET`, or the same `JWT_SECRET` when relying on derivation.
+  Rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly,
+  which invalidates all web sessions and paired mobile devices. If you run multiple Tracearr
+  instances against the same database, every instance must share the same `BETTER_AUTH_SECRET`, or
+  the same `JWT_SECRET` when relying on derivation.
 </Callout>
 
 ## OIDC Single Sign-On
@@ -119,7 +123,8 @@ TRUST_PROXY=true
 When `CORS_ORIGIN` is unset, the API reflects the request origin. Set `TRUST_PROXY=true` so Tracearr resolves the real client IP from `X-Forwarded-*` headers; this makes sign-in rate limits count per client instead of per proxy.
 
 <Callout type="info">
-Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set `CORS_ORIGIN` to the public URL) for cookie login to work.
+  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set
+  `CORS_ORIGIN` to the public URL) for cookie login to work.
 </Callout>
 
 ## Claim Code
@@ -132,16 +137,17 @@ When set, the claim code will be printed to the log on startup.
 <Image
   src="/images/claimcode-log.png"
   alt="Claim code"
-  className="rounded-lg mt-6 shadow-md"
+  className="mt-6 rounded-lg shadow-md"
   width={541}
   height={232}
 />
 
 Before you can access the setup page, you must enter the claim code.
+
 <Image
   src="/images/claimcode-web.png"
   alt="Claim code"
-  className="rounded-lg mt-6 shadow-md"
+  className="mt-6 rounded-lg shadow-md"
   width={513}
   height={360}
 />
@@ -156,7 +162,8 @@ BASE_PATH=/tracearr
 ```
 
 <Callout type="info">
-You only need to set this if Tracearr is accessed through a reverse proxy under a subpath (e.g. `https://example.com/tracearr`). If Tracearr is served at the root, this can be left unset.
+  You only need to set this if Tracearr is accessed through a reverse proxy under a subpath (e.g.
+  `https://example.com/tracearr`). If Tracearr is served at the root, this can be left unset.
 </Callout>
 
 ## DNS Cache
@@ -170,8 +177,9 @@ DNS_CACHE_MAX_TTL=3600
 ```
 
 <Callout type="info">
-Tracearr will respect the TTL provided by the DNS server, but will not cache entries longer than the value set in `DNS_CACHE_MAX_TTL`.
-Error responses (e.g. DNS resolution failures) are not cached to ensure that transient issues do not persist longer than necessary.
+  Tracearr will respect the TTL provided by the DNS server, but will not cache entries longer than
+  the value set in `DNS_CACHE_MAX_TTL`. Error responses (e.g. DNS resolution failures) are not
+  cached to ensure that transient issues do not persist longer than necessary.
 </Callout>
 
 ## Gzip Compression
@@ -184,8 +192,9 @@ GZIP_ENABLED=true
 ```
 
 <Callout type="info">
-Most deployments sit behind a reverse proxy (e.g. Nginx, Caddy, Traefik) that already handles compression. Only enable this if Tracearr is serving traffic directly without a compressing proxy in front of it. \
-Enabling gzip will slightly increase CPU usage on the server.
+  Most deployments sit behind a reverse proxy (e.g. Nginx, Caddy, Traefik) that already handles
+  compression. Only enable this if Tracearr is serving traffic directly without a compressing proxy
+  in front of it. \ Enabling gzip will slightly increase CPU usage on the server.
 </Callout>
 
 ## Poster Cache
@@ -205,6 +214,7 @@ BACKUP_DIR=/custom/path/to/backups
 ```
 
 <Callout type="info">
-When using Docker, the default `/data/backup` path is already configured as a volume. If you change this, ensure the directory exists and is writable, and mount it as a volume if needed. \
-See [Backup & Restore](/configuration/backup) for full documentation.
+  When using Docker, the default `/data/backup` path is already configured as a volume. If you
+  change this, ensure the directory exists and is writable, and mount it as a volume if needed. \
+  See [Backup & Restore](/configuration/backup) for full documentation.
 </Callout>

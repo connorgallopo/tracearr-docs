@@ -3,7 +3,7 @@ title: Collecting Logs for a Bug Report
 description: Capture Tracearr, PostgreSQL, and Redis logs from standard Docker, a Docker UI, the supervised image, a Proxmox VE LXC, or Kubernetes.
 ---
 
-import { Callout } from "nextra/components"
+import { Callout } from 'nextra/components';
 
 # Collecting Logs
 
@@ -21,10 +21,10 @@ The commands below diverge by install, and following the wrong branch costs a ro
 docker ps
 ```
 
-| `docker ps` shows | Your install is |
-|---|---|
-| Three containers | Standard Docker |
-| One container | Supervised |
+| `docker ps` shows                     | Your install is                     |
+| ------------------------------------- | ----------------------------------- |
+| Three containers                      | Standard Docker                     |
+| One container                         | Supervised                          |
 | Nothing, or `docker` is not a command | Proxmox VE LXC, or a manual install |
 
 If you deployed with the Helm chart, skip to [Kubernetes](#kubernetes). If you administer Docker through a web interface rather than a shell, read [No Terminal?](#no-terminal) after the section for your install.
@@ -74,7 +74,9 @@ If your tool has an export or download control, use that instead. It writes the 
 If it cannot reach back far enough, attach what it gave you and say so in the report. A short log with that note is worth more than a long one that starts in the wrong place.
 
 <Callout type="warning">
-Attach log text, not a picture of it. A screenshot holds one screenful, cannot be searched, and silently drops everything scrolled off the top. Where your tool offers an export or download, use it.
+  Attach log text, not a picture of it. A screenshot holds one screenful, cannot be searched, and
+  silently drops everything scrolled off the top. Where your tool offers an export or download, use
+  it.
 </Callout>
 
 ## Supervised
@@ -84,7 +86,8 @@ Go to `/debug` on your Tracearr instance and click **Download All** in the Logs 
 The Log Explorer on the same page is for looking, not for attaching. It caps a response at 1000 lines and 256 KiB, returns newest first, and cannot reach rotated backup files at all. A reproduction window wider than that is cut off before you see it. For what each supervised log file holds, see the [Debug Page](/configuration/debug).
 
 <Callout type="warning">
-All of `/debug` is owner-only, enforced on the server with no client-side guard. Sign in as the owner account first, otherwise you get a rendered page whose every panel returns 403.
+  All of `/debug` is owner-only, enforced on the server with no client-side guard. Sign in as the
+  owner account first, otherwise you get a rendered page whose every panel returns 403.
 </Callout>
 
 If the log endpoints answer with this instead of content:
@@ -131,7 +134,9 @@ Both log files rotate weekly, with roughly 11 to 12 weeks retained. The `cat` in
 The log directories carry no world-read bit: `drwxr-s--- redis adm` on Redis, `-rw-r----- postgres adm` on the PostgreSQL file. Run the block as root or as a member of `adm`. The Proxmox console gives you root, so it works there. Over SSH as an ordinary user, the `journalctl` lines succeed and the `cat` lines fail with permission denied, and you end up with a file holding lifecycle messages only.
 
 <Callout type="info">
-The `while read -r` loop matters after a `pg_upgradecluster`, when `pg_lsclusters` lists two online clusters. Collapsing it into a single `cat "$(...)"` fails on the embedded newline and captures neither cluster.
+  The `while read -r` loop matters after a `pg_upgradecluster`, when `pg_lsclusters` lists two
+  online clusters. Collapsing it into a single `cat "$(...)"` fails on the embedded newline and
+  captures neither cluster.
 </Callout>
 
 ## Kubernetes

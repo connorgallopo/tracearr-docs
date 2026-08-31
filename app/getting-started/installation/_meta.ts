@@ -4,4 +4,4 @@ export default {
   supervised: 'Supervised',
   kubernetes: 'Kubernetes (Helm)',
   railway: 'Railway (Cloud)',
-}
+};

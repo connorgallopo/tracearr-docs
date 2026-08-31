@@ -1,4 +1,4 @@
-import nextra from "nextra";
+import nextra from 'nextra';
 
 const withNextra = nextra({
   // Nextra options
@@ -10,38 +10,38 @@ export default withNextra({
   async redirects() {
     return [
       {
-        source: "/getting-started/installation/portainer",
-        destination: "/getting-started/installation/docker-ui",
+        source: '/getting-started/installation/portainer',
+        destination: '/getting-started/installation/docker-ui',
         permanent: true,
       },
       {
-        source: "/debug",
-        destination: "/configuration/debug",
+        source: '/debug',
+        destination: '/configuration/debug',
         permanent: true,
       },
       {
-        source: "/rules",
-        destination: "/configuration/automations",
+        source: '/rules',
+        destination: '/configuration/automations',
         permanent: true,
       },
       {
-        source: "/configuration/rules",
-        destination: "/configuration/automations",
+        source: '/configuration/rules',
+        destination: '/configuration/automations',
         permanent: true,
       },
       {
-        source: "/update",
-        destination: "/upgrading",
+        source: '/update',
+        destination: '/upgrading',
         permanent: true,
       },
       {
-        source: "/analytics",
-        destination: "/",
+        source: '/analytics',
+        destination: '/',
         permanent: true,
       },
       {
-        source: "/performance",
-        destination: "/",
+        source: '/performance',
+        destination: '/',
         permanent: true,
       },
     ];

@@ -18,4 +18,4 @@ export default {
     },
   },
   faq: 'FAQ',
-}
+};
