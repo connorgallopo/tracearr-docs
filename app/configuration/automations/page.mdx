@@ -370,13 +370,16 @@ The picker groups them the way they're grouped here. Search it by what you want 
 
 ### Sessions
 
-| Trigger                     | Fires when                                                       |
-| --------------------------- | ---------------------------------------------------------------- |
-| A stream starts             | Someone presses play                                             |
-| A stream stops              | Playback ends, however it ended                                  |
-| Transcoding starts or stops | The server switches a stream between direct play and transcoding |
-| A stream is paused          | The moment someone pauses                                        |
-| A stream sits paused        | A stream has been paused longer than the minutes you set         |
+| Trigger                     | Fires when                                                             |
+| --------------------------- | ---------------------------------------------------------------------- |
+| A stream starts             | Playback is confirmed, about thirty seconds after Tracearr sees it     |
+| A stream is first seen      | Tracearr first notices a stream, before the thirty-second confirmation |
+| A stream stops              | Playback ends, however it ended                                        |
+| Transcoding starts or stops | The server switches a stream between direct play and transcoding       |
+| A stream is paused          | The moment someone pauses                                              |
+| A stream sits paused        | A stream has been paused longer than the minutes you set               |
+
+**A stream is first seen** fires the moment Tracearr notices a new stream. Every stream is held for about thirty seconds before it is recorded, which keeps phantoms out of your history, and **A stream starts** fires once that hold clears. First seen doesn't wait. That has a cost: a stream that dies during the hold, someone pressing stop straight away or a player that never really got going, has already fired, on a session your history will never show. An alert a person reads can afford the thirty seconds. A webhook another app acts on usually can't, and that's what this trigger is for.
 
 **A stream sits paused** carries its own settings: the number of minutes, and whether that's counted **this time** or **in total**. This time resets when the user resumes; in total adds up every pause in the session.
 
@@ -699,7 +702,7 @@ The rename and everything else on this page happen in one startup. Skipping a ve
 
 **A fresh install seeds five automations.** Four of them cover the alerts that used to be on by default, and New device joins them in this release. An install that already has rules gets its conversions instead.
 
-**Stream-start alerts arrive a little later.** They fire once Tracearr has confirmed the session, about thirty seconds after it first sees it.
+**Stream-start alerts arrive a little later.** They fire once Tracearr has confirmed the session, about thirty seconds after it first sees it. For anything that can't wait that long, the **A stream is first seen** trigger fires at first sight instead.
 
 **`rule.type` is null everywhere.** The `/api/v1/violations` responses and every `/api/v1/public/*` shape keep their exact field names, `rule` and `ruleId` included. `rule.type` is in them and is always `null`. It has been null on every row since the 2.x conversion; this release stops pretending otherwise.
 
