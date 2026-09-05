@@ -1,0 +1,82 @@
+---
+title: Email & Newsletters
+description: Send alerts and scheduled newsletters from Tracearr over SMTP. Set up an email destination, get SPF, DKIM and DMARC right, brand the emails, and manage who receives them.
+---
+
+import { Callout, Steps } from "nextra/components"
+
+# Email & Newsletters
+
+Tracearr sends two kinds of email: alerts, which any automation can route to an email destination the same way it routes to Discord or ntfy, and newsletters, a digest of what was added to a server over a window, sent to that server's members on a schedule with an unsubscribe link in every message.
+
+Both go through one SMTP destination, one rendering package and one branding block. Nothing is sent through a provider's HTTP API.
+
+## The email destination
+
+Newsletters and alerts both need an email destination under **Settings → Notifications → Destinations**.
+
+<Steps>
+### Add the destination
+
+Click **Add destination** and pick **Email**. The preset fills the host, port and security for Postmark, Resend, Amazon SES, Mailgun, SendGrid, Brevo and Gmail; **Custom** leaves them to you.
+
+### Fill the account
+
+`Username` and `Password` are whatever the provider issues (an API key for most of them). `From address` is what recipients see, and it has to be an address the provider lets you send as. `To` is the list an alert goes to; newsletters ignore it and address their own recipients.
+
+### Test it
+
+**Test** verifies the connection first, so a wrong password, a refused connection and a TLS mismatch each read as their own error, then sends a one-paragraph test email.
+</Steps>
+
+<Callout type="info">
+The rate limit (`Messages per second`, default 2) is per Tracearr instance. Two instances behind one Redis send at twice the rate.
+</Callout>
+
+## SPF, DKIM and DMARC
+
+Whether a message lands in the inbox is decided by the receiving provider, and the three DNS records below are what it checks. They live on the domain of the `From address`, in your DNS host, not in Tracearr.
+
+- **SPF** lists which servers may send for the domain. Your provider gives you the record to add; it looks like `v=spf1 include:spf.example-provider.com ~all`.
+- **DKIM** signs each message with a key the provider holds. The provider gives you one or more `CNAME` or `TXT` records to add, and signing starts once they resolve.
+- **DMARC** tells receivers what to do when SPF or DKIM fail. Start with `v=DMARC1; p=none; rua=mailto:you@yourdomain` on `_dmarc.yourdomain` and tighten to `quarantine` once reports look clean.
+
+The newsletter editor's **Readiness** list flags the one mismatch it can see from Tracearr: a `From address` on a different domain than the SMTP username, which some providers refuse outright.
+
+## Newsletters
+
+**Settings → Notifications → Newsletters** lists them. Each newsletter belongs to the servers in its scope; a Jellyfin newsletter reads as the Jellyfin server's, and nothing global renames one server's mail after another.
+
+A newsletter has:
+
+- **Schedule**: daily, weekly, monthly, or a five-field cron expression, in a timezone you pick. A time inside the spring-forward hour runs when the clock reaches the next valid minute.
+- **Content**: the window (since the last send, with a fallback for the first run, or a fixed number of days), the servers and libraries in scope, and four sections (movies, shows with seasons and episode ranges, music grouped by artist, and most watched, which is off by default) each capped at a number of titles.
+- **Message**: the name it is shown as (defaults to the scoped server's name), the subject with `{{server_name}}`, `{{start_date}}`, `{{end_date}}` and `{{item_count}}` placeholders, and an intro and outro with bold, italic, links and bullet lists.
+- **Recipients**: the members of the scoped servers, plus addresses you type. The panel under it shows who will receive the next send, who has no address, and who you excluded.
+- **Delivery**: the email destination, how posters travel (see below), and whether an empty window sends nothing.
+
+**Preview** renders the current window in a sandboxed frame. **Send test** sends it to one address, ignoring the suppression list. **Send now** shows the recipient and item counts and the window before it sends. The **History** tab keeps every send with its recipients, their delivery status, and a snapshot you can open or resend to the recipients that failed.
+
+### Poster images
+
+Posters travel one of two ways. **Attached** (the default) puts the images in the message itself, which every mail client shows; it makes each message a few hundred kilobytes. **Hosted** links the images to this Tracearr over its external URL, which keeps messages small but needs the URL reachable from the public internet, since Gmail and Outlook fetch images through their own proxies, and it shows that URL, with the server id and poster path in it, to every recipient's provider. **No posters** renders text cards only.
+
+## Branding
+
+**Settings → Notifications → Email** holds the block every email uses: the logo (Tracearr's, none, or an image at a URL), the accent color, a footer line, an optional postal address, and whether unsubscribe by email is offered beside the link.
+
+The sender name is per newsletter, under **Message**, and falls back to the scoped server's name; alerts use the server they are about.
+
+## Suppressed addresses
+
+Every newsletter carries an unsubscribe link. Using it adds the address to the suppression list on the same page, which is global to the address: it opts the address out of every newsletter on the install, whether it came from a member or was typed in by hand. You can add an address by hand and remove any address; the next send picks up the change.
+
+Alerts sent to the destination's own `To` list are never suppressed. They are addresses you typed for yourself.
+
+## Contact email
+
+Jellyfin and Emby do not sync email addresses, and Plex Home users often have none. Give a member an address from their page under **Users** (the pencil beside the name), or inline from the newsletter's **No email address** list. It is used only to address newsletters: it grants no login and never matches a synced account.
+
+## What a newsletter can trigger
+
+Every finished send raises a `newsletter.sent` or `newsletter.failed` trigger, so an automation can tell you when a schedule reached nobody. The gallery ships **Newsletter failed**, which sends to any destination you pick.
