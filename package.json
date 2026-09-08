@@ -41,6 +41,11 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "zod": "<4.4.0"
+    "nextra": {
+      "zod": "<4.4.0"
+    },
+    "nextra-theme-docs": {
+      "zod": "<4.4.0"
+    }
   }
 }
