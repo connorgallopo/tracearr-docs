@@ -23,7 +23,7 @@ Tracearr uses environment variables for core configuration.
 
 | Variable                       | Description                                                 | Default                     |
 | ------------------------------ | ----------------------------------------------------------- | --------------------------- |
-| `PORT`                         | HTTP server port                                            | `3000`                      |
+| `PORT`                         | Port the server binds to inside the container               | `3000`                      |
 | `NODE_ENV`                     | Environment mode                                            | `production`                |
 | `LOG_LEVEL`                    | Logging verbosity                                           | `info`                      |
 | `BETTER_AUTH_SECRET`           | Session signing/encryption key                              | derived from `JWT_SECRET`   |
@@ -42,6 +42,14 @@ Tracearr uses environment variables for core configuration.
 | `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10`                        |
 | `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                 | none                        |
 | `BACKUP_DIR`                   | Directory for storing database backups                      | `/data/backup`              |
+
+<Callout type="info" title="PORT in the Docker Compose files">
+  In the compose files, `PORT` sets the host side of the port mapping, `"${PORT:-3000}:3000"`. The
+  container always listens on 3000. To reach Tracearr on a different host port, set `PORT=8080` in
+  your `.env` and leave the container port alone. Setting `PORT` in the service's `environment:`
+  block moves the port the server binds to, which leaves the published mapping and the image's
+  health check pointing at 3000.
+</Callout>
 
 ## Database Configuration
 
