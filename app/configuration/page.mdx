@@ -13,7 +13,7 @@ Most settings are available in the **Settings** page:
 
 - **Servers** — Add and manage media server connections
 - **[Real-Time Updates](/configuration/realtime)** — Instant Jellyfin and Emby sessions with the SSE plugin
-- **Notifications** — Add the destinations alerts are sent to (see below)
+- **[Notification Destinations](/configuration/destinations)**: the places alerts are sent to (see below)
 - **[Email & Newsletters](/configuration/email)**: send alerts over SMTP and schedule recently-added digests to members
 - **Sharing Detection** — Set up account sharing detection
 - **Appearance** — Customize the dashboard
@@ -21,7 +21,7 @@ Most settings are available in the **Settings** page:
 
 ## Notification destinations
 
-A destination is a named place notifications go. Mobile push and browser toasts are built in; you add the rest under **Settings → Notifications**: Discord, ntfy, Gotify, Apprise, Pushover, or a JSON webhook. You can have more than one of the same type. Two Discord webhooks pointing at different rooms is a normal setup.
+A destination is a named place notifications go. Mobile push and browser toasts are built in; you add the rest under **Settings → Notifications**: Discord, ntfy, Gotify, Apprise, Pushover, email, or a JSON webhook. You can have more than one of the same type. Two Discord webhooks pointing at different rooms is a normal setup. The kinds and their fields are on the [Notification Destinations](/configuration/destinations) page.
 
 A destination has one checkbox of its own, **Receive violations**, which sends it every violation. Everything else a destination hears about comes from an [automation](/configuration/automations): a Send Notification action names the destinations it sends to, and it reaches them whether or not they asked for anything. The per-event checkboxes destinations used to carry are gone; upgrading turned each subscription into an automation that sends to the destinations that had it ticked.
 

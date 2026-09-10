@@ -285,7 +285,7 @@ You can add several actions to one automation. They all run when the conditions 
 
 #### Send Notification
 
-Sends an alert to the notification destinations you pick.
+Sends an alert to the notification destinations you pick. An email destination is one of the choices; see [Email & Newsletters](/configuration/email) for its setup and [Notification destinations](/configuration/destinations) for the rest.
 
 | Setting      | Description                                                              |
 | ------------ | ------------------------------------------------------------------------ |
@@ -427,6 +427,17 @@ Both come out of the library sync. When your server pushes library events they a
 
 An upgrade fires on any change to those six values, a drop included. To hear about improvements only, add a condition such as "Resolution is at least 4K". An upgrade message can name both sides: `{{media.title}}: {{media.from.resolution}} → {{media.to.resolution}}`.
 
+### Newsletters
+
+| Trigger                 | Fires when                                                    |
+| ----------------------- | ------------------------------------------------------------- |
+| A newsletter is sent    | A scheduled or manual newsletter reached everyone on its list |
+| A newsletter send fails | A newsletter reached nobody, or only part of its list         |
+
+Both carry `{{newsletter.name}}`, `{{newsletter.outcome}}`, `{{newsletter.recipientCount}}` and `{{newsletter.error}}`.
+
+These two are about the install rather than a person or a session, so they supply no user, no account and no server. That rules them out of a policy automation, and out of any action that needs somebody to act on.
+
 ### What a Trigger Decides
 
 The triggers you pick decide what the rest of the builder will offer you.
@@ -563,14 +574,14 @@ Use the trash button on the automation's row, or select several rows and choose 
 
 ## Ready-Made Automations
 
-**New automation** opens a gallery of automations that are already built. Twenty-one ship with Tracearr, in four groups:
+**New automation** opens a gallery of automations that are already built. Twenty-two ship with Tracearr, in four groups:
 
-| Group            | What's in it                                                                                                                                                                                                                  |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Notifications    | Tell a destination something happened: a stream started or stopped, a stream is transcoding, a stream sat paused too long, media was added or upgraded, an account played from a new device, an account's trust score changed |
-| Server health    | A server went down or came back, and the three update triggers                                                                                                                                                                |
-| Limits and rules | The six sharing-detection policies (too many streams, impossible travel, two places at once, many IPs in a window, blocked countries, inactive account), plus one for stopping 4K transcodes                                  |
-| Housekeeping     | Stop paused streams                                                                                                                                                                                                           |
+| Group            | What's in it                                                                                                                                                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Notifications    | Tell a destination something happened: a stream started or stopped, a stream is transcoding, a stream sat paused too long, media was added or upgraded, an account played from a new device, an account's trust score changed, a newsletter send failed |
+| Server health    | A server went down or came back, and the three update triggers                                                                                                                                                                                          |
+| Limits and rules | The six sharing-detection policies (too many streams, impossible travel, two places at once, many IPs in a window, blocked countries, inactive account), plus one for stopping 4K transcodes                                                            |
+| Housekeeping     | Stop paused streams                                                                                                                                                                                                                                     |
 
 There's a search box over the cards. Each card shows the automation's sentence in plain words and whether it records **A violation** or **An alert**.
 

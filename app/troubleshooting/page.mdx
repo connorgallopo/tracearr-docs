@@ -70,6 +70,14 @@ The rest of this section is procedure rather than pointers. [Collecting Logs](/t
 - [An automation is firing too often](/configuration/automations#an-automation-is-firing-too-often)
 - [A share code someone sent me won't import](/configuration/automations#codes-that-wont-read)
 
+### Email and Newsletters
+
+- [The test email fails](/configuration/email#errors-from-the-mail-server)
+- [I don't know what to put in the SMTP username and password](/configuration/email#username-and-password-by-provider)
+- [A newsletter says it sent but nobody got it](/faq#my-newsletter-says-it-sent-but-nobody-got-it)
+- [Members get no links to items on my Jellyfin or Emby server](/getting-started/first-server#public-address)
+- [The unsubscribe link shows a login page](/configuration/environment#reverse-proxy)
+
 ### Importing History
 
 - [Records were skipped during a Tautulli import](/getting-started/import#import-from-tautulli)
@@ -167,6 +175,24 @@ disconnected on buffer overflow
 ```
 
 Your client is reading slower than events arrive. See [Client Keeps Getting Disconnected](/sse-plugin/troubleshooting#client-keeps-getting-disconnected).
+
+### Email
+
+```
+SMTP authentication failed for <username> at <host>
+Could not connect to <host>:<port>
+TLS failed for <host>:<port>; check the security setting
+host: host must be a hostname or IP address without a scheme, port or path
+No alert recipients on this destination. Add one under Settings, Destinations.
+```
+
+All five come from an email destination. The first three come from the **Test** button or from an alert on its way out, the fourth from saving the destination, and the last when an automation sends to one whose alert recipient list is empty. See [Errors from the mail server](/configuration/email#errors-from-the-mail-server).
+
+```
+ENCRYPTION_KEY is set but is not 64 hex characters; fix or unset it
+```
+
+The server refuses to start on this. See [Authentication Secrets](/configuration/environment#authentication-secrets).
 
 ### Logs and the Debug Page
 

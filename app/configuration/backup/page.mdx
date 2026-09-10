@@ -101,6 +101,12 @@ The recovery loop detects healthy connections and re-initializes all services, t
 
 The maintenance page shows live restore progress with phase indicators, and the page automatically reloads when the restore completes.
 
+### Destination Secrets and the Encryption Key
+
+A backup is a dump of the whole database, so notification destinations, newsletters, their send history and the email suppression list all travel with it.
+
+The configuration of each destination is stored encrypted, under `ENCRYPTION_KEY` when that is set and under a key derived from `JWT_SECRET` otherwise. Restore into an install whose secret differs from the one the backup was written under and those rows cannot be read. Every affected destination is flagged "Re-enter this destination's secret" in the list and is skipped until you do, so an SMTP password or a webhook URL has to be typed in again. Keep whichever secret applies alongside the backup file and none of that happens.
+
 ### Superuser Requirement
 
 Restoring a backup requires the database user to have **superuser** privileges. This is needed for TimescaleDB's `timescaledb_pre_restore()` and `timescaledb_post_restore()` functions.

@@ -42,6 +42,7 @@ Tracearr uses environment variables for core configuration.
 | `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10`                        |
 | `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                 | none                        |
 | `BACKUP_DIR`                   | Directory for storing database backups                      | `/data/backup`              |
+| `ENCRYPTION_KEY`               | Key for destination secrets and email link signatures       | derived from `JWT_SECRET`   |
 
 <Callout type="info" title="PORT in the Docker Compose files">
   In the compose files, `PORT` sets the host side of the port mapping, `"${PORT:-3000}:3000"`. The
@@ -93,11 +94,22 @@ Tracearr requires two secrets, each a long random string unique to your installa
 
 A third secret, `BETTER_AUTH_SECRET`, signs and encrypts web and mobile sessions. It is optional: when unset, Tracearr derives it from `JWT_SECRET` (HKDF-SHA256), so existing installs need no new configuration. Setting it explicitly is recommended. Tracearr fails to start only when neither `BETTER_AUTH_SECRET` nor `JWT_SECRET` is set.
 
+A fourth, `ENCRYPTION_KEY`, is 64 hex characters and also optional. It protects the stored configuration of every notification destination, including SMTP passwords and webhook URLs, and it signs the unsubscribe and browser-view links in newsletter email. Each of the two uses gets its own key derived from this value, so neither can open the other. When `ENCRYPTION_KEY` is unset both derive from `JWT_SECRET` by HKDF-SHA256 instead, and existing installs need no new configuration. Set it when you want to rotate `JWT_SECRET` without re-entering every destination secret.
+
 ```bash
 JWT_SECRET=<64-character hex string>
 COOKIE_SECRET=<64-character hex string>
 BETTER_AUTH_SECRET=<64-character hex string>  # optional, recommended
+ENCRYPTION_KEY=<64-character hex string>      # optional
 ```
+
+A malformed value stops the server on start:
+
+```
+ENCRYPTION_KEY is set but is not 64 hex characters; fix or unset it
+```
+
+Rotating `JWT_SECRET` while `ENCRYPTION_KEY` is unset leaves Tracearr unable to read the stored destination secrets. Each affected destination is flagged "Re-enter this destination's secret" in the list, receives nothing until you do, and cannot be tested.
 
 <Callout type="warning">
   Rotating `JWT_SECRET` also changes the derived `BETTER_AUTH_SECRET` when it is not set explicitly,
@@ -129,6 +141,15 @@ TRUST_PROXY=true
 ```
 
 When `CORS_ORIGIN` is unset, the API reflects the request origin. Set `TRUST_PROXY=true` so Tracearr resolves the real client IP from `X-Forwarded-*` headers; this makes sign-in rate limits count per client instead of per proxy.
+
+Two API paths answer without a login by design, and an authenticating proxy such as Authelia, Authentik or a Cloudflare Access policy must let them through:
+
+```
+/api/v1/email/unsubscribe/*
+/api/v1/newsletters/view/*
+```
+
+The first is the unsubscribe page every newsletter links to; the second is the browser view of a digest that was sent. Gating either one shows members a login page instead of the page they asked for. Both carry their own limit of 60 requests a minute.
 
 <Callout type="info">
   Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set

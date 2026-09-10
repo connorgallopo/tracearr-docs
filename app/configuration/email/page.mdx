@@ -3,35 +3,149 @@ title: Email & Newsletters
 description: Send alerts and scheduled newsletters from Tracearr over SMTP. Set up an email destination, get SPF, DKIM and DMARC right, brand the emails, and manage who receives them.
 ---
 
-import { Callout, Steps } from "nextra/components"
+import { Callout, Steps } from 'nextra/components';
 
 # Email & Newsletters
 
-Tracearr sends two kinds of email: alerts, which any automation can route to an email destination the same way it routes to Discord or ntfy, and newsletters, a digest of what was added to a server over a window, sent to that server's members on a schedule with an unsubscribe link in every message.
+Tracearr sends two kinds of email. Alerts are what an automation routes to an email destination, the same way it routes to Discord or ntfy. Newsletters are a digest of what was added to a server over a window, sent to that server's members on a schedule, with an unsubscribe link in every message.
 
 Both go through one SMTP destination, one rendering package and one branding block. Nothing is sent through a provider's HTTP API.
 
 ## The email destination
 
-Newsletters and alerts both need an email destination under **Settings → Notifications → Destinations**.
+Alerts and newsletters both need an email destination under **Settings** → **Notifications** → **Destinations**. Only the owner can add one. What every destination has in common is on the [Notification destinations](/configuration/destinations) page. The rest of this section is the part specific to email.
 
 <Steps>
 ### Add the destination
 
-Click **Add destination** and pick **Email**. The preset fills the host, port and security for Postmark, Resend, Amazon SES, Mailgun, SendGrid, Brevo and Gmail; **Custom** leaves them to you.
+Click **Add destination** and pick **Email**.
+
+### Pick a provider
+
+**Provider** fills the SMTP host, port and security for the seven providers listed below. **Custom** leaves all three to you.
 
 ### Fill the account
 
-`Username` and `Password` are whatever the provider issues (an API key for most of them). `From address` is what recipients see, and it has to be an address the provider lets you send as. `To` is the list an alert goes to; newsletters ignore it and address their own recipients.
+What goes in Username and Password differs by provider, and the description under each box names it for the provider you picked. **From address** is what recipients see, and it has to be an address the provider lets you send as.
 
 ### Test it
 
-**Test** verifies the connection first, so a wrong password, a refused connection and a TLS mismatch each read as their own error, then sends a one-paragraph test email.
+**Test** opens the connection and checks the credentials first, then sends a message with the subject `Test email from Tracearr (<destination name>)`. It goes to **Alert recipients**, or to the From address when that list is empty.
+
 </Steps>
 
-<Callout type="info">
-The rate limit (`Messages per second`, default 2) is per Tracearr instance. Two instances behind one Redis send at twice the rate.
-</Callout>
+### Provider presets
+
+| Provider   | SMTP host                            | Port | Security |
+| ---------- | ------------------------------------ | ---- | -------- |
+| Postmark   | `smtp.postmarkapp.com`               | 587  | STARTTLS |
+| Resend     | `smtp.resend.com`                    | 465  | TLS      |
+| Amazon SES | `email-smtp.us-east-1.amazonaws.com` | 587  | STARTTLS |
+| Mailgun    | `smtp.mailgun.org`                   | 587  | STARTTLS |
+| SendGrid   | `smtp.sendgrid.net`                  | 587  | STARTTLS |
+| Brevo      | `smtp-relay.brevo.com`               | 587  | STARTTLS |
+| Gmail      | `smtp.gmail.com`                     | 587  | STARTTLS |
+
+Picking a provider writes those three values and nothing else, and you can edit any of them afterwards. Amazon SES and Mailgun EU need the region edited into the host.
+
+### The fields
+
+| Field               | Required | Default    | Notes                                                                              |
+| ------------------- | -------- | ---------- | ---------------------------------------------------------------------------------- |
+| Provider            | Yes      | `Custom`   | Fills the three fields below it from the table above                               |
+| SMTP host           | Yes      | none       | A hostname or IP address, with no scheme, port or path                             |
+| Port                | Yes      | `587`      | A whole number from 1 to 65535                                                     |
+| Security            | Yes      | `STARTTLS` | STARTTLS (usually port 587), TLS (usually port 465), or None (plain text, port 25) |
+| Username            | No       | blank      | Leave blank when the server needs no login                                         |
+| Password            | No       | blank      | Stored encrypted, and never read back into the form                                |
+| Messages per second | Yes      | `2`        | A whole number from 1 to 50                                                        |
+| Message stream      | No       | blank      | Postmark only, up to 64 characters, letters, digits and hyphens                    |
+| From name           | No       | `Tracearr` | The display name on the From header                                                |
+| From address        | Yes      | none       | The address recipients see and reply to unless Reply-to is set                     |
+| Reply-to            | No       | blank      | One address                                                                        |
+| Alert recipients    | No       | blank      | Comma-separated addresses that alerts go to; newsletters ignore this list          |
+
+Username and Password are optional, so a relay that wants no login works with both left blank.
+
+### Username and password by provider
+
+Each provider names these two differently, and swapping them fails the test with `SMTP authentication failed`. Once you pick a provider the dialog shows the matching line under each box.
+
+| Provider   | Username                                                                                                                                       | Password                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Postmark   | Your Server API token.                                                                                                                         | The same Server API token, or a stream token's secret.                                                                   |
+| Resend     | The word resend, exactly.                                                                                                                      | Your Resend API key. The sender domain must be verified in Resend first.                                                 |
+| Amazon SES | The SMTP user name from the SES console, not an IAM access key. Put your region in the host.                                                   | The SMTP password from the SES console. Sandbox accounts send 200 messages a day to verified addresses only.             |
+| Mailgun    | `postmaster@yourdomain`, not your Mailgun login.                                                                                               | The SMTP password from that domain's settings. A sandbox domain only reaches its authorized recipients.                  |
+| SendGrid   | The word apikey, exactly.                                                                                                                      | Your SendGrid API key.                                                                                                   |
+| Brevo      | Your Brevo login email.                                                                                                                        | An SMTP key from SMTP & API > SMTP, not the API key.                                                                     |
+| Gmail      | Your full Gmail address. Gmail sends from this address whatever the sender address says, and personal accounts stop near 500 recipients a day. | An app password from Google Account > Security > 2-Step Verification > App passwords. Your account password is rejected. |
+
+### Message stream
+
+Postmark separates transactional and broadcast mail into streams. Put a stream ID in **Message stream** and Tracearr adds an `X-PM-Message-Stream` header carrying it to every message sent through this destination. Leave it blank on every other provider; nothing else reads the header.
+
+### Rate limit
+
+**Messages per second** defaults to 2 and accepts 1 to 50. The limit is per Tracearr instance, so two instances behind one Redis send at twice the rate you set here. Stay under whatever your provider allows.
+
+### Host validation
+
+**SMTP host** takes a bare hostname or IP address. Saving with a value that carries a scheme, a port or a path is refused, before anything tries to connect:
+
+```
+host: host must be a hostname or IP address without a scheme, port or path
+```
+
+Link-local addresses are refused as well, both `169.254.0.0/16` and `fe80::/10`. Private, loopback and CGNAT addresses are allowed, so a relay running on the same box or elsewhere on your LAN works.
+
+### Connection behaviour
+
+Tracearr holds one pooled connection set per destination, capped at 2 connections carrying at most 100 messages each. Changing any connection field closes the pool and opens a new one.
+
+| Timeout    | Value       |
+| ---------- | ----------- |
+| Connection | 30 seconds  |
+| Greeting   | 30 seconds  |
+| Socket     | 120 seconds |
+
+### Errors from the mail server
+
+Three connection failures are rewritten into text you can act on. Everything else the mail server says is passed through as it arrived.
+
+```
+SMTP authentication failed for <username> at <host>
+```
+
+The server took the connection and rejected the credentials. With Username blank the message reads `anonymous`, which means the server wanted a login you did not give it.
+
+```
+Could not connect to <host>:<port>
+```
+
+Nothing answered. The connection was refused, it timed out, or the hostname did not resolve.
+
+```
+TLS failed for <host>:<port>; check the security setting
+```
+
+The TLS handshake failed, usually because Security does not match the port. Port 465 wants TLS; 587 wants STARTTLS.
+
+One more comes from Tracearr rather than from the mail server:
+
+```
+No alert recipients on this destination. Add one under Settings, Destinations.
+```
+
+An automation sent an alert to a destination whose **Alert recipients** list is empty. Newsletters do not hit this, because they address their own recipients.
+
+## Alerts over email
+
+An automation's **Send Notification** action reaches an email destination the same way it reaches any other. The alert goes to the addresses in **Alert recipients**, and to nothing else. A destination can also be given every violation on its own with the **Receive violations** switch, which stays disabled until that list holds an address.
+
+Each alert renders as one card: the event title, a severity label reading Info, Warning or High, the message, and the time in UTC. A violation adds the user, the rule, the severity, and the server when the violation names one. Something added to or upgraded in a library adds its poster, the resolution, dynamic range and codec lines, and links out to the item. When an external URL is set under **Settings** → **Access** → **Remote access**, the mail ends with an **Open Tracearr** link.
+
+The From header carries **From name**, or `Tracearr` when you left it blank, and the display name inside the message is the server the event is about.
 
 ## SPF, DKIM and DMARC
 
@@ -41,42 +155,28 @@ Whether a message lands in the inbox is decided by the receiving provider, and t
 - **DKIM** signs each message with a key the provider holds. The provider gives you one or more `CNAME` or `TXT` records to add, and signing starts once they resolve.
 - **DMARC** tells receivers what to do when SPF or DKIM fail. Start with `v=DMARC1; p=none; rua=mailto:you@yourdomain` on `_dmarc.yourdomain` and tighten to `quarantine` once reports look clean.
 
-The newsletter editor's **Readiness** list flags the one mismatch it can see from Tracearr: a `From address` on a different domain than the SMTP username, which some providers refuse outright.
-
-## Newsletters
-
-**Settings → Notifications → Newsletters** lists them. Each newsletter belongs to the servers in its scope; a Jellyfin newsletter reads as the Jellyfin server's, and nothing global renames one server's mail after another.
-
-A newsletter has:
-
-- **Schedule**: daily, weekly, monthly, or a five-field cron expression, in a timezone you pick. A time inside the spring-forward hour runs when the clock reaches the next valid minute.
-- **Content**: the window (since the last send, with a fallback for the first run, or a fixed number of days), the servers and libraries in scope, and four sections (movies, shows with seasons and episode ranges, music grouped by artist, and most watched, which is off by default) each capped at a number of titles.
-- **Message**: the name it is shown as (defaults to the scoped server's name), the subject with `{{server_name}}`, `{{start_date}}`, `{{end_date}}` and `{{item_count}}` placeholders, and an intro and outro with bold, italic, links and bullet lists.
-- **Recipients**: the members of the scoped servers, plus addresses you type. The panel under it shows who will receive the next send, who has no address, and who you excluded.
-- **Delivery**: the email destination, how posters travel (see below), and whether an empty window sends nothing.
-
-**Preview** renders the current window in a sandboxed frame. **Send test** sends it to one address, ignoring the suppression list. **Send now** shows the recipient and item counts and the window before it sends. The **History** tab keeps every send with its recipients, their delivery status, and a snapshot you can open or resend to the recipients that failed.
-
-### Poster images
-
-Posters travel one of two ways. **Attached** (the default) puts the images in the message itself, which every mail client shows; it makes each message a few hundred kilobytes. **Hosted** links the images to this Tracearr over its external URL, which keeps messages small but needs the URL reachable from the public internet, since Gmail and Outlook fetch images through their own proxies, and it shows that URL, with the server id and poster path in it, to every recipient's provider. **No posters** renders text cards only.
+The newsletter editor's **Readiness** list flags the one mismatch it can see from Tracearr: "The from address and the SMTP username sit on different domains; some providers refuse that."
 
 ## Branding
 
-**Settings → Notifications → Email** holds the block every email uses: the logo (Tracearr's, none, or an image at a URL), the accent color, a footer line, an optional postal address, and whether unsubscribe by email is offered beside the link.
+**Settings** → **Notifications** → **Email** holds the block every email uses, alerts and newsletters alike.
 
-The sender name is per newsletter, under **Message**, and falls back to the scoped server's name; alerts use the server they are about.
+| Setting                        | Default    | Notes                                                                                     |
+| ------------------------------ | ---------- | ----------------------------------------------------------------------------------------- |
+| Logo                           | `Tracearr` | Tracearr's own mark, no logo, or an image at an http or https URL of up to 500 characters |
+| Accent color                   | `#0ea0b3`  | A six-digit hex color                                                                     |
+| Footer text                    | blank      | One line under every email, up to 500 characters                                          |
+| Postal address                 | blank      | Up to 500 characters; some jurisdictions expect one on bulk mail                          |
+| Offer unsubscribe by email too | off        | Adds a mailto form to the `List-Unsubscribe` header                                       |
 
-## Suppressed addresses
+The mailto form points at the destination's **Reply-to** address, so someone has to read that mailbox and act on what arrives. The link in the message footer works either way.
 
-Every newsletter carries an unsubscribe link. Using it adds the address to the suppression list on the same page, which is global to the address: it opts the address out of every newsletter on the install, whether it came from a member or was typed in by hand. You can add an address by hand and remove any address; the next send picks up the change.
+Tracearr's own logo travels as an attachment. A logo you point at by URL is fetched by the recipient's mail client instead.
 
-Alerts sent to the destination's own `To` list are never suppressed. They are addresses you typed for yourself.
+## Newsletters
 
-## Contact email
+Newsletter scheduling, windows, sections and send history are being documented on their own page at `/configuration/email/newsletters`. Until it is published, the newsletter editor under **Settings** → **Notifications** → **Newsletters** carries the same information in its field descriptions and its **Readiness** list.
 
-Jellyfin and Emby do not sync email addresses, and Plex Home users often have none. Give a member an address from their page under **Users** (the pencil beside the name), or inline from the newsletter's **No email address** list. It is used only to address newsletters: it grants no login and never matches a synced account.
+## Recipients and unsubscribes
 
-## What a newsletter can trigger
-
-Every finished send raises a `newsletter.sent` or `newsletter.failed` trigger, so an automation can tell you when a schedule reached nobody. The gallery ships **Newsletter failed**, which sends to any destination you pick.
+Who receives a newsletter, how members get a contact email, and the suppression list are being documented at `/configuration/email/recipients`. Until it is published, the recipients panel in the newsletter editor and the **Suppressed addresses** list under **Settings** → **Notifications** → **Email** are where those are managed.

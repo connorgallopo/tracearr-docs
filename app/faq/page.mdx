@@ -12,6 +12,8 @@ import { Tabs } from 'nextra/components';
 - [What media servers does Tracearr support?](#what-media-servers-does-tracearr-support)
 - [Is Tracearr free?](#is-tracearr-free)
 - [Can I import data from Tautulli or Jellystat?](#can-i-import-data-from-tautulli-or-jellystat)
+- [Does Tracearr need a mail provider?](#does-tracearr-need-a-mail-provider)
+- [Is a contact email the same as a login email?](#is-a-contact-email-the-same-as-a-login-email)
 
 **Installation**
 
@@ -31,6 +33,8 @@ import { Tabs } from 'nextra/components';
 - [How do I reset my Tracearr password?](#how-do-i-reset-my-tracearr-password)
 - [Server Resources is empty](#server-resources-is-empty)
 - [Pages are slow to load on Unraid](#pages-are-slow-to-load-on-unraid)
+- [My newsletter says it sent but nobody got it](#my-newsletter-says-it-sent-but-nobody-got-it)
+- [Members on my Jellyfin server get no links to the items](#members-on-my-jellyfin-server-get-no-links-to-the-items)
 
 **Data & Maintenance Jobs**
 
@@ -61,6 +65,18 @@ Yes, Tracearr is free and open source under the AGPL-3.0 license.
 ### Can I import data from Tautulli or Jellystat?
 
 Yes. Tracearr imports from Tautulli (Plex), directly from the Playback Reporting plugin (Jellyfin and Emby), and from a Jellystat backup file. See the [import guide](/getting-started/import).
+
+---
+
+### Does Tracearr need a mail provider?
+
+No. Tracearr speaks SMTP and nothing else, so any relay works, including one running on the same machine as Tracearr. The seven provider presets are there to save you looking up a host and a port; **Custom** takes whatever you have. See [Email & Newsletters](/configuration/email).
+
+---
+
+### Is a contact email the same as a login email?
+
+No, they are two different fields on two different things. A Tracearr account's email is part of signing in and is what the [`set-email`](/configuration/recovery#set-email) recovery command changes. A contact email is an address the owner types for a person so newsletters have somewhere to go. It grants no login, and it is never used to match a synced media server account to a Tracearr account.
 
 ---
 
@@ -295,6 +311,20 @@ Paths under `/mnt/user` go through Unraid's FUSE filesystem layer (shfs), which 
 - `/mnt/appdata/tracearr/postgres` — if you've set up a dedicated appdata share on cache
 
 If you're using the **supervised image** from Community Apps, edit the container and change the **PostgreSQL Data** path. If you're using **Docker Compose** with named volumes, this doesn't apply — Docker manages the volume storage directly.
+
+---
+
+### My newsletter says it sent but nobody got it
+
+Open the newsletter and read the **History** tab. Every send lists its recipients with a per-address status of Queued, Sent, Failed, Suppressed or Unknown, so an address that was skipped says why on its own row.
+
+Three things to check. An address on the suppression list under **Settings** → **Notifications** → **Email** is skipped on every newsletter, and shows as Suppressed. A newsletter covering several servers is split into one email per group of members, and a group whose servers added nothing in the window is mailed nobody; the editor's **Readiness** list warns about that before you send. And members with no address anywhere are listed separately in the recipients panel rather than mailed.
+
+---
+
+### Members on my Jellyfin server get no links to the items
+
+Newsletter item links come from the server's **Public address**, which is a separate field from the Server URL and is blank until you fill it in. Without it, or with an address a member off your network could not open, the links are left out and the newsletter editor's **Readiness** list names the server. See [Public address](/getting-started/first-server#public-address).
 
 ---
 

@@ -4,6 +4,7 @@ export default {
   automations: 'Automations',
   realtime: 'Real-Time Updates',
   tailscale: 'Tailscale VPN',
+  destinations: 'Notification Destinations',
   email: 'Email & Newsletters',
   backup: 'Backup & Restore',
   recovery: 'Account Recovery',

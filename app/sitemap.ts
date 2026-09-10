@@ -124,9 +124,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/configuration/destinations`,
+      lastModified: getLastModified('configuration/destinations/page.mdx'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/configuration/email`,
-      lastModified: getLastModified("configuration/email/page.mdx"),
-      changeFrequency: "monthly",
+      lastModified: getLastModified('configuration/email/page.mdx'),
+      changeFrequency: 'monthly',
       priority: 0.8,
     },
     {

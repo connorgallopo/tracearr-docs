@@ -1,0 +1,61 @@
+---
+title: Notification Destinations
+description: Add the places Tracearr sends notifications to. The kinds are Discord, ntfy, Gotify, Apprise, Pushover, a JSON webhook, email, mobile push and browser toasts.
+---
+
+import { Callout } from 'nextra/components';
+
+# Notification destinations
+
+A destination is a named place a notification goes. An [automation](/configuration/automations) sends to the destinations its **Send Notification** action lists, and a destination can also be subscribed to violations on its own.
+
+Destinations live under **Settings** → **Notifications** → **Destinations**. Only the owner can manage them; anyone else sees "Only the owner can manage notification destinations."
+
+## The kinds
+
+| Kind           | What you fill in                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Discord        | Webhook URL                                                                                                        |
+| Webhook (JSON) | URL                                                                                                                |
+| ntfy           | Server URL, Topic (starts as `tracearr`), and an Auth token that is optional for public topics                     |
+| Gotify         | Server URL. Tracearr posts to it as given, so the token goes in it: `https://gotify.example.com/message?token=...` |
+| Apprise        | API URL                                                                                                            |
+| Pushover       | User key and API token                                                                                             |
+| Email          | An SMTP server. The fields are on the [Email & Newsletters](/configuration/email) page                             |
+| Mobile push    | Nothing. It is built in, and each paired device filters in its own notification settings                           |
+| Browser toasts | Nothing. It is built in, and toasts appear in the browser you are looking at                                       |
+
+You can add more than one of the same kind. Two Discord webhooks pointing at different rooms is a normal setup.
+
+Every destination carries a name of up to 100 characters, which is what the automation editor lists, and an Enabled switch. A destination that is switched off receives nothing.
+
+## Receive violations
+
+One switch on each destination sends it every violation Tracearr records. That is the only thing a destination subscribes to by itself. Every other event reaches a destination because an automation names it.
+
+On an email destination the switch stays disabled until **Alert recipients** holds an address, and reads "Add alert recipients to send violations here" until it does.
+
+## The Test button
+
+Test appears in the destination dialog and on the card in the list. In the dialog for a new destination it uses the settings in front of you, so you can check them before saving. Everywhere else it uses what is stored.
+
+The button is disabled until every required field is filled, where it reads "Fill in the required fields to test". Editing a saved destination with unsaved changes disables it too, reading "Save first to test", because it would otherwise test the old settings. A failure shows the provider's own error text inside the dialog, truncated to 500 characters.
+
+Built-in destinations, mobile push and browser toasts, have no Test button and cannot be deleted.
+
+## How automations reach a destination
+
+A **Send Notification** action names one or more destinations, and each of them receives the alert whether or not it subscribed to anything. The action also carries a cooldown in minutes. See [Actions](/configuration/automations#send-notification).
+
+The card shows "Used by N automations" and "Used by N newsletters" so you can see what breaks before you delete one. Deleting asks `Delete <name>? Automations and newsletters that use it stop until they are updated.`
+
+## Secrets at rest
+
+Webhook URLs, API tokens, user keys and SMTP passwords are encrypted in the database. The key comes from `ENCRYPTION_KEY` when it is set and is derived from `JWT_SECRET` otherwise; see [Authentication Secrets](/configuration/environment#authentication-secrets).
+
+When a stored secret cannot be decrypted, which happens if the secret it was written under changed, the card shows "Re-enter this destination's secret". Until you re-enter it, that destination is skipped by both notifications and the Test button.
+
+<Callout type="info">
+  Reading a destination back never returns a stored secret. The field shows "Set (leave blank to
+  keep)", so leaving it empty keeps what is stored and typing a new value replaces it.
+</Callout>

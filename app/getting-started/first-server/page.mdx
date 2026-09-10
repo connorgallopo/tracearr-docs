@@ -51,6 +51,12 @@ If your Tracearr instance is configured with an OIDC identity provider (Authenti
    - **API Key** — From Emby Server → API Keys
 5. Click **Connect**
 
+### Public address
+
+Both the Jellyfin and the Emby form carry one more field, **Public address**, which is optional and has no equivalent on Plex. It is the address members use to open the server from outside your network, such as `https://jellyfin.example.com`, and newsletter links use it.
+
+Tracearr always talks to the server on the Server URL. The public address is only ever put into links other people click, so setting it changes nothing about polling, sessions or the API key. Leave it blank and newsletters carry no links to items on that server. Give it an address a member off your network could not open, such as an RFC 1918 or loopback address, a Tailscale `100.64.0.0/10` address, or a `.local` or `.ts.net` name, and the links are left out for the same reason; the newsletter editor's Readiness list names the server and says which of the two it hit.
+
 <Callout type="info">
   Jellyfin and Emby sessions are detected by polling out of the box. For instant, push-based
   sessions like Plex, install the [Tracearr SSE plugin](/configuration/realtime).
