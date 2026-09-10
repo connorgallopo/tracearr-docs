@@ -1,0 +1,160 @@
+---
+title: Recipients & Unsubscribes
+description: Choose who receives a Tracearr newsletter, give Jellyfin and Emby members a contact email, and handle unsubscribes and the suppression list.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Recipients and unsubscribes
+
+Who receives a [newsletter](/configuration/email/newsletters) is set on its Recipients card, one newsletter at a time. Unsubscribes are not: an address that opts out is suppressed across every newsletter on the install.
+
+## Who receives a newsletter
+
+Two sources, and a newsletter can use either or both.
+
+**Everyone on the chosen servers** is a switch, on by default. It reaches everyone with an active account on the servers the newsletter covers: "Their address comes from their contact email, then their Tracearr email, then the address their media server account carries."
+
+**Extra addresses** are typed by hand, up to 200 of them, each with an optional name of up to 100 characters. They are "Addresses with no account here. They get the version covering every server, and they can unsubscribe like anyone else." A typed address that is not an address is flagged on blur with "That is not an email address."
+
+You are a member too. If you have an account on one of these servers you are on the list; use **Exclude** to take yourself off.
+
+With Members switched off, the card reads "Members are off; only the extra addresses receive this newsletter." Turn both off and the panel says "Nobody will receive this newsletter" with "Turn on Members above, or add an extra address, to reach someone."
+
+## How an address is found
+
+For each person Tracearr tries three sources in order and takes the first one that has a value.
+
+<Steps>
+### Contact email
+
+The address the owner typed for that person in Tracearr. It exists for newsletters and nothing else.
+
+### Their Tracearr account email
+
+The email on their Tracearr identity, which is the one they sign in with.
+
+### The address their media server account carries
+
+Plex sends an email address for shared accounts. Plex Home and managed accounts often have none. Neither Jellyfin nor Emby exposes an email address in its user API, so nothing ever arrives from those two.
+
+</Steps>
+
+The resolved address is lower-cased. Two people who resolve to the same address get one email, not two.
+
+People who never receive a newsletter whatever their address: disabled accounts, which are left out entirely, and banned or pending identities, which are listed as excluded so you can see why a name is missing.
+
+### Setting a contact email
+
+Because Jellyfin and Emby send no addresses, most self-hosters end up typing some. There are two places to do it.
+
+The newsletter's recipients panel groups people with no address under **No email address**, each row with a box and a **Save** button that writes straight away. Where the person's media server username is itself an email address, the box is prefilled with it, so saving is one click.
+
+The person's own page carries the same field under their username, reading `Newsletter address: none set` with a pencil beside it for the owner. The dialog is **Edit name and contact email**.
+
+<Callout type="info">
+  A contact email is not a login. It "grants no login and never matches a synced account", so it
+  cannot be used to sign in and it never merges two accounts together. The login email is a separate
+  field, changed with the `set-email` command on the [Account Recovery](/configuration/recovery)
+  page.
+</Callout>
+
+Contact emails are up to 255 characters and are stored in lower case.
+
+## Exclude and include
+
+Every row in **Will receive** carries an **Exclude** button. Excluding takes that person off this newsletter and no other: "These people stay off this newsletter until you include them again. Other newsletters are unaffected." Up to 200 people can be excluded per newsletter.
+
+Excluded people collapse into an **Excluded (N)** group at the bottom of the panel, each with **Include** to put them back. Changes made here wait for Save, and are marked **Excluded after save** or **Included after save** until you press it.
+
+The group also holds people who are off the list for reasons you did not choose. Those carry a **Banned** or **Pending** badge and have no Include button.
+
+## One email per set of servers
+
+A newsletter covering several servers sends a different email to each set of members, because a member should not read about titles on a server they cannot open.
+
+Tracearr groups everyone by which of the newsletter's servers they have an account on. Each distinct set gets one email, covering exactly those servers. Someone with an account on all three servers gets one email covering all three. Someone with an account on one gets an email covering that one.
+
+Extra addresses belong to no server, so they get the version covering every server the newsletter names.
+
+The panel shows this split whenever there is more than one group, headed "3 with an account on Movies and Music", with the note "People on different servers get different emails. Each list below only sees what was added to the servers named."
+
+A group whose servers added nothing in the window is mailed nothing at all when **Skip when nothing was added** is on, and the editor's readiness rail warns about it beforehand.
+
+## The recipients panel
+
+The panel under the Recipients card answers who the next send reaches. It reads the saved newsletter, so it needs the newsletter saved at least once: before that it says "Save to see recipients." and offers Preview instead.
+
+| Group                | What is in it                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| Will receive (N)     | Everyone who resolves to an address and is not suppressed or excluded, split by server set |
+| Suppressed (N)       | Addresses that unsubscribed or were suppressed by hand; the send skips them                |
+| No email address (N) | Nothing was found in any of the three sources; each row takes a contact email              |
+| Excluded (N)         | Excluded by you, or banned or pending                                                      |
+
+Each row shows the person's avatar, their name linked to their user page, and the resolved address with the account it came from underneath. An extra address shows a mail icon instead and is labelled **Extra address**.
+
+Changing the server list without saving leaves the panel answering for the old one, and it says so: "This list still reflects the saved servers. Save to see who the new selection reaches."
+
+## Unsubscribing
+
+Every newsletter sent to members carries an unsubscribe link in its footer. The link is per recipient and is written in at delivery, which is why it does nothing in a preview.
+
+The link needs the external URL under **Settings** → **Access** → **Remote access**. Without one the footer carries no link and reads "Reply to this email to unsubscribe." instead.
+
+Opening the link shows a confirmation page naming the sender, "Unsubscribe from all newsletters?", with one button. Pressing it suppresses the address and answers "You are unsubscribed". A tampered or expired link shows "This link is not valid" with the line "The unsubscribe link is incomplete or has expired. Reply to the email you received and the sender will remove you."
+
+Both the page and the confirm are served from Tracearr itself at `/api/v1/email/unsubscribe/<token>`, rate limited to 60 requests a minute, and never name the address they are about.
+
+### One-click unsubscribe
+
+Every message that carries an unsubscribe link also carries a `List-Unsubscribe` header, which is the header a mail client reads to offer an unsubscribe control of its own.
+
+The one-click form of it, `List-Unsubscribe-Post`, is added only when the external URL is https. Over http the header and the footer link still work, but the button in the mail client does not, and the readiness rail says "External URL is set over http: members get an unsubscribe link, but one-click unsubscribe needs https."
+
+Turning on **Offer unsubscribe by email too** under **Settings** → **Notifications** → **Email** adds a mailto form to the same header. It points at the destination's **Reply-to** address, so someone has to read that mailbox and act on what arrives.
+
+### View in browser
+
+The same footer carries a link to the sent copy on the web, at `/api/v1/newsletters/view/<token>`, also public and rate limited to 60 requests a minute. It serves the snapshot of that send, so it stops working when the snapshot is pruned after 90 days and answers "This newsletter is not available".
+
+## The suppression list
+
+Suppressed addresses live under **Settings** → **Notifications** → **Email**, below the branding block. "Suppression is global to the address: it opts the address out of every newsletter on this install."
+
+| Reason        | Where it came from                          |
+| ------------- | ------------------------------------------- |
+| Unsubscribed  | Someone used the link in a message          |
+| Added by hand | The owner used **Add address** on this page |
+
+An unsubscribe row links back to the newsletter it came from. Removing an address asks "\<address\> will receive newsletters again from the next send."
+
+Deleting a newsletter does not clear anything here: "\<name\> and its send history will be deleted. Suppressed addresses stay suppressed."
+
+Alerts are unaffected. An automation's email alert goes to the destination's **Alert recipients** list, which the suppression list never touches.
+
+## Per-recipient statuses
+
+Opening a send in the **History** tab lists every address it was addressed to with its own status.
+
+| Status     | What it means                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| Queued     | Handed to the delivery queue, not yet accepted by the mail server                          |
+| Sent       | The mail server accepted the message                                                       |
+| Failed     | The mail server refused it; the row carries its error text                                 |
+| Suppressed | The address was on the suppression list when the send started, so nothing was mailed       |
+| Unknown    | "The server stopped answering after the message went out; it is never retried on its own." |
+
+Each row also shows the attempt count. A send that ends Partly sent or Failed can be retried from the same sheet, which reuses the stored snapshot and re-queues only the rows that failed.
+
+## Behind a reverse proxy
+
+Three paths are unauthenticated on purpose, because a member with no Tracearr account opens them:
+
+```
+/api/v1/email/unsubscribe/*
+/api/v1/newsletters/view/*
+/api/v1/images/proxy
+```
+
+An authenticating proxy in front of Tracearr, such as Authelia, Authentik or a Cloudflare Access policy, has to let all three through. Gating the first puts a login page in front of the unsubscribe button. Gating the other two breaks the browser view and hosted poster images.

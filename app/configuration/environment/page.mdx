@@ -142,14 +142,15 @@ TRUST_PROXY=true
 
 When `CORS_ORIGIN` is unset, the API reflects the request origin. Set `TRUST_PROXY=true` so Tracearr resolves the real client IP from `X-Forwarded-*` headers; this makes sign-in rate limits count per client instead of per proxy.
 
-Two API paths answer without a login by design, and an authenticating proxy such as Authelia, Authentik or a Cloudflare Access policy must let them through:
+Three API paths answer without a login by design, and an authenticating proxy such as Authelia, Authentik or a Cloudflare Access policy must let them through:
 
 ```
 /api/v1/email/unsubscribe/*
 /api/v1/newsletters/view/*
+/api/v1/images/proxy
 ```
 
-The first is the unsubscribe page every newsletter links to; the second is the browser view of a digest that was sent. Gating either one shows members a login page instead of the page they asked for. Both carry their own limit of 60 requests a minute.
+The first is the unsubscribe page every newsletter links to; the second is the browser view of a digest that was sent; the third serves hosted poster images to mail clients. Gating the first two shows members a login page instead of the page they asked for, and gating the third leaves hosted posters blank. The first two carry their own limit of 60 requests a minute.
 
 <Callout type="info">
   Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set

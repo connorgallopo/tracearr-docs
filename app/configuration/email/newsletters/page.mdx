@@ -1,0 +1,262 @@
+---
+title: Newsletters
+description: Schedule a recently-added digest for the members of a Plex, Jellyfin or Emby server. Covers the window, sections, per-server variants, preview and send history.
+---
+
+import { Steps } from 'nextra/components';
+
+# Newsletters
+
+A newsletter is a digest of what was added to one or more media servers over a window, mailed to the members of those servers on a schedule. Each one carries its own schedule, window, section limits, subject, recipients and email destination.
+
+Newsletters live under **Settings** → **Notifications** → **Newsletters**. Only the owner can manage them; anyone else sees "Only the owner can manage newsletters."
+
+A newsletter scoped to more than one server does not send one identical email to everybody. Each member gets a version covering only the servers they have an account on. Those versions are called variants throughout the editor, and who lands in which one is on the [Recipients and unsubscribes](/configuration/email/recipients) page.
+
+## What you need first
+
+A newsletter sends through an email destination, which is the SMTP account described on the [Email & Newsletters](/configuration/email) page. With no email destination the Newsletters list shows "Newsletters need an email destination" and an **Add email destination** button that creates one and drops you into a new newsletter with it already selected.
+
+A newsletter with no destination is never scheduled at all. The same is true of one whose destination is switched off or whose stored secret cannot be read: the schedule is removed until the destination works again.
+
+## Creating one
+
+<Steps>
+### Start a new newsletter
+
+**New newsletter** opens an empty editor. **Duplicate**, in the row menu of an existing newsletter, copies its settings under the name `Copy of <name>` and opens that.
+
+### Fill the six cards
+
+Basics, Schedule, Content, Message, Recipients and Delivery. Every field is described below.
+
+### Watch the rail
+
+**Before you send** sits beside the cards and says whether a send would reach anyone. It never blocks saving.
+
+### Save
+
+The Save bar at the bottom of the page is disabled until something changes. A form with an invalid field refuses and shows "Fix the highlighted fields before saving.", then scrolls to the first problem.
+
+</Steps>
+
+Names are unique. Saving a second newsletter under a name already in use is refused with `A newsletter with that name already exists`.
+
+## Basics
+
+| Field                                   | Default | Notes                                                        |
+| --------------------------------------- | ------- | ------------------------------------------------------------ |
+| Name                                    | blank   | Required, up to 100 characters. Only you see it              |
+| Turn it on now (**Enabled** once saved) | on      | "Off means the schedule does not run; Send now still works." |
+
+## Schedule
+
+**Repeats** takes Daily, Weekly, Monthly or Cron expression.
+
+| Repeats         | What else it asks for                                                   |
+| --------------- | ----------------------------------------------------------------------- |
+| Daily           | Time                                                                    |
+| Weekly          | Day (Sunday to Saturday) and Time                                       |
+| Monthly         | Day of month and Time                                                   |
+| Cron expression | Expression, five fields: minute, hour, day of month, month, day of week |
+
+**Day of month** stops at 28. The editor says why: "Days 1 to 28, so the run never lands on a month that does not have the day." There is no 29th, 30th or 31st.
+
+The cron expression accepts five fields made of digits and the `*`, `,`, `-` and `/` operators. Six-field expressions with seconds are refused.
+
+### Timezone
+
+**Timezone** does two jobs: "Sets the send time and the dates printed in the subject and the email." Every schedule kind, cron included, runs against this zone rather than the container's.
+
+A time inside the spring-forward hour runs when the clock reaches the next valid minute.
+
+Quiet hours are a mobile push setting and have no effect on a newsletter. A newsletter set for 03:00 sends at 03:00.
+
+### Next run
+
+The Schedule card ends with the next run in the newsletter's own timezone. Before the first save, and whenever the schedule or timezone has unsaved changes, it reads "Next run is set when you save." A newsletter that is off, or has no usable destination, reads "Not scheduled".
+
+## Content
+
+### The window
+
+**Covers** decides what counts as recent.
+
+**Everything since the last email** picks up where the last email stopped, so nothing is listed twice. It carries a first-run fallback, a day box reading "The first email looks back", which ships at 7. The mark moves only after a send that reached someone. A test send does not move it, a failed send does not move it, and a run that found nothing does not move it, so a skipped week is not lost.
+
+**A fixed number of days** always looks back the same number of days from the moment it runs, so a title added twice in that span is listed twice.
+
+Both take 1 to 31 days, and both are capped the same way at render time: "Never more than 31 days, whatever this says." A newsletter that has not run for two months still covers only the last 31 days.
+
+### Servers and libraries
+
+**Servers** takes up to 50 servers. Left empty it reads **All servers** and covers every connected server.
+
+The server list picks both the titles and the people. Only members with an account on those servers receive the newsletter, and someone with an account on several of them gets one email covering all of theirs.
+
+**Libraries** takes up to 200 library-and-server pairs and narrows what the email lists. It does not change who receives it. A library that no longer exists shows as an **Unknown library** chip you can remove.
+
+When a title exists on more than one server in scope, the copy on the first server in the **Servers** order is the one that appears, and its poster and item link come from that server. The other copies are folded into the same card.
+
+### Sections
+
+The email lists what was added in the window, up to these limits. Anything over the limit, and anything trimmed to keep the email under the 102 KB at which Gmail clips it, becomes a "+N more" line.
+
+| Section             | On by default | Limit ships at | Range   |
+| ------------------- | ------------- | -------------- | ------- |
+| Movies              | Yes           | 12 movies      | 1 to 12 |
+| Shows               | Yes           | 12 shows       | 1 to 12 |
+| Shows: seasons each | Yes           | 8 seasons      | 1 to 8  |
+| Music               | Yes           | 8 albums       | 1 to 12 |
+| Most watched        | No            | 10 most played | 1 to 10 |
+
+Music is counted in albums, shared across artists in the order they were added. Most watched is the only section that is not about new titles: it is what members played most in the window, new or not, with a play count.
+
+Each trimmed section ends with a line of the form `+4 more albums`, and a show trimmed to its season cap gets `+2 more seasons` under it.
+
+### The size budget
+
+Gmail clips a message whose HTML part passes 102,400 bytes. Tracearr renders the digest, measures it, and while it is over the budget removes one item at a time until it fits. 1,024 bytes are held back for the per-recipient unsubscribe and view links written in at delivery, so the target is 101,376 bytes.
+
+Each removal takes the last item from whichever section holds the most items. A tie goes to whichever of shows, movies, albums, most watched comes first in that order. Removed items are not lost from the counts; they show up in the section's "+N more" line.
+
+## Message
+
+| Field     | Default                                        | Notes                          |
+| --------- | ---------------------------------------------- | ------------------------------ |
+| From name | the scoped server's name                       | Up to 100 characters           |
+| Subject   | `What's new on {{server_name}} ({{end_date}})` | Required, up to 200 characters |
+| Intro     | blank                                          | Above the first section        |
+| Outro     | blank                                          | Above the unsubscribe footer   |
+
+**From name** is the name in the From line and at the end of the email. Left empty on a newsletter covering exactly one server, it uses that server's name. A newsletter covering two or more servers has no one server name to sign with, so the field becomes required: "This newsletter covers 3 servers, so there is no one server name to sign it with. Pick a name."
+
+### Subject placeholders
+
+Four tokens are replaced when the email is built.
+
+| Token             | What it becomes                                                        |
+| ----------------- | ---------------------------------------------------------------------- |
+| `{{server_name}}` | the From name above                                                    |
+| `{{start_date}}`  | the first day of the window                                            |
+| `{{end_date}}`    | the day the email goes out                                             |
+| `{{item_count}}`  | movies, episodes and albums added, counting episodes rather than shows |
+
+Dates are formatted in the newsletter's timezone.
+
+### Intro and outro
+
+Both are rich text and take bold, italic, links and bulleted lists. Each one holds 2000 characters and shows a counter against that limit.
+
+## Recipients
+
+The Recipients card holds the **Everyone on the chosen servers** switch, the extra addresses list, and the panel showing who the next send reaches. All of it is on the [Recipients and unsubscribes](/configuration/email/recipients) page.
+
+## Delivery
+
+### Email destination
+
+The SMTP account this sends through. It does not decide who receives it, and it does not use the destination's **Alert recipients** list. With no email destination saved anywhere, the field offers **Add email destination** in place of the picker.
+
+### Poster images
+
+| Choice     | What it does                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Hosted     | Loaded from this Tracearr over the external URL; the URL must be reachable from the public internet, and every recipient's mail provider sees it |
+| Attached   | Attached to the email. Every client shows them, and the email is larger, so the size limit trims more titles                                     |
+| No posters | Cards render without posters                                                                                                                     |
+
+A new newsletter starts on **Attached**.
+
+Hosted needs the external URL under **Settings** → **Access** → **Remote access**. Picking Hosted without one shows "No external URL is set. Hosted posters need one before this can be saved: set it under Access, Remote access, or pick Attached.", and saving in that state is refused with `Hosted images need the external URL set first`. A newsletter already saved as Hosted whose external URL is later removed falls back to attached posters at send time.
+
+A newsletter saved before this control narrowed may hold a fourth mode, Automatic. It reads as **Attached**, behaves as Attached, and is rewritten to whatever you pick next.
+
+### Skip when nothing was added
+
+On by default. "Nothing new means no email. On a newsletter covering several servers this is per group: people whose servers added nothing hear nothing, the rest still get theirs. A test send always renders."
+
+Turned off, a window with nothing in it still mails an empty digest.
+
+### Link titles to Tracearr
+
+Off by default. "The Tracearr UI is admin-only today, so members will hit the login page; the media server link stays either way."
+
+The media server link is separate and depends on that server having an address members can reach. Plex items route through `app.plex.tv`. A Jellyfin or Emby item link needs the **Public address** on that server, and the readiness rail names any server whose links are being left out.
+
+## Before you send
+
+The rail beside the cards opens with "These do not block saving. They decide whether a send reaches anyone." Failing rows sort to the top, then warnings, then everything else.
+
+| Row              | Passing text                                                                   | What it means when it fails                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Destination      | Sending through "\<name\>".                                                    | "No email destination is set, so this newsletter cannot send." A **Choose a destination** link focuses the field                                     |
+| External URL     | External URL is set; hosted posters, the browser view and Tracearr links work. | "No external URL: hosted posters, the browser view and Tracearr links are off." Over http it warns that one-click unsubscribe needs https            |
+| From domain      | The from address matches the SMTP account's domain.                            | "The from address and the SMTP username sit on different domains; some providers refuse that."                                                       |
+| Recipients       | N recipients resolve to an address.                                            | "Nobody resolves to an address yet." A **Go to recipients** link scrolls to the card                                                                 |
+| Per-server links | not shown when links work                                                      | "Item links for \<server\> are left out because it has no public address.", or the same line ending "because its public address is private"          |
+| Empty variant    | not shown when every group has something                                       | "Members on only \<servers\> get nothing from the next send: \<servers\> added no titles in the window."                                             |
+| DNS              | always shown                                                                   | Deliverability depends on SPF, DKIM and DMARC records for the sending domain, with a link to [that section](/configuration/email#spf-dkim-and-dmarc) |
+
+The Recipients row reads differently before the first save, where it says "Recipients are unknown until the newsletter is saved." Change the server list on a saved newsletter and the rail adds "The recipient rows reflect the saved servers. Save to check the new selection."
+
+## Preview
+
+**Preview** renders the email as a member would receive it. It works before the newsletter has ever been saved and on unsaved changes, where the dialog is badged **Preview of unsaved changes**. The button is disabled while a field is invalid.
+
+Above the render the dialog shows the subject, the window it covered, how many of what was found is listed, how many items the size budget held back, and a recipient line: "42 people get this newsletter across all versions. 3 have no address and 1 unsubscribed."
+
+| Control        | Options             |
+| -------------- | ------------------- |
+| Who is looking | one tab per variant |
+| Width          | 600 px, 375 px      |
+| Images         | Shown, Blocked      |
+
+Blocked strips the image sources and keeps the alt text, which is what a client with remote images off shows: "Many clients block remote images until the reader allows them."
+
+The unsubscribe and view-in-browser links are filled in per recipient when the email is sent, so they do nothing in the preview.
+
+## Send test
+
+**Send test** renders the current window and sends it to one address, ignoring the suppression list. The window does not move, so a test never eats a scheduled send's material.
+
+The dialog takes one address, prefilled with your own, and on a newsletter covering several servers a picker for which version to send. Unsaved changes disable the button, with "Save your changes before sending."
+
+Two refusals come back from the server: `A send is already in progress` while another send is open, and `variantKey names a server outside this newsletter` if the chosen version names a server the newsletter no longer covers.
+
+## Send now
+
+**Send now** sits in the dropdown beside Send test, and in the row menu on the Newsletters list. Its own description says it best: "Mails everyone now and moves the window forward, the same as a scheduled run."
+
+The confirmation works out who gets what before it lets you press Send, then reads "Send to 42 recipients: 12 movies, 3 shows, 0 albums added between Aug 28 and Sep 4", adding a line when the size budget held items back. When nobody resolves it says so and the Send button stays disabled: "Nobody resolves to an address (3 members have none), so there is nothing to send."
+
+Only one send per newsletter runs at a time. A second attempt is refused with `A send is already in progress`, and deleting a newsletter mid-send is refused with `A send is in progress; wait for it to finish`.
+
+## History
+
+The **History** tab appears once the newsletter is saved; until then it is disabled with "History appears once the newsletter is saved." Every scheduled, manual and test send lands there with its outcome, trigger, window, recipient count and item counts.
+
+| Outcome     | Meaning                                                            |
+| ----------- | ------------------------------------------------------------------ |
+| Rendering   | Working out variants and building the email                        |
+| Sending     | Messages are queued and going out                                  |
+| Sent        | Every recipient was accepted                                       |
+| Partly sent | Some recipients failed                                             |
+| Failed      | Nothing went out                                                   |
+| Nothing new | The window found nothing and **Skip when nothing was added** is on |
+
+Opening a send shows every recipient with a status, an attempt count and the mail server's own error text where there is one. A newsletter covering several servers lists one block per version, headed "Members on \<servers\>", and a version with nothing new says "Nothing new for these servers; nobody in this group was mailed."
+
+**Open snapshot** shows the exact copy that went out, per version. Snapshots are kept for 90 days; after that the sheet says "The snapshot was pruned after 90 days; nothing can be viewed or resent." The send rows themselves are kept for a year.
+
+A send that finished Partly sent or Failed offers **Retry failed**, which re-queues only the rows that failed. It needs the snapshot: once that is gone the button answers `The snapshot for this send has been pruned; nothing can be resent`.
+
+## Deleting a newsletter
+
+Deleting asks: "\<name\> and its send history will be deleted. Suppressed addresses stay suppressed." Unsubscribes are not undone by deleting the newsletter they came from.
+
+## Deliverability
+
+Whether these messages reach an inbox is decided by the receiving provider, not by Tracearr. The three DNS records it checks are covered under [SPF, DKIM and DMARC](/configuration/email#spf-dkim-and-dmarc).
+
+Two automation triggers fire off the back of a send. `newsletter.sent` and `newsletter.failed` carry the newsletter's name, outcome, recipient count and error, and can route to any destination; see [Automations](/configuration/automations).
