@@ -112,6 +112,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/configuration/requests`,
+      lastModified: getLastModified('configuration/requests/page.mdx'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/configuration/tailscale`,
       lastModified: getLastModified('configuration/tailscale/page.mdx'),
       changeFrequency: 'monthly',

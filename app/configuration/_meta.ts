@@ -3,6 +3,7 @@ export default {
   environment: 'Environment Variables',
   automations: 'Automations',
   realtime: 'Real-Time Updates',
+  requests: 'Seerr Requests',
   tailscale: 'Tailscale VPN',
   destinations: 'Notification Destinations',
   email: 'Email & Newsletters',

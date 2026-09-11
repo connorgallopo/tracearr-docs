@@ -1,0 +1,86 @@
+---
+title: Seerr Requests
+description: Link Seerr, Overseerr or Jellyseerr to a Tracearr server to see who requested each title, when it landed, and whether the requester ever watched it.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Seerr Requests
+
+Tracearr can link one **Seerr** instance to each media server. Overseerr and Jellyseerr share the same API, so any of the three works. Once linked, Tracearr mirrors the request history into its own database and shows it in two places:
+
+- **Media detail** gets a line under the availability list, "Requested by agelwarg · Sep 8, 2026 · landed 2 min later", plus a Requests panel listing every request for that title.
+- **User detail** gets a Requests card with a summary (requests, approval rate, never watched, median wait) and the person's request history, each row marked with whether they have watched what they asked for.
+
+Tracearr only reads from Seerr. It never approves, declines or creates requests.
+
+## Link a server
+
+Go to **Settings → Servers → Connections**. Each server row carries a Requests line.
+
+<Steps>
+
+### Copy the API key from Seerr
+
+In Seerr, open **Settings → General** and copy the **API key**.
+
+### Link the server
+
+Click **Link Seerr** on the server's row, paste the Seerr URL (the address you open Seerr at, without `/api/v1`) and the key, then click **Test** at the end of the key field.
+
+### Check the match
+
+A successful test names the Seerr instance, its version, its media server type, and the Tracearr server it belongs to. **Save** only enables when that server is the row you clicked. When editing an existing link, changing the URL with the key field left blank skips the test in the dialog; Tracearr re-checks the match on the server with the stored key and refuses the change if it points at a different media server.
+
+</Steps>
+
+A Seerr instance is bound to exactly one media server in its own settings. Tracearr compares the machine id Seerr reports against the server's own id, so a Seerr pointed at a different Plex or Jellyfin cannot be linked to the wrong row. The test result says which server it does match, if any.
+
+<Callout type="info">
+  Saving starts a full sync of the request history. On a Seerr with a few hundred requests that
+  takes seconds; the row shows the request count once it lands. After that Tracearr checks Seerr
+  every 15 minutes and does a full pass nightly. **Sync now** in the row's Seerr menu forces a full
+  pass.
+</Callout>
+
+The API key is encrypted in the database the same way notification destination secrets are, under `ENCRYPTION_KEY` or, when that is not set, a key derived from `JWT_SECRET`. If that secret changes, the row shows **Needs API key** and sync pauses until you enter the key again.
+
+## How requests are matched
+
+Each Seerr request carries the requester's plex.tv account id (Plex) or their Jellyfin or Emby user id, and the title's TMDB and TVDB ids. Tracearr matches:
+
+| Seerr field                          | Tracearr side                                 |
+| ------------------------------------ | --------------------------------------------- |
+| Requester's Plex account id          | The user's account on the linked Plex server  |
+| Requester's Jellyfin or Emby user id | The user's account on the linked server       |
+| TMDB id (movies), TVDB id (shows)    | The library title, across every copy you have |
+| Plex rating key or Jellyfin item id  | Fallback when the provider ids do not match   |
+
+No matching by username or email, and Seerr email addresses are never stored.
+
+The server row shows two counts when matching left anything behind: **unmatched titles** and **unmatched users**. When both are zero the row shows only the request count. A title stays unmatched when it never arrived in the library or was removed later; the request still appears on the requester's user page with the title Seerr knows it by. A user stays unmatched when the requester has no account on the linked server, which is normal for Seerr local accounts. Those requests show the Seerr username in grey, or "Not on this server" when Seerr gave none.
+
+Matching runs again on every full sync, so a title that arrives in the library after the request was mirrored links up on the next nightly pass. The 15-minute check only re-matches requests Seerr changed since the last run.
+
+Seerr marks a title available only when it finds it in a library enabled under Seerr's own Plex or Jellyfin settings. A request whose title sits in a library Seerr does not scan stays approved in Seerr, and Tracearr shows it that way with no wait time, even though the title is in the Tracearr library.
+
+## What the pages show
+
+**Status** follows Seerr's own vocabulary: Pending, Approved, Declined, Failed, and Available (Seerr calls this completed). A request Seerr has since deleted stays in Tracearr with a Removed badge, so history survives cleanup in Seerr.
+
+**Wait** is the time from the request to the title landing in the library. For a new season of a show already on the server, Seerr only records the moment it noticed the season was available, so the wait can be a few minutes longer than it really was.
+
+**Seasons** lists the seasons a show request asked for, or All seasons. A 4K request and a request Seerr made from a watchlist each carry a small flag.
+
+**Watched** uses the same rule as the rest of the library pages: a movie counts once the requester has watched it, a show counts once they have watched every episode currently in the library, with a partial ring for progress. The badge is about the person who requested it, so a green check on a user page means they did watch what they asked for.
+
+**Never watched** in the user summary counts available requests the requester has not started. It scans the 500 most recent available requests, so for a requester past that mark the figure is a floor.
+
+## Unlinking
+
+**Unlink** in the row's Seerr menu deletes the mirrored request history for that server. **Disable sync** in the same menu keeps the history and stops syncing; the row reads Paused until you enable it again.
+
+<Callout type="info">
+  Linking Seerr does not add anything to automations or notifications. Request events as automation
+  triggers are planned as a follow-up.
+</Callout>
