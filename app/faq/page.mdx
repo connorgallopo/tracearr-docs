@@ -108,7 +108,7 @@ If you go that route, you are on your own. We can't help with problems that only
 ### Tracearr can't connect to my media server
 
 1. Verify your server URL is correct and accessible from Tracearr
-2. Check that your API key/token is valid
+2. Check that your API key/token is valid. A replaced Jellyfin or Emby key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
 3. Ensure there are no firewall rules blocking the connection
 4. Check the Tracearr logs for specific error messages
 5. Try [Disabling IPv6 in Docker](#disabling-ipv6-in-docker)
@@ -179,7 +179,7 @@ This forces the container to use IPv4 only, which resolves the issue in most cas
 ### Sessions aren't being tracked
 
 1. Verify the server connection is active in **Settings** → **Servers**
-2. Check that your API key or token is still valid
+2. Check that your API key or token is still valid. A replaced Jellyfin or Emby key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
 3. Start a playback session — Plex sessions appear instantly, while Jellyfin and Emby sessions appear within a poll cycle
 
 ---

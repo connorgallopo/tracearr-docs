@@ -25,6 +25,10 @@ The rest of this section is procedure rather than pointers. [Collecting Logs](/t
 - [Tracearr can't connect to my media server](/faq#tracearr-cant-connect-to-my-media-server)
 - [Jellyfin stopped working right after I upgraded it to 12](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin)
 - [Adding a server fails with a fetch error inside Docker](/faq#disabling-ipv6-in-docker)
+- [I deleted or regenerated my Jellyfin or Emby API key](/configuration/servers#changing-the-url-or-api-key)
+- [Adding a server again created a second copy of it](/configuration/servers#re-adding-a-server-with-the-same-url)
+- [My Plex servers stopped working after I changed my Plex password](/configuration/servers#reauthorizing-an-account)
+- [I can't unlink a Plex account](/configuration/servers#unlinking-an-account)
 - [Check Plugin says Playback Reporting isn't installed when it is](/faq#jellyfin-10119-playback-reporting-check-fails-with-a-500-error)
 - [Migrations fail against a PostgreSQL server I run myself](/faq#can-i-run-tracearr-without-docker)
 
@@ -145,6 +149,24 @@ cannot reach [Plex/Emby/Jellyfin] server ... fetch failed
 ```
 
 This comes up while adding a media server, usually from IPv6 resolution inside the container. See [Disabling IPv6 in Docker](/faq#disabling-ipv6-in-docker).
+
+```
+That address or API key reaches a different server. A server can only be pointed at itself.
+Could not read which server answers at that address.
+Tracearr has no record of which server this is and cannot reach it with the saved address and key, so it cannot confirm the change points at the same server.
+Jellyfin rejected this API key (it may be invalid or expired).
+Emby rejected this API key (it may be invalid or expired).
+```
+
+The first three come from saving a new URL or API key in **Edit Server**. The last two can also come from **Add Server**. See [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key).
+
+```
+That Plex sign-in was for a different account. Sign in as <username> to reauthorize it.
+Cannot unlink this Plex account. Please delete the <n> server(s) connected through this account first.
+Cannot unlink your only login account. Set a password first or link another Plex account with login enabled.
+```
+
+All three come from **Settings** → **Servers** → **Plex accounts**. See [Reauthorizing an account](/configuration/servers#reauthorizing-an-account) and [Unlinking an account](/configuration/servers#unlinking-an-account).
 
 ```
 jellyfin request failed: 500 Internal Server Error

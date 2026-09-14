@@ -1,5 +1,6 @@
 export default {
   index: 'Overview',
+  servers: 'Media Servers',
   environment: 'Environment Variables',
   automations: 'Automations',
   realtime: 'Real-Time Updates',
