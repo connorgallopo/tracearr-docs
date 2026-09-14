@@ -48,12 +48,11 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     shortcut: [{ url: '/favicon.ico' }],
   },
+  // No title or description here: Next fills them from each page's own. The
+  // relative url and canonical resolve to the page being rendered.
   openGraph: {
-    title: 'Tracearr Documentation',
-    description:
-      'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, and Emby. Installation guides, configuration, and troubleshooting.',
     siteName: 'Tracearr Docs',
-    url: 'https://docs.tracearr.com',
+    url: './',
     images: [
       {
         url: '/images/og-image.png',
@@ -65,13 +64,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tracearr Documentation',
-    description:
-      'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, and Emby.',
     images: ['/images/og-image.png'],
   },
   alternates: {
-    canonical: 'https://docs.tracearr.com',
+    canonical: './',
   },
 };
 
