@@ -7,10 +7,11 @@ import { Callout, Steps } from 'nextra/components';
 
 # Seerr Requests
 
-Tracearr can link one **Seerr** instance to each media server. Overseerr and Jellyseerr share the same API, so any of the three works. Once linked, Tracearr mirrors the request history into its own database and shows it in two places:
+Tracearr can link one **Seerr** instance to each media server. Overseerr and Jellyseerr share the same API, so any of the three works. Once linked, Tracearr mirrors the request history into its own database and shows it in three places:
 
 - **Media detail** gets a line under the availability list, "Requested by agelwarg · Sep 8, 2026 · landed 2 min later", plus a Requests panel listing every request for that title.
 - **User detail** gets a Requests card with a summary (requests, approval rate, never watched, median wait) and the person's request history, each row marked with whether they have watched what they asked for.
+- **Media → Requests** in the sidebar covers the servers you have picked: how many requests landed and got watched, what landed and was never played, and who follows through. See [The Requests page](#the-requests-page).
 
 Tracearr only reads from Seerr. It never approves, declines or creates requests.
 
@@ -58,7 +59,7 @@ Each Seerr request carries the requester's plex.tv account id (Plex) or their Je
 
 No matching by username or email, and Seerr email addresses are never stored.
 
-The server row shows two counts when matching left anything behind: **unmatched titles** and **unmatched users**. When both are zero the row shows only the request count. A title stays unmatched when it never arrived in the library or was removed later; the request still appears on the requester's user page with the title Seerr knows it by. A user stays unmatched when the requester has no account on the linked server, which is normal for Seerr local accounts. Those requests show the Seerr username in grey, or "Not on this server" when Seerr gave none.
+The server row shows the request count. It does not show how many titles or users went unmatched. A title stays unmatched when it never arrived in the library or was removed later; the request still appears on the requester's user page with the title Seerr knows it by. A user stays unmatched when the requester has no account on the linked server, which is normal for Seerr local accounts. Those requests show the Seerr username in grey, or "Not on this server" when Seerr gave none.
 
 Matching runs again on every full sync, so a title that arrives in the library after the request was mirrored links up on the next nightly pass. The 15-minute check only re-matches requests Seerr changed since the last run.
 
@@ -72,9 +73,29 @@ Seerr marks a title available only when it finds it in a library enabled under S
 
 **Seasons** lists the seasons a show request asked for, or All seasons. A 4K request and a request Seerr made from a watchlist each carry a small flag.
 
-**Watched** uses the same rule as the rest of the library pages: a movie counts once the requester has watched it, a show counts once they have watched every episode currently in the library, with a partial ring for progress. The badge is about the person who requested it, so a green check on a user page means they did watch what they asked for.
+**Watched** uses the same rule as the rest of the library pages: a movie counts once it has been watched, a show counts once every episode currently in the library has, with a partial ring for progress. A show request that named seasons only counts those seasons, so a season 2 request is watched when season 2 is, whatever happened to season 1.
+
+The badge has two colours. Green, "Watched by the requester", means the person who asked for it watched it. Orange, "Watched by someone else", means another account did and the requester has not. Green wins when both are true.
 
 **Never watched** in the user summary counts available requests the requester has not started. It scans the 500 most recent available requests, so for a requester past that mark the figure is a floor.
+
+## The Requests page
+
+**Requests** appears under **Media** in the sidebar once at least one server has Seerr linked. It follows the server picker at the top of the app, so picking one server narrows every number on it. With nothing linked the page says "No Seerr linked" and offers **Link Seerr**.
+
+Three cards run across the top:
+
+| Card         | What it counts                                                           |
+| ------------ | ------------------------------------------------------------------------ |
+| Requested    | Every request, with how many of them landed underneath                   |
+| Watched      | Requests that landed and got watched, as a share of the ones that landed |
+| Never played | Titles that landed and nobody has played, with their size on disk        |
+
+**Where requests end up** draws the same three stages as a funnel: Requested, Landed, Watched. "Watched means someone got through 85% of it, the same bar the library pages use. A request has to land and be matched to a title before Tracearr can measure that."
+
+**Landed and never played** lists the titles behind the Never played card, "Downloaded because someone asked, and no account on these servers has pressed play even once." It is zero plays from anyone, not under 85%, so a half-watched title never shows up here. It sorts largest on disk first, and a title with nothing on disk is left out.
+
+**Requesters** has one row per person: how many titles they asked for, how many landed, how many they watched, how many someone else watched, and their median wait. It sorts by Watched first. For a show request that named seasons, only those seasons count towards watched.
 
 ## Unlinking
 

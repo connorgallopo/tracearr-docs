@@ -13,13 +13,13 @@ Who receives a [newsletter](/configuration/email/newsletters) is set on its Reci
 
 Two sources, and a newsletter can use either or both.
 
-**Everyone on the chosen servers** is a switch, on by default. It reaches everyone with an active account on the servers the newsletter covers: "Their address comes from their contact email, then their Tracearr email, then the address their media server account carries."
+**Everyone on the chosen servers** is a switch, on by default. It reaches everyone with an active account on the servers the newsletter covers: "Each person is mailed at their contact email if you set one, otherwise at the email on their Tracearr or media server account. Each person gets their own copy and sees only their own address."
 
-**Extra addresses** are typed by hand, up to 200 of them, each with an optional name of up to 100 characters. They are "Addresses with no account here. They get the version covering every server, and they can unsubscribe like anyone else." A typed address that is not an address is flagged on blur with "That is not an email address."
+**Add people without an account** opens a list for addresses typed by hand, up to 200 of them, each with an optional name of up to 100 characters. It is "For someone who isn't on your servers." A box above the rows takes a pasted list, one address per line or separated by commas. A typed address that is not an address is flagged with "That is not an email address."
 
-You are a member too. If you have an account on one of these servers you are on the list; use **Exclude** to take yourself off.
+You are a member too. "If you have an account on one of these servers you are included too. Open Manage recipients to exclude yourself."
 
-With Members switched off, the card reads "Members are off; only the extra addresses receive this newsletter." Turn both off and the panel says "Nobody will receive this newsletter" with "Turn on Members above, or add an extra address, to reach someone."
+With nobody to send to, the card says "Nobody will receive this newsletter" with "Turn on Everyone on the chosen servers, or add an address below."
 
 ## How an address is found
 
@@ -36,11 +36,11 @@ The email on their Tracearr identity, which is the one they sign in with.
 
 ### The address their media server account carries
 
-Plex sends an email address for shared accounts. Plex Home and managed accounts often have none. Neither Jellyfin nor Emby exposes an email address in its user API, so nothing ever arrives from those two.
+Plex sends an email address for shared accounts. Plex Home and managed accounts often have none. Neither Jellyfin nor Emby exposes an email address in its user API, so a Jellyfin or Emby account only counts here when its username is itself an email address. That address is used as-is and the row marks it **from username**. When a person has both, the Plex address wins.
 
 </Steps>
 
-The resolved address is lower-cased. Two people who resolve to the same address get one email, not two.
+The resolved address is lower-cased. Two people who resolve to the same address get one email, not two, and that email covers the servers of both.
 
 People who never receive a newsletter whatever their address: disabled accounts, which are left out entirely, and banned or pending identities, which are listed as excluded so you can see why a name is missing.
 
@@ -48,7 +48,7 @@ People who never receive a newsletter whatever their address: disabled accounts,
 
 Because Jellyfin and Emby send no addresses, most self-hosters end up typing some. There are two places to do it.
 
-The newsletter's recipients panel groups people with no address under **No email address**, each row with a box and a **Save** button that writes straight away. Where the person's media server username is itself an email address, the box is prefilled with it, so saving is one click.
+**Manage recipients** lists people with no address under its **No email address** tab, each row with a box and a **Save** button that writes straight away. The recipients card shows the same rows until they are filled in.
 
 The person's own page carries the same field under their username, reading `Newsletter address: none set` with a pencil beside it for the owner. The dialog is **Edit name and contact email**.
 
@@ -63,11 +63,11 @@ Contact emails are up to 255 characters and are stored in lower case.
 
 ## Exclude and include
 
-Every row in **Will receive** carries an **Exclude** button. Excluding takes that person off this newsletter and no other: "These people stay off this newsletter until you include them again. Other newsletters are unaffected." Up to 200 people can be excluded per newsletter.
+Every row on the **Receiving** tab of **Manage recipients** carries an **Exclude** button, and every row on **Excluded** carries **Include**. Tick several rows, or **Select all**, and use **Exclude selected** or **Include selected** to change them together. Excluding takes a person off this newsletter and no other: "These people stay off this newsletter until you include them again. Other newsletters are unaffected." Up to 200 people can be excluded per newsletter.
 
-Excluded people collapse into an **Excluded (N)** group at the bottom of the panel, each with **Include** to put them back. Changes made here wait for Save, and are marked **Excluded after save** or **Included after save** until you press it.
+"Exclude and Include change the form. Nothing is saved until you press Save." Until then the rows are marked **Excluded after save** or **Included after save**.
 
-The group also holds people who are off the list for reasons you did not choose. Those carry a **Banned** or **Pending** badge and have no Include button.
+The Excluded tab also lists people who are off the list for reasons you did not choose, with a **Banned**, **Pending** or **Not on a chosen server** badge and no Include button.
 
 ## One email per set of servers
 
@@ -77,24 +77,26 @@ Tracearr groups everyone by which of the newsletter's servers they have an accou
 
 Extra addresses belong to no server, so they get the version covering every server the newsletter names.
 
-The panel shows this split whenever there is more than one group, headed "3 with an account on Movies and Music", with the note "People on different servers get different emails. Each list below only sees what was added to the servers named."
+**Manage recipients** shows this split whenever there is more than one group, headed "3 with an account on Movies and Music", with the note "People on different servers get different emails. Each group below only sees what was added to the servers named."
 
 A group whose servers added nothing in the window is mailed nothing at all when **Skip when nothing was added** is on, and the editor's readiness rail warns about it beforehand.
 
-## The recipients panel
+## Who the next send reaches
 
-The panel under the Recipients card answers who the next send reaches. It reads the saved newsletter, so it needs the newsletter saved at least once: before that it says "Save to see recipients." and offers Preview instead.
+The Recipients card answers for the form as it stands, saved or not, so changing the server list or the switch updates it straight away.
 
-| Group                | What is in it                                                                              |
+It opens on one line of counts, "Will receive 42 · Excluded 2 · No email address 3 · Suppressed 1", leaving out any that are zero. Below that, a few rows that need a look: people who joined since the last send, marked **New since last send**, people with no address, and anyone with an exclude or include waiting for Save. With nothing to flag it shows the first few people who will receive it. "3 joined since the last send" appears under the counts when it applies.
+
+**Manage recipients (N)** opens the full list in a sheet, with a search box ("Search by name, username or address"), a **Server** filter and four tabs:
+
+| Tab                  | What is in it                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------ |
-| Will receive (N)     | Everyone who resolves to an address and is not suppressed or excluded, split by server set |
-| Suppressed (N)       | Addresses that unsubscribed or were suppressed by hand; the send skips them                |
+| Receiving (N)        | Everyone who resolves to an address and is not suppressed or excluded, split by server set |
+| Excluded (N)         | Excluded by you, or banned, pending or not on a chosen server                              |
 | No email address (N) | Nothing was found in any of the three sources; each row takes a contact email              |
-| Excluded (N)         | Excluded by you, or banned or pending                                                      |
+| Suppressed (N)       | Addresses that unsubscribed or were suppressed by hand; the send skips them                |
 
 Each row shows the person's avatar, their name linked to their user page, and the resolved address with the account it came from underneath. An extra address shows a mail icon instead and is labelled **Extra address**.
-
-Changing the server list without saving leaves the panel answering for the old one, and it says so: "This list still reflects the saved servers. Save to see who the new selection reaches."
 
 ## Unsubscribing
 

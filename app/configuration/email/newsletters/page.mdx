@@ -150,13 +150,13 @@ Both are rich text and take bold, italic, links and bulleted lists. Each one hol
 
 ## Recipients
 
-The Recipients card holds the **Everyone on the chosen servers** switch, the extra addresses list, and the panel showing who the next send reaches. All of it is on the [Recipients and unsubscribes](/configuration/email/recipients) page.
+The Recipients card holds the **Everyone on the chosen servers** switch, a summary of who the next send reaches with **Manage recipients** to exclude people, and **Add people without an account** for typed addresses. All of it is on the [Recipients and unsubscribes](/configuration/email/recipients) page.
 
 ## Delivery
 
 ### Email destination
 
-The SMTP account this sends through. It does not decide who receives it, and it does not use the destination's **Alert recipients** list. With no email destination saved anywhere, the field offers **Add email destination** in place of the picker.
+The SMTP account this sends through. It does not decide who receives it, and it does not use the destination's **Alert recipients** list. With no email destination saved anywhere, the field offers **Add email destination** in place of the picker. The dialog it opens is titled **Add email server** and only asks for the SMTP server and sender, leaving out **Alert recipients** and **Receive violations**: "Newsletter recipients are set on the newsletter itself. To send alerts through this server too, edit it later under Destinations."
 
 ### Poster images
 
@@ -198,7 +198,7 @@ The rail beside the cards opens with "These do not block saving. They decide whe
 | Empty variant    | not shown when every group has something                                       | "Members on only \<servers\> get nothing from the next send: \<servers\> added no titles in the window."                                             |
 | DNS              | always shown                                                                   | Deliverability depends on SPF, DKIM and DMARC records for the sending domain, with a link to [that section](/configuration/email#spf-dkim-and-dmarc) |
 
-The Recipients row reads differently before the first save, where it says "Recipients are unknown until the newsletter is saved." Change the server list on a saved newsletter and the rail adds "The recipient rows reflect the saved servers. Save to check the new selection."
+The Recipients row answers for the form as it stands, saved or not, and reads "Checking who receives this newsletter." while it works that out.
 
 ## Preview
 

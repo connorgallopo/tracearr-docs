@@ -50,20 +50,20 @@ Picking a provider writes those three values and nothing else, and you can edit 
 
 ### The fields
 
-| Field               | Required | Default    | Notes                                                                              |
-| ------------------- | -------- | ---------- | ---------------------------------------------------------------------------------- |
-| Provider            | Yes      | `Custom`   | Fills the three fields below it from the table above                               |
-| SMTP host           | Yes      | none       | A hostname or IP address, with no scheme, port or path                             |
-| Port                | Yes      | `587`      | A whole number from 1 to 65535                                                     |
-| Security            | Yes      | `STARTTLS` | STARTTLS (usually port 587), TLS (usually port 465), or None (plain text, port 25) |
-| Username            | No       | blank      | Leave blank when the server needs no login                                         |
-| Password            | No       | blank      | Stored encrypted, and never read back into the form                                |
-| Messages per second | Yes      | `2`        | A whole number from 1 to 50                                                        |
-| Message stream      | No       | blank      | Postmark only, up to 64 characters, letters, digits and hyphens                    |
-| From name           | No       | `Tracearr` | The display name on the From header                                                |
-| From address        | Yes      | none       | The address recipients see and reply to unless Reply-to is set                     |
-| Reply-to            | No       | blank      | One address                                                                        |
-| Alert recipients    | No       | blank      | Comma-separated addresses that alerts go to; newsletters ignore this list          |
+| Field               | Required | Default    | Notes                                                                                  |
+| ------------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
+| Provider            | Yes      | `Custom`   | Fills the three fields below it from the table above                                   |
+| SMTP host           | Yes      | none       | A hostname or IP address, with no scheme, port or path                                 |
+| Port                | Yes      | `587`      | A whole number from 1 to 65535                                                         |
+| Security            | Yes      | `STARTTLS` | STARTTLS (usually port 587), TLS (usually port 465), or None (plain text, port 25)     |
+| Username            | No       | blank      | Leave blank when the server needs no login                                             |
+| Password            | No       | blank      | Stored encrypted, and never read back into the form                                    |
+| Messages per second | Yes      | `2`        | A whole number from 1 to 50                                                            |
+| Message stream      | No       | blank      | Postmark only, up to 64 characters, letters, digits and hyphens                        |
+| From name           | No       | `Tracearr` | The display name on the From header                                                    |
+| From address        | Yes      | none       | The address recipients see and reply to unless Reply-to is set                         |
+| Reply-to            | No       | blank      | One address                                                                            |
+| Alert recipients    | No       | blank      | Comma-separated; an alert is one email with every address in To. Newsletters ignore it |
 
 Username and Password are optional, so a relay that wants no login works with both left blank.
 

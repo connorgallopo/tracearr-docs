@@ -175,7 +175,7 @@ Order the work so the restart costs you nothing:
 
 Tracearr's request logs record the full URL, query string included. Every query-parameter key that has ever appeared in one live host's request logs is ordinary application state: `page`, `pageSize`, `period`, `scope`, `serverIds`, `sort`, `timezone` and the like. No tokens, no passwords. Logs are safe to attach.
 
-Two routes do accept a credential in a query string, `/backup/download/:filename?token=` and the image route `/:id/image/*?token=`. Neither appeared once in 8,552 request lines on that host. If you want certainty before you upload, check first:
+One route does accept a credential in a query string, `/backup/download/:filename?token=`, and that token is single use and expires after 60 seconds. It did not appear once in 8,552 request lines on that host. If you want certainty before you upload, check first:
 
 ```bash
 grep -n 'token=' tracearr.log
