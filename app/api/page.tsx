@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImage } from '../shared-metadata';
 import { ApiReference } from './api-reference';
 
 // Re-fetch the specs from the latest stable release at most hourly, so a new
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
     title: 'Tracearr API Reference',
     description,
     url: 'https://docs.tracearr.com/api',
+    images: [ogImage],
   },
 };
 

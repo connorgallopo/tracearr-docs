@@ -7,6 +7,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 import { Globe } from 'lucide-react';
 import { SiGithub, SiDiscord } from 'react-icons/si';
+import { ogImage } from './shared-metadata';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -53,14 +54,7 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: 'Tracearr Docs',
     url: './',
-    images: [
-      {
-        url: '/images/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Tracearr - Free Media Server Monitoring for Plex, Jellyfin, and Emby',
-      },
-    ],
+    images: [ogImage],
   },
   twitter: {
     card: 'summary_large_image',

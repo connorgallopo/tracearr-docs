@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useMDXComponents as getMDXComponents } from '@/mdx-components';
+import { ogImage } from '../../shared-metadata';
 import {
   EFFECT_LINES,
   GROUP_LABELS,
@@ -52,6 +53,7 @@ export async function generateMetadata({
       title: `${template.name} - Tracearr automation template`,
       description: template.description,
       url: `https://docs.tracearr.com/templates/${slug}`,
+      images: [ogImage],
     },
   };
 }

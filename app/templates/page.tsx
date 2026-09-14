@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { useMDXComponents as getMDXComponents } from '@/mdx-components';
+import { ogImage } from '../shared-metadata';
 import { getTemplates } from './data';
 import { BUILTIN_TOOLTIP, Badge, Gallery, VERIFIED_TOOLTIP } from './gallery';
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Tracearr automation templates',
     description,
     url: 'https://docs.tracearr.com/templates',
+    images: [ogImage],
   },
 };
 
