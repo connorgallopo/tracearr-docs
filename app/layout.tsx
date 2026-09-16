@@ -4,7 +4,6 @@ import { getPageMap } from 'nextra/page-map';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from '@vercel/analytics/next';
 import { Globe } from 'lucide-react';
 import { SiGithub, SiDiscord } from 'react-icons/si';
 import { ogImage } from './shared-metadata';
@@ -162,11 +161,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         >
           {children}
         </Layout>
-        <Analytics />
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
-      {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-      )}
     </html>
   );
 }

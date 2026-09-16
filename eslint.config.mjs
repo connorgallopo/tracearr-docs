@@ -13,12 +13,25 @@ const compat = new FlatCompat({ baseDirectory: __dirname });
 
 export default [
   {
-    ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'public/_pagefind/**'],
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+      'public/_pagefind/**',
+    ],
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
       'no-console': 'warn',
+    },
+  },
+  {
+    files: ['scripts/**'],
+    rules: {
+      'no-console': 'off',
     },
   },
   {
