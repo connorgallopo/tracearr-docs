@@ -1,6 +1,7 @@
 import { execFileSync } from 'child_process';
 import { readdirSync } from 'fs';
 import { join, relative } from 'path';
+import { withPostHogConfig } from '@posthog/nextjs-config';
 import nextra from 'nextra';
 
 const withNextra = nextra({
@@ -65,7 +66,7 @@ function listPages(dir: string, route: string, buildTime: string): DocPage[] {
 const buildTime = new Date().toISOString();
 ensureFullHistory();
 
-export default withNextra({
+const config = withNextra({
   // Next.js options
   reactStrictMode: true,
   env: {
@@ -130,3 +131,14 @@ export default withNextra({
     ];
   },
 });
+
+const personalApiKey = process.env.POSTHOG_API_KEY;
+
+// withPostHogConfig has to be the outermost wrapper or its build hooks are dropped.
+export default personalApiKey
+  ? withPostHogConfig(config, {
+      personalApiKey,
+      projectId: process.env.POSTHOG_PROJECT_ID,
+      sourcemaps: { releaseName: 'docs-site' },
+    })
+  : config;

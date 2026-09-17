@@ -16,6 +16,7 @@
   "dependencies": {
     "@giscus/react": "^3.1.0",
     "@next/third-parties": "^16.1.5",
+    "@posthog/nextjs-config": "^1.11.1",
     "@scalar/api-reference-react": "^0.9.60",
     "lucide-react": "^1.0.0",
     "next": "^15.5.23",
