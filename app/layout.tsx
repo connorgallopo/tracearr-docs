@@ -134,11 +134,6 @@ const structuredData = {
     url: 'https://tracearr.com',
     logo: 'https://tracearr.com/images/logo-transparent.png',
   },
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: 'https://docs.tracearr.com?q={search_term_string}',
-    'query-input': 'required name=search_term_string',
-  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

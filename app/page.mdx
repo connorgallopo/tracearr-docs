@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 **Real-time monitoring for Plex, Jellyfin, and Emby. One dashboard for all your servers.**
 
-Tracearr is a free, open-source monitoring platform that gives you complete visibility into your media servers. Track streams in real-time, analyze playback patterns, and detect account sharing — all from a single interface.
+Tracearr is a free, open-source monitoring platform that gives you complete visibility into your media servers. Track streams in real-time, analyze playback patterns, and detect account sharing, all from a single interface.
 
 <Image
   src="/images/dashboard-hero.png"
@@ -43,37 +43,42 @@ If you run multiple media servers, you've probably dealt with this: Tautulli onl
 
 ### Real-Time Monitoring
 
-- **Live Session Tracking** — See every active stream instantly with WebSocket updates
-- **Instant Jellyfin & Emby** — Push-based session updates with the optional [SSE plugin](/sse-plugin)
-- **Multi-Server Dashboard** — Plex, Jellyfin, and Emby unified in one view
-- **Interactive World Map** — Visualize where streams originate globally
-- **Server Resources** — Monitor CPU, memory, and transcoder load; the [SSE plugin](/sse-plugin) adds live CPU/RAM for Jellyfin and Emby
+- **Live Session Tracking**: See every active stream instantly with WebSocket updates
+- **Instant Jellyfin & Emby**: Push-based session updates with the optional [SSE plugin](/sse-plugin)
+- **Multi-Server Dashboard**: Plex, Jellyfin, and Emby unified in one view
+- **Interactive World Map**: Visualize where streams originate globally
+- **Server Resources**: CPU and memory charts per server. Plex reports its own numbers; Jellyfin and Emby need the [SSE plugin](/sse-plugin)
 
 ### Account Sharing Detection
 
-Six ready-made automations to catch suspicious activity:
+Ready-made automations flag suspicious activity:
 
-- **Impossible Travel** — NYC then London 30 minutes later? Flagged.
-- **Simultaneous Locations** — Same account streaming from two cities at once
-- **Device Velocity** — Too many unique IPs in a short time window
-- **Concurrent Streams** — Set per-user stream limits
-- **Geo Restrictions** — Block streaming from specific countries
-- **Account Inactivity** — Get notified when accounts go dormant
+- **Impossible Travel**: NYC then London 30 minutes later? Flagged.
+- **Simultaneous Locations**: Same account streaming from two cities at once
+- **Device Velocity**: Too many unique IPs in a short time window
+- **Concurrent Streams**: Set per-user stream limits
+- **Geo Restrictions**: Flag streams from countries you block
+- **Account Inactivity**: Flag accounts that go unused for a set number of days
+
+Tracearr ships more [ready-made automations](/configuration/automations#ready-made-automations), and the [template gallery](/templates) has ones you can import.
 
 ### Analytics & Insights
 
-- **Watch History** — Complete session history with device and location data
-- **Stream Analytics** — Transcode vs direct play, bandwidth, codec breakdowns
-- **Library Analytics** — Storage predictions, duplicate detection, engagement metrics
-- **Trust Scores** — Automated scoring based on user behavior
+- **Watch History**: Complete session history with device and location data
+- **Stream Analytics**: Transcode vs direct play, bandwidth, codec breakdowns
+- **Media Catalog**: One record per title across every server, matched by IMDb, TMDB, or TVDB ID, or by title and year
+- **Library Analytics**: Storage predictions, duplicate detection, engagement metrics
+- **Seerr Requests**: [Link Seerr, Overseerr, or Jellyseerr](/configuration/requests) to see who requested a title, when it landed, and whether they watched it
+- **Merged Users**: Merge one person's accounts on different servers into a single user. Tracearr suggests matches, and you can split an account back out
+- **Trust Scores**: Automated scoring based on user behavior
 
 ### Alerts & Integrations
 
-- **Discord Webhooks** — Instant notifications when your automations fire
-- **Custom Notifications** — Apprise support for 80+ notification services
-- **Public API** — REST API with Swagger UI for third-party integrations
-- **Data Import** — Migrate from Tautulli or Jellystat without losing history
-- **Mobile App** — Monitor on the go with the [iOS](https://apps.apple.com/us/app/tracearr/id6755941553) and [Android](https://play.google.com/store/apps/details?id=com.tracearr.mobile) apps
+- **Notifications**: Send to Discord, ntfy, Gotify, Apprise, Pushover, a JSON webhook, email, mobile push, or browser toasts. See [Notification Destinations](/configuration/destinations)
+- **Newsletters**: Email a server's members a scheduled [digest of what was added](/configuration/email/newsletters)
+- **Public API**: REST API for third-party integrations. The [API reference](/api) is rendered with Scalar, and your own instance has it at `/api-docs`
+- **Data Import**: [Import watch history](/getting-started/import) from Tautulli, a Jellystat backup, or the Playback Reporting plugin
+- **Mobile App**: Monitor on the go with the [iOS](https://apps.apple.com/us/app/tracearr/id6755941553) and [Android](https://play.google.com/store/apps/details?id=com.tracearr.mobile) apps
 
 ## Get Started
 
@@ -88,8 +93,8 @@ Six ready-made automations to catch suspicious activity:
 
 ## Community
 
-- **GitHub** — [github.com/connorgallopo/tracearr](https://github.com/connorgallopo/tracearr)
-- **Discord** — [Join the community](https://discord.gg/a7n3sFd2Yw)
-- **Issues** — [Report bugs or request features](https://github.com/connorgallopo/tracearr/issues)
+- **GitHub**: [github.com/connorgallopo/tracearr](https://github.com/connorgallopo/tracearr)
+- **Discord**: [Join the community](https://discord.gg/a7n3sFd2Yw)
+- **Issues**: [Report bugs or request features](https://github.com/connorgallopo/tracearr/issues)
 
-Tracearr is licensed under [AGPL-3.0](https://github.com/connorgallopo/Tracearr/blob/main/LICENSE) — free and open source.
+Tracearr is free and open source, licensed under [AGPL-3.0](https://github.com/connorgallopo/Tracearr/blob/main/LICENSE).
