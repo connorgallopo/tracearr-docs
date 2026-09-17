@@ -279,7 +279,7 @@
     "description": "Tell a destination when a newsletter send fails or reaches only part of its list.",
     "group": "notifications",
     "kind": "notification",
-    "minServerVersion": "2.2.0",
+    "minServerVersion": "2.3.0",
     "inputs": [
       {
         "key": "to",
@@ -290,7 +290,7 @@
     ],
     "sentence": "When newsletter.failed, send a notification.",
     "effects": ["tellsOnly", "everyServer"],
-    "code": "tracearr1.pZHBbuMgEIZfBY32iCNjZ53YD9FLq16qHsYwOKMScAG3iqK8e4XTptuV9rScBjH888_3n8GQZc-Zg4fhDKhLlX6UT2cgj6MjA0OOC0lgAwMoq3Q9dlT1WmG1HRuq9maHVf15mqZuQEIORewX-3nJMJTrRUI-zQQDJPIGLs8XCTp4w7fRUwzLXCaXpxf2ZZwPmS1rXJ1KSDoUiXMRizxNFP_LqYKbKU_vyVHOFDcWuWitDg0lHXm-goIHck6gMJQy-9WTeD-QFyi-v4uynigaSYQoIqE-UBLBu5OYMWYRrOCchOOUNyDBsp8ozpF9AaVrZW3fjsrgDlvcK701qFo9Ijaoab-3pDscbbfVqu-b-rfdtZ2h7a7VTa-6gn7F-Be6BBLWLK64Xuh0DeXG-Y-VSq_DkRwMcF92WfsivS4cvxBfnv-V0JH9PcU3io8U05Vas2k2NUjweCyk775RfZIuuR7oiLcvSkJyy_Qjluorlg8",
+    "code": "tracearr1.pZHBbuMgEIZfBY32iCNjZ53YD9FLq16qHsYwOKMScAG3iqK8e4XTptuV9rScBjH888_3n8GQZc-Zg4fhDKhLlX6UT2cgj6MjA0OOC0lgAwMoq3Q9dlT1WmG1HRuq9maHVf15mqZuQEIORewX-3nJMJTrRUI-zQQDJPIGLs8XCTp4w7fRUwzLXCaXpxf2ZZwPmS1rXJ1KSDoUiXMRizxNFP_LqYKbKU_vyVHOFDcWuWitDg0lHXm-goIHck6gMJQy-9WTeD-QFyi-v4uynigaSYQoIqE-UBLBu5OYMWYRrOCchOOUNyDBsp8ozpF9AaVrZW3fjsrgDlvcK701qFo9Ijaoab-3pDscbbfVqu-b-rfdtZ2h7a7VTa-6gn7F-Be6BBLWLK64Xuh0DeXG-Y-VSq_DkRwMcF92WfsivS4cvxBfnv-V0JH9PcU3io8U05Vas2k3NUjweCyk775RfZIuuR7oiLcvSkJyy_Qjluorlg8",
     "fingerprint": "c01ff93b1da7a3a81c4da13cbaa2ace88fec6abf64c199205f736de473c29162",
     "builtin": true,
     "verified": true,
