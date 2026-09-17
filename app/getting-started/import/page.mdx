@@ -57,42 +57,45 @@ Click **Start Import** to begin. You'll see real-time progress showing:
 
 Records may be skipped for these reasons:
 
-- **User not found** — The Plex user doesn't exist in Tracearr. Sync your server first.
-- **Duplicate session** — The session was already imported in a previous run.
-- **In-progress session** — Active or incomplete sessions without a reference ID are skipped.
+- **User not found**: The Plex user doesn't exist in Tracearr. Sync your server first.
+- **Duplicate session**: The session was already imported in a previous run.
+- **In-progress session**: Active or incomplete sessions without a reference ID are skipped.
+- **Started after the server was added**: Plays that started after you added this server to Tracearr are skipped. Tracearr has been capturing sessions since then.
 
 ## Import from Jellystat
 
-Jellystat import uses a JSON backup file that you export from Jellystat.
+Jellystat import uses a backup file that you export from Jellystat. Jellystat 1.1.12 writes a `.jsonl` file and earlier releases write `.json`. Tracearr accepts both.
 
 ### Step 1: Export from Jellystat
 
 1. In Jellystat, go to **Settings** → **Backup**
-2. Under **Options**, **deselect everything except "Activity"** — selected options appear in purple, deselected options appear in red
-
-![Jellystat backup options with only Activity selected](/images/jellystat-backups.png)
-
+2. Under **Options**, keep every table selected. Selected tables appear in purple, deselected tables in red
 3. Go back to **Settings** → **Settings** and scroll down to the **Tasks** section
 4. Find **"Backup Jellystat"** and click the **Start** button on the far right
-5. Return to **Settings** → **Backup** — you should see a new backup with the current timestamp in the file name
+5. Return to **Settings** → **Backup**. A new backup with the current timestamp in its file name is listed
 
 <Callout type="info">
-  The **Date** column in Jellystat's backup list is a known bug and always shows an incorrect date.
-  Use the **File Name** timestamp to identify your backup.
+  The **Date** column in Jellystat's backup list shows the file's creation time on disk, which can
+  differ from the time in the file name. Use the **File Name** timestamp.
 </Callout>
 
-6. On the far right of your new backup, click **Actions** → **Download** to save the JSON file
+6. On the far right of your new backup, click **Actions** → **Download** to save the file
 
-<Callout type="error" title="Activity Backup Only">
-  You must export an **Activity** backup specifically. Full backups are not supported — only the
-  Activity backup contains the playback history needed for import.
+<Callout type="warning" title="Tables Tracearr reads">
+Tracearr reads four tables. A backup without one of them imports with fewer plays linked.
+
+- **Activity**: the plays.
+- **Episodes**: links an episode play to the episode. Without it, episode plays import unlinked, and importing them again later does not link them.
+- **Library Items**: with **Episodes**, used to check plays that Jellystat moved onto a different title.
+- **Playback Reporting Plugin Data**: identifies plays Jellystat imported from the plugin. Without it, those episode plays in a Jellystat 1.1.12 backup import unlinked.
+
 </Callout>
 
 ### Step 2: Upload and Configure
 
 1. In Tracearr, go to **Settings** → **Import**
 2. Select your **Target Server** (Jellyfin or Emby)
-3. Drag and drop your downloaded JSON file, or click to select it
+3. Drag and drop your downloaded backup file (`.json` or `.jsonl`), or click to select it
 4. Configure import options:
 
 <Callout type="warning" title="Large File Uploads">
@@ -103,7 +106,7 @@ Jellystat import uses a JSON backup file that you export from Jellystat.
 
 | Option                         | Description                                                                                                                                    |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Enrich with media metadata** | Fetches season/episode numbers and artwork from your server. Slower but provides better data quality. _(Recommended)_                          |
+| **Enrich with media metadata** | Fetches season/episode numbers, artwork and runtime from your server. Watched state and the runtime check need the runtime. _(Recommended)_    |
 | **Update existing records**    | Updates previously imported sessions with codec, bitrate, and transcode data from the backup. Useful when re-importing to backfill new fields. |
 
 ### Step 3: Start Import
@@ -120,12 +123,26 @@ Click **Start Import** to begin. Progress shows:
 
 Records may be skipped for these reasons:
 
-- **User not found** — The Jellyfin/Emby user doesn't exist in Tracearr. Sync your server first.
-- **Duplicate session** — The session was already imported in a previous run.
+- **User not found**: The Jellyfin/Emby user doesn't exist in Tracearr. Sync your server first.
+- **Duplicate session**: The session was already imported in a previous run.
+- **Started after the server was added**: Plays that started after you added this server to Tracearr are skipped. Tracearr has been capturing sessions since then.
+- **Play time past the runtime**: With **Enrich with media metadata** on, a play recorded as running more than 60 seconds past the media runtime is skipped and counted in the import summary.
+- **Theme music and trailers**: With enrichment on, plays of theme songs, theme videos and trailers are filtered out.
 
 <Callout type="info">
   If many records are skipped due to "user not found", ensure you've synced your server recently in
   **Settings → Servers**.
+</Callout>
+
+<Callout type="info" title="What Jellystat records">
+Jellystat records how long a play ran, not where it stopped, so these plays show no playback position.
+
+With **Enrich with media metadata** on, a play counts as watched when its play time reaches your watched threshold of the media runtime. The thresholds are in **Settings** → **Data & API** → **API** and default to 85%. Without enrichment there is no runtime, so no Jellystat play counts as watched.
+
+A stream that hung while playing but stayed under the runtime imports as recorded.
+
+When a sync no longer finds an item in Jellyfin, Jellystat moves its plays onto another item with the same name. Tracearr leaves such a play unlinked when the backup shows the two are different titles. It cannot check once the original has been purged in Jellystat.
+
 </Callout>
 
 ## Import from Playback Reporting Plugin
@@ -189,14 +206,18 @@ Re-running the import is safe. Once a server's history is in Tracearr, later run
 
 Records may be skipped for these reasons:
 
-- **User not found** — The Jellyfin/Emby user doesn't exist in Tracearr. Sync your server first to add all users.
-- **Duplicate record** — The row was already imported, either directly or through a prior Jellystat import of the same plugin data.
-- **Overlapping record** — The row's timestamp falls inside a date range Tracearr already has for this server. Enable **Import the full date range** to import it anyway.
+- **User not found**: The Jellyfin/Emby user doesn't exist in Tracearr. Sync your server first to add all users.
+- **Duplicate record**: The row was already imported, either directly or through a prior Jellystat import of the same plugin data.
+- **Overlapping record**: The row's timestamp falls inside a date range Tracearr already has for this server. Enable **Import the full date range** to import it anyway.
+- **Started after the server was added**: Rows that started after you added this server to Tracearr are skipped, even with **Import the full date range** on. Tracearr has been capturing sessions since then.
+- **Play time past the runtime**: With **Enrich with media metadata** on, a row recorded as running more than 60 seconds past the media runtime is skipped and counted in the import summary.
 
 <Callout type="info" title="Emby records more than Jellyfin">
 Emby's Playback Reporting plugin also logs client IP addresses and pause duration, so Emby imports carry location data and pause time alongside each session. Jellyfin's plugin records neither field, so Jellyfin imports have no IP or location data.
 
 Neither plugin records codec or bitrate. Imported sessions have no stream-detail data on either server, and it can't be backfilled later since the plugin never captured it.
+
+Pause time is stored as the plugin recorded it. A stream that sat paused for days imports with that pause time. It shows in history and counts toward no statistic.
 
 </Callout>
 
@@ -205,9 +226,9 @@ Neither plugin records codec or bitrate. Imported sessions have no stream-detail
 If the plugin has already been removed from your server, or you'd rather not reinstall it, Jellystat can still bridge the gap. Use this path only for history the direct import cannot reach: a Jellystat backup import that covers the same plays as an earlier direct import will insert them again, because the Jellystat importer checks only its own record IDs.
 
 1. **Install Jellystat** temporarily alongside your Jellyfin or Emby server
-2. **Import your Playback Reporting data into Jellystat** — in Jellystat, go to **Settings**, then **Task** → **Complete Sync with Jellyfin**, then **Task** → **Import Playback Reporting Plugin Data**
-3. **Export from Jellystat** — follow the [export steps above](#step-1-export-from-jellystat) to create and download an Activity backup
-4. **Import into Tracearr** — follow the [Jellystat import steps](#import-from-jellystat) above
+2. **Import your Playback Reporting data into Jellystat**: in Jellystat, go to **Settings**, then **Task** → **Complete Sync with Jellyfin**, then **Task** → **Import Playback Reporting Plugin Data**
+3. **Export from Jellystat**: follow the [export steps above](#step-1-export-from-jellystat) to create and download a backup
+4. **Import into Tracearr**: follow the [Jellystat import steps](#import-from-jellystat) above
 
 This is a one-time migration path. Once your data is in Tracearr, you can uninstall both the Playback Reporting plugin and Jellystat if you'd like.
 
@@ -221,12 +242,12 @@ This is a one-time migration path. Once your data is in Tracearr, you can uninst
 
 After import completes, you may want to run some maintenance jobs in **Settings → Jobs**:
 
-| Job                        | When to Run                                                             |
-| -------------------------- | ----------------------------------------------------------------------- |
-| **Normalize Players**      | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV") |
-| **Fix Imported Progress**  | If imported sessions show 0% progress                                   |
-| **Backfill User Dates**    | If users show "Never" for last activity despite having history          |
-| **Full Aggregate Rebuild** | If charts or statistics look incorrect                                  |
+| Job                               | When to Run                                                                                                                   |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Normalize Players**             | If device names appear inconsistent (e.g., "AndroidTV" vs "Android TV")                                                       |
+| **Fix Imported Session Progress** | If Tautulli history imported before Tracearr 1.3.9 shows no progress. Jellystat and Playback Reporting imports don't need it. |
+| **Backfill User Dates**           | If users show "Never" for last activity despite having history                                                                |
+| **Full Aggregate Rebuild**        | If charts or statistics look incorrect                                                                                        |
 
 See the [FAQ](/faq) for more details on these jobs.
 

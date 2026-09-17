@@ -40,7 +40,7 @@ import { Tabs } from 'nextra/components';
 
 - [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
 - [I see both "US" and "United States" in my country data](#i-see-both-us-and-united-states-in-my-country-data)
-- [My imported Tautulli sessions show 0% progress](#my-imported-tautulli-sessions-show-0-progress)
+- [My Tautulli history imported before Tracearr 1.3.9 shows no progress](#my-tautulli-history-imported-before-tracearr-139-shows-no-progress)
 - [Users show "Never" for last activity](#users-show-never-for-last-activity-even-though-they-have-watch-history)
 - [My Library Growth charts are empty](#my-library-growth-charts-are-empty-or-missing-historical-data)
 - [My analytics numbers look wrong or charts show gaps](#my-analytics-numbers-look-wrong-or-charts-show-gaps)
@@ -344,9 +344,9 @@ Run **Normalize Countries** in Settings → Jobs. This converts full country nam
 
 ---
 
-### My imported Tautulli sessions show 0% progress
+### My Tautulli history imported before Tracearr 1.3.9 shows no progress
 
-Run **Fix Imported Progress** in Settings → Jobs. This recalculates progress values for imported sessions that have duration but missing progress data.
+Run **Fix Imported Session Progress** in Settings → Jobs. It estimates progress and length for plays that have neither, and never changes a play that already has either value.
 
 ---
 
