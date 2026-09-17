@@ -43,10 +43,10 @@
   },
   "overrides": {
     "nextra": {
-      "zod": "<4.4.0"
+      "zod": "<4.7.0"
     },
     "nextra-theme-docs": {
-      "zod": "<4.4.0"
+      "zod": "<4.7.0"
     }
   }
 }
