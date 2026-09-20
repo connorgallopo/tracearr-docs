@@ -88,6 +88,16 @@ The Schedule card ends with the next run in the newsletter's own timezone. Befor
 
 Both take 1 to 31 days, and both are capped the same way at render time: "Never more than 31 days, whatever this says." A newsletter that has not run for two months still covers only the last 31 days.
 
+### What counts as added
+
+A title is dated by when Tracearr first saw it, not by the date the media server reports. Server added dates move: a rescan, a rebuilt library, or a file replaced in place can reset them, and a title you have had for years arrives looking new. The date Tracearr records does not move once the item exists.
+
+Two things follow from that.
+
+Connect a server and its whole library is new to Tracearr, however old the files are. The first newsletter after connecting one lists everything the window reaches, so a 31 day window covers the lot. Send it manually first, or set a short window for the first run, before the schedule takes over.
+
+Rebuild or merge a library on the server and its titles are new again. The server issues new ids, Tracearr records items it has not seen before, and the next newsletter lists them. The library is fine; the newsletter is reporting what changed on Tracearr's side.
+
 ### Servers and libraries
 
 **Servers** takes up to 50 servers. Left empty it reads **All servers** and covers every connected server.
