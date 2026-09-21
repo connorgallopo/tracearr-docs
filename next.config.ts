@@ -110,6 +110,15 @@ const config = withNextra({
         destination: '/',
         permanent: true,
       },
+      // skipTrailingSlashRedirect turns off Next's own slash normalisation for
+      // every route, so without this each page answers 200 at both /x and /x/.
+      // The negative lookahead keeps /ingest out of it, which is the only
+      // reason the flag is on.
+      {
+        source: '/:path((?!ingest/).*)/',
+        destination: '/:path',
+        permanent: true,
+      },
     ];
   },
   // The proxied /ingest paths 308 away unless this is off.
