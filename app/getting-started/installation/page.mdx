@@ -46,6 +46,15 @@ docker compose -f docker-compose.pg18.yml up -d
 
 Tracearr will be available at `http://localhost:3000`.
 
+<Callout type="info">
+  **Upgrading from before 2.5.0?** Add the poster cache volume to your existing
+  `docker-compose.pg18.yml`: `tracearr_images:/data/tracearr/image-cache` on the `tracearr`
+  service, and `tracearr_images:` under the top-level `volumes:` key. Without it the poster cache
+  is rebuilt from scratch every time the container is recreated, which on a large library means
+  hours of requests to your media server. Fresh installs using the compose file above already have
+  it.
+</Callout>
+
 <Callout type="info" title="Configuration">
   See the comments in the compose file for optional environment variables like `TZ`, `PORT`,
   `LOG_LEVEL`, and `DB_PASSWORD`.

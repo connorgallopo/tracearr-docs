@@ -67,6 +67,8 @@ Tracearr will be available at `http://localhost:3000`.
 
 The supervised image runs three processes as three different system users — `postgres`, `redis`, and `tracearr` — each writing to its own data directory. On every startup, the entrypoint script runs `chown` and `chmod` across all three directories to ensure correct ownership before supervisord launches each process. PostgreSQL in particular requires `0700` permissions on its data directory and will refuse to start otherwise.
 
+The poster cache sits inside the `tracearr_data` volume, so it survives restarts and updates with no extra configuration.
+
 Named volumes are backed by Docker's storage driver (typically ext4 or xfs), so these permission fixes work reliably every time. FUSE-based filesystems — like Unraid's array — may silently fail to apply `chown` or `chmod`, which means PostgreSQL sees the wrong permissions and won't start. supervisord will restart it in a loop, and the container will never become healthy.
 
 <Callout type="error" title="Bind mounts are not supported with the supervised image">
