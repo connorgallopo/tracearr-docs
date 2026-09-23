@@ -1,6 +1,6 @@
 ---
 title: Mobile App - Pairing, Notifications & Settings
-description: Set up the Tracearr mobile app for iOS and Android. Download links, QR code pairing, push notification setup, multi-server support, and troubleshooting.
+description: Set up the Tracearr mobile app for iOS and Android. Download links, QR code pairing, push notification setup, the home screen widget, multi-server support, and troubleshooting.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -138,6 +138,43 @@ To prevent notification spam, the app enforces rate limits:
 
 You can see your current rate limit status in the notification settings.
 
+## Home Screen Widget
+
+The **Now Playing** widget shows active streams and transcodes across your servers, and how many servers are down. On iOS it comes in small, medium and large Home Screen sizes and three Lock Screen sizes. On Android it is a resizable widget, 4 by 2 cells by default.
+
+On iOS, long-press the widget and choose **Edit Widget** to pick what each stream shows: user, episode, quality and bitrate, player, and progress.
+
+The widget always shows the time its data is from, such as "as of 2:06". Data more than 15 minutes old is shown as stale.
+
+### How the Widget Updates
+
+While the app is open, the widget follows what the app shows. When you leave the app, it refreshes once if its data is more than 30 seconds old.
+
+In the background:
+
+- **iOS:** Tracearr sends your phone a silent push when a stream starts or stops. The push wakes the app, which fetches the current streams and asks iOS to redraw the widget. The server sends each device at most one of these pushes every 20 minutes, plus one more when that window ends so the widget gets the latest state.
+- **iOS and Android:** the app also asks the system to refresh the widget no more often than every 15 minutes. The system decides when that actually runs.
+- **Android:** Tracearr doesn't send the silent push to Android devices, so the widget mostly refreshes on that schedule and when you open the app. Some Android phone makers stop background work for apps removed from the recent apps list; see [dontkillmyapp.com](https://dontkillmyapp.com).
+
+### iOS Requirements
+
+iOS only updates the widget in the background when:
+
+- **Background App Refresh** is on for Tracearr. Check **Settings** → **General** → **Background App Refresh**: both the main switch and the Tracearr switch. With it off, iOS never wakes the app for the push.
+- **Low Power Mode** is off. It turns Background App Refresh off while it's on.
+- Tracearr hasn't been swiped away in the app switcher. iOS doesn't launch an app the user force-quit until it's opened again or the phone restarts.
+
+The app can't read the Background App Refresh setting yet, so it can't warn you when it's off.
+
+### Apple's Limits
+
+iOS decides whether and when the widget updates in the background. Two limits apply, and Apple doesn't publish exact numbers for either:
+
+- **Background pushes.** Apple: "The number of background notifications allowed by the system depends on current conditions, but don't try to send more than two or three per hour." iOS can delay or drop pushes past that. ([Pushing background updates to your app](https://developer.apple.com/documentation/usernotifications/pushing-background-updates-to-your-app))
+- **Widget reloads.** Each widget you add has its own reload budget over a 24-hour window that iOS fits to how you use your phone. For a widget you look at often, Apple says the daily budget "typically includes from 40 to 70 refreshes", roughly one every 15 to 60 minutes. Reloads while the Tracearr app is open don't count. ([Keeping a widget up to date](https://developer.apple.com/documentation/widgetkit/keeping-a-widget-up-to-date))
+
+Expect one to three background updates an hour at best. When a widget's budget runs out, iOS holds its reloads until the budget refills over the day. Opening the app updates the widget right away either way.
+
 ## Managing Connected Devices
 
 In **Settings** → **Mobile** on the web dashboard:
@@ -184,6 +221,15 @@ Click **Disable Mobile Access** to turn off the feature entirely. All devices wi
 2. Verify your device's notification permissions for Tracearr
 3. Use **Send Test Notification** to verify the connection
 4. Check that you haven't hit rate limits
+
+### Widget Isn't Updating
+
+1. Open the app. The widget updates right away.
+2. Make sure the app is up to date. Some fixes arrive as over-the-air updates, which install when the app fully restarts, so it can take two restarts.
+3. On iOS, turn on Background App Refresh for Tracearr and turn off Low Power Mode. See [iOS Requirements](#ios-requirements).
+4. Don't swipe Tracearr away in the app switcher.
+5. If the widget only changes when you open the app, it has probably used its reload budget for the day. It refills on its own. See [Apple's Limits](#apples-limits).
+6. On Android, check that your phone's battery settings aren't restricting Tracearr.
 
 ### Device Shows "Last seen" a Long Time Ago
 
