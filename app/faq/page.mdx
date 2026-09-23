@@ -40,6 +40,7 @@ import { Tabs } from 'nextra/components';
 
 - [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
 - [I see both "US" and "United States" in my country data](#i-see-both-us-and-united-states-in-my-country-data)
+- [I set a server location but past local plays still show as Local Network](#i-set-a-server-location-but-past-local-plays-still-show-as-local-network)
 - [My Tautulli history imported before Tracearr 1.3.9 shows no progress](#my-tautulli-history-imported-before-tracearr-139-shows-no-progress)
 - [Users show "Never" for last activity](#users-show-never-for-last-activity-even-though-they-have-watch-history)
 - [My Library Growth charts are empty](#my-library-growth-charts-are-empty-or-missing-historical-data)
@@ -194,7 +195,7 @@ Install the [Tracearr SSE plugin](/configuration/realtime) on your Jellyfin or E
 
 ### I don't see any location data / Everything shows as local
 
-> **Note:** Local streams (those originating from your home network) will never show location data — this is expected behavior. Geolocation only applies to remote streams from outside your network. If your _remote_ streams are showing as "local" or missing location data, continue reading.
+> **Note:** Local streams (those from your home network) have a private IP that no geolocation database can place, so they show as **Local Network** and stay off the map. To put them on the map, give the server a [location](/configuration/servers#server-location). If your _remote_ streams are showing as "local" or missing location data, continue reading.
 
 Tracearr uses client IP addresses reported by your media server to determine geolocation. If remote sessions show as "local" or have no location data, your media server isn't seeing the real client IPs — usually because a reverse proxy is in front of it.
 
@@ -341,6 +342,12 @@ Run **Normalize Players** in Settings → Jobs. This standardizes device and pla
 ### I see both "US" and "United States" in my country data
 
 Run **Normalize Countries** in Settings → Jobs. This converts full country names to standard codes so your world map and country filters work properly.
+
+---
+
+### I set a server location but past local plays still show as Local Network
+
+Saving a [server location](/configuration/servers#server-location) runs **Apply Server Locations** on its own. If another job was running at the time, it starts when that one finishes. If past plays still show as Local Network after that, run **Apply Server Locations** in Settings → Jobs, which rechecks every server.
 
 ---
 

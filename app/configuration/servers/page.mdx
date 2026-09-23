@@ -1,6 +1,6 @@
 ---
 title: Media Servers
-description: Change a Jellyfin or Emby server's URL or API key, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
+description: Change a Jellyfin or Emby server's URL or API key, give a server a location for its local plays, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
 ---
 
 # Media Servers
@@ -37,6 +37,18 @@ Plex servers have no API Key field. Plex signs in through plex.tv, and its Serve
 The URL has to match the one shown under the server's name character for character. `http://192.168.1.100:8096/` does not match a saved `http://192.168.1.100:8096`, and neither does `https` against `http` or a hostname against an IP. Each of those adds a second server instead.
 
 This route only checks that the key has administrator access at that URL. It doesn't compare server IDs, so use **Edit Server** when you can.
+
+### Server location
+
+A play from your home network has a private IP, which no geolocation database can place, so Tracearr labels it **Local Network** and leaves it off the stream map. Giving the server a location puts those plays on the map at that spot. It's optional, and nothing is looked up online: the location is whatever you set here.
+
+In **Edit Server**, click **Set location**. Click the map to drop a pin, or type the **Latitude** and **Longitude**, then pick the **Country** and add a **City** and **Region** if you want them. Click **Update** to save. If the map can't load, the coordinate fields still work.
+
+If the server moved, click **Add a move**, pick the date it moved, and place the new spot. Local plays that started on or after that date use the new location, and earlier ones keep the old one. The date means midnight at the start of that day in your browser's time zone. The first entry reads **From the beginning** and covers everything before the first move; without it, plays before the first move stay **Local Network**.
+
+Saving starts **Apply Server Locations** in the background, which rewrites that server's past local plays to match; new plays get the location as they start. While it runs, the section says "Past sessions are still being updated." To undo it, remove every entry and save, and the job puts those plays back to **Local Network**.
+
+Placed plays show on the stream map and everywhere else a location appears, with a **Local** badge, and the **Network** filter in History still lists them under **Local**. Automations keep treating them as local: **Country** never matches them, **Active Session Distance** and **Travel Speed** leave them out, and **Is Local Network** is unchanged.
 
 ## Plex accounts
 
