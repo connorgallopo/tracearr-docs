@@ -85,7 +85,7 @@ Jellystat import uses a backup file that you export from Jellystat. Jellystat 1.
 Tracearr reads four tables. A backup without one of them imports with fewer plays linked.
 
 - **Activity**: the plays.
-- **Episodes**: links an episode play to the episode. Without it, episode plays import unlinked, and importing them again later does not link them.
+- **Episodes**: links an episode play to the episode. Without it, episode plays import unlinked. Importing the same backup again with the table included links them.
 - **Library Items**: with **Episodes**, used to check plays that Jellystat moved onto a different title.
 - **Playback Reporting Plugin Data**: identifies plays Jellystat imported from the plugin. Without it, those episode plays in a Jellystat 1.1.12 backup import unlinked.
 
