@@ -89,11 +89,13 @@ Three cards run across the top:
 | ------------ | ------------------------------------------------------------------------ |
 | Requested    | Every request, with how many of them landed underneath                   |
 | Watched      | Requests that landed and got watched, as a share of the ones that landed |
-| Never played | Titles that landed and nobody has played, with their size on disk        |
+| Never played | Requests that landed and nobody has played, with their size on disk      |
 
 **Where requests end up** draws the same three stages as a funnel: Requested, Landed, Watched. "Watched means someone got through 85% of it, the same bar the library pages use. A request has to land and be matched to a title before Tracearr can measure that."
 
-**Landed and never played** lists the titles behind the Never played card, "Downloaded because someone asked, and no account on these servers has pressed play even once." It is zero plays from anyone, not under 85%, so a half-watched title never shows up here. It sorts largest on disk first, and a title with nothing on disk is left out.
+The funnel and the Requesters table judge a request by everything that landed for it, including episodes deleted since. Pruning a watched title never turns its request back into an unwatched one, and a season whose unwatched episodes were deleted stays unwatched here even when its poster badge reads watched.
+
+**Landed and never played** lists the requests behind the Never played card, "Downloaded because someone asked, and no account on these servers has pressed play even once." It is zero plays from anyone, not under 85%, so a half-watched title never shows up here. It sorts largest on disk first, and a title with nothing on disk is left out.
 
 **Requesters** has one row per person: how many titles they asked for, how many landed, how many they watched, how many someone else watched, and their median wait. It sorts by Watched first. For a show request that named seasons, only those seasons count towards watched.
 
