@@ -62,6 +62,14 @@ Records may be skipped for these reasons:
 - **In-progress session**: Active or incomplete sessions without a reference ID are skipped.
 - **Started after the server was added**: Plays that started after you added this server to Tracearr are skipped. Tracearr has been capturing sessions since then.
 
+### Plays that import without a title
+
+A play links to a library title by the Plex rating key Tautulli recorded for it. A title you deleted and added again, or fixed the match on, has a new key, so its old plays import with no link: they appear in history and in the play counts, but not in watched state, on the title's media page, or in request tracking.
+
+**Link Imported Plex History** in Settings → Data → Jobs repairs them. For each unlinked play it asks Tautulli for the Plex guid it recorded at play time and links the play when exactly one title in your library carries that guid. Plays that match nothing or more than one title stay unlinked; Tracearr never guesses by name. The job also runs by itself after each Plex library sync for two weeks after an import, and it needs Tautulli reachable at the address saved in the import settings.
+
+**Remove Imported Duplicates**, in the same place, deletes an imported play only when a play Tracearr captured itself already records the same thing.
+
 ## Import from Jellystat
 
 Jellystat import uses a backup file that you export from Jellystat. Jellystat 1.1.12 writes a `.jsonl` file and earlier releases write `.json`. Tracearr accepts both.
@@ -240,7 +248,7 @@ This is a one-time migration path. Once your data is in Tracearr, you can uninst
 
 ## After Importing
 
-After import completes, you may want to run some maintenance jobs in **Settings → Jobs**:
+Every import refreshes the statistics for the dates it wrote, so the charts pick up the new plays without a rebuild. After import completes, you may want to run some maintenance jobs in **Settings → Jobs**:
 
 | Job                               | When to Run                                                                                                                   |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
