@@ -1,13 +1,14 @@
 ---
 title: Install the SSE Plugin - Jellyfin & Emby
-description: Install the Tracearr SSE plugin from the Jellyfin plugin repository or the Emby release zip, then verify the event stream with curl.
+description: Install the Tracearr SSE plugin from the Jellyfin plugin repository or the Emby plugin catalog, then verify the event stream with curl.
 ---
 
 import { Callout, Steps, Tabs } from 'nextra/components';
+import Image from 'next/image';
 
 # Installation
 
-Jellyfin installs from a plugin repository through the dashboard. Emby has no user-pasteable repository equivalent, so the Emby plugin installs manually from the release zip.
+Jellyfin installs from the Tracearr plugin repository, which you add to the dashboard once. Emby lists the plugin in its built-in plugin catalog.
 
 <Callout type="info">
   Using Tracearr? **Settings** → **Servers** → **Set up real-time updates** on a Jellyfin or Emby
@@ -18,7 +19,7 @@ Jellyfin installs from a plugin repository through the dashboard. Emby has no us
 <Tabs items={['Jellyfin', 'Emby']}>
 <Tabs.Tab>
 
-Requires Jellyfin 10.11 or newer.
+Requires Jellyfin 12.0 or newer. Jellyfin 12 changed the plugin interfaces, so current builds don't load on 10.11; the last release for 10.11 is 0.4.1.
 
 <Steps>
 
@@ -51,13 +52,29 @@ Requires Emby 4.9 or newer. No Emby Premiere subscription is needed.
 
 <Steps>
 
-### Download the plugin
+### Open the catalog
 
-Download the latest `Tracearr.Sse.Emby_<version>.zip` from the [releases page](https://github.com/Tracearr/Media-Server-SSE/releases).
+In your Emby dashboard, go to **Plugins** → **Catalog**. **Tracearr SSE** is in the **Notifications** row.
 
-### Install the DLL
+<Image
+  src="/images/emby-catalog.png"
+  alt="The Notifications row of the Emby plugin catalog, with Tracearr SSE between Slack Notifications and Webhooks"
+  width={3000}
+  height={580}
+  className="mt-4 rounded-lg shadow-md"
+/>
 
-Extract `Emby.Plugin.Sse.dll` into Emby's `programdata/plugins/` directory.
+### Install
+
+Open **Tracearr SSE**, pick the newest version, and click **Install**.
+
+<Image
+  src="/images/emby-catalog-listing.png"
+  alt="The Tracearr SSE listing in the Emby catalog, with the version picker and Install button"
+  width={1538}
+  height={1786}
+  className="mt-4 rounded-lg shadow-md"
+/>
 
 ### Restart Emby
 
@@ -65,7 +82,9 @@ Restart Emby to load the plugin.
 
 </Steps>
 
-To update, repeat the same steps with the new release zip.
+Plugin updates come through the catalog like any other Emby plugin.
+
+If you'd rather install by hand: download `Tracearr.Sse.Emby_<version>.zip` from [Releases](https://github.com/Tracearr/Media-Server-SSE/releases), extract `Emby.Plugin.Sse.dll` into Emby's `programdata/plugins/` directory, then restart.
 
 </Tabs.Tab>
 </Tabs>

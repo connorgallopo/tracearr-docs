@@ -63,6 +63,16 @@ Disconnects without overflow log lines are network-path issues: see the reverse 
 - The Tracearr container must be able to reach the media server URL you configured; if Tracearr connects through a reverse proxy, the SSE path has to survive it (see above).
 - Sessions still work without the plugin via polling, so streams appearing with a short delay means the SSE link specifically is down, not the server connection.
 
+## Emby Catalog Update Fails with "Access to the Path Is Denied"
+
+If you installed the DLL by hand before the plugin was in the Emby catalog, the plugin update task can fail with:
+
+```
+Access to the path '/config/plugins/Emby.Plugin.Sse.dll' is denied.
+```
+
+The DLL is owned by a different user than the one Emby runs as. This happens when the file was copied in as root: the official `emby/embyserver` image runs Emby as UID 2, which can't overwrite a root-owned file. Delete `Emby.Plugin.Sse.dll` from the plugins folder, restart Emby, and install **Tracearr SSE** from **Plugins** → **Catalog**. Catalog installs are written by Emby itself, so later updates go through.
+
 ## Still Stuck
 
 Server-side messages from the plugin appear in the normal Jellyfin/Emby log; search it for `SSE`. Open an issue at [Tracearr/Media-Server-SSE](https://github.com/Tracearr/Media-Server-SSE/issues) with the log lines, or ask in the [Discord](https://discord.gg/a7n3sFd2Yw).
