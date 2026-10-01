@@ -293,10 +293,96 @@ You can add several actions to one automation. They all run when the conditions 
 
 Sends an alert to the notification destinations you pick. An email destination is one of the choices; see [Email & Newsletters](/configuration/email) for its setup and [Notification destinations](/configuration/destinations) for the rest.
 
-| Setting      | Description                                                              |
-| ------------ | ------------------------------------------------------------------------ |
-| Destinations | Which destinations receive it; pick from Settings → Notifications        |
-| Cooldown     | Minutes to wait before sending another notification for the same trigger |
+| Setting      | Description                                                               |
+| ------------ | ------------------------------------------------------------------------- |
+| Destinations | Which destinations receive it; pick from Settings → Notifications         |
+| Cooldown     | Minutes to wait before sending another notification for the same trigger  |
+| Priority     | How urgent each destination should treat it; see [Priority](#priority)    |
+| Message      | An optional title and body of your own; see [Message Text](#message-text) |
+
+##### Message Text
+
+Open **Message** on a send action to write its title and body. Leave a field blank and each destination uses its own default text for that part, so you can change the body and keep the default title, or the other way round. The preview under the fields renders your text from sample values and shows one tab for each kind of destination you picked, cut to that destination's limits.
+
+Type `{{` to open the variable list, or use **Insert variable** under the body. Choosing one writes it at the cursor.
+
+| Syntax                                             | What it does                                                                |
+| -------------------------------------------------- | --------------------------------------------------------------------------- |
+| `{{ user.username }}`                              | Prints the value                                                            |
+| `{{ user.identityName \| default: "someone" }}`    | Prints the value, or the text after `default:` when the value is empty      |
+| `{% if media.year %}({{ media.year }}){% endif %}` | Keeps the part inside only when the value is not empty                      |
+| `{% if media.show %}...{% else %}...{% endif %}`   | Keeps the first part when the value is not empty, the second part otherwise |
+
+Spaces inside the braces are optional. The text after `default:` can sit in single or double quotes. Blocks can nest. There are no comparisons, no `and` or `or`, and no other filters. A line that holds only an `if`, `else` or `endif` tag disappears along with its line break, so wrapping a whole line in a block leaves no blank line behind. A literal `{{` can't be written.
+
+A body written like this:
+
+```
+{{ user.username }} started {{ session.name }}
+{% if session.sourceDynamicRange %}
+Source: {{ session.sourceDynamicRange }}
+{% endif %}
+```
+
+renders for a Pushover destination as:
+
+```
+alex started The Bear S01 · E06
+Source: Dolby Vision
+```
+
+When the stream has no source dynamic range, the `Source:` line and both tag lines are gone.
+
+Values print as plain text. Discord gets a backslash before formatting characters in a value, so a title like `my_show` doesn't turn into italics, and mentions such as `@everyone` stay text and never ping anyone. Links in values (the download and release note links, or a URL inside an error message) stay clickable.
+
+Each destination cuts text that runs past its limit and ends it with `…`:
+
+| Destination  | Title limit              | Body limit                                            |
+| ------------ | ------------------------ | ----------------------------------------------------- |
+| Discord      | 256 characters           | 4096 characters, less what the rest of the embed uses |
+| ntfy         | 200 characters           | 4096 bytes                                            |
+| Gotify       | 200 characters           | 2000 characters                                       |
+| Apprise      | 200 characters           | 2000 characters                                       |
+| Pushover     | 250 characters           | 1024 characters                                       |
+| Email        | 200 characters, one line | 2000 characters                                       |
+| Mobile push  | 200 characters           | 1024 characters, within the 4096-byte push size       |
+| In-app toast | 200 characters           | 2000 characters                                       |
+
+Discord and email keep the fields and card Tracearr builds around your text; only the title and description change. A webhook destination keeps its JSON shape, with your rendered title and message added under `automation`, and applies no length limit.
+
+A variable has to be available from every trigger you picked, since any one of them can be the one that fires. The builder marks a variable a trigger can't supply and Save stays disabled until it is fixed. These are the variables each trigger supplies:
+
+| Trigger                                                           | Variables                                                                                                                                                                                                                                |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A stream starts, is first seen, changes transcoding, or is paused | `user.username`, `user.identityName`, `session.name`, `session.mediaTitle`, `session.mediaType`, `session.seasonNumber`, `session.episodeNumber`, `session.sourceDynamicRange`, `session.sourceVideoCodec`, `server.name`, `server.type` |
+| A stream stops                                                    | The stream variables above, and `durationMinutes`                                                                                                                                                                                        |
+| A stream sits paused                                              | The stream variables above, and `minutes`                                                                                                                                                                                                |
+| An account goes quiet                                             | `user.username`, `user.identityName`, `server.name`, `server.type`, `days`                                                                                                                                                               |
+| An account plays from a new device                                | `user.username`, `user.identityName`, `session.mediaTitle`, `session.mediaType`, `server.name`, `server.type`, `device.name`, `device.platform`, `device.product`, `device.location`                                                     |
+| An account's trust score changes                                  | `user.username`, `user.identityName`, `server.name`, `server.type`, `trust.previous`, `trust.new`, `trust.reason`                                                                                                                        |
+| A server goes down or comes back up                               | `server.name`, `server.type`                                                                                                                                                                                                             |
+| A plugin update is available                                      | `server.name`, `server.type`, `installedVersion`, `latestVersion`, `downloadUrl`                                                                                                                                                         |
+| A server update is available                                      | `server.name`, `server.type`, `installedVersion`, `latestVersion`, `releaseUrl`                                                                                                                                                          |
+| A Tracearr update is available                                    | `installedVersion`, `latestVersion`, `releaseUrl`                                                                                                                                                                                        |
+| Media is added                                                    | `media.title`, `media.name`, `media.show`, `media.season`, `media.episode`, `media.episodeCount`, `media.type`, `media.year`, `media.library`, `media.server`, `server.name`, `server.type`                                              |
+| Media is upgraded                                                 | The media variables above, and `media.from.*` and `media.to.*` for `resolution`, `dynamicRange`, `videoCodec`, `audioCodec`, `audioChannels` and `fileSize`                                                                              |
+| A newsletter is sent, or fails                                    | `newsletter.name`, `newsletter.outcome`, `newsletter.recipientCount`, `newsletter.error`                                                                                                                                                 |
+
+`session.name` is the show and episode for an episode (for example "The Bear S01 · E06") and the title for anything else. `media.name` does the same for library items.
+
+##### Priority
+
+The Priority select on a send action sets how urgent the notification is. Automatic, the default, keeps the priority each destination already uses for that event. Any other choice replaces it for Pushover, Gotify and ntfy; no other destination reads it.
+
+| Level  | Pushover                       | Gotify                  | ntfy       |
+| ------ | ------------------------------ | ----------------------- | ---------- |
+| Lowest | -2, no notification            | 0, no notification      | 1, min     |
+| Low    | -1, popup without sound        | 2, icon only            | 2, low     |
+| Normal | 0, sound, quiet hours apply    | 5, icon and sound       | 3, default |
+| High   | 1, sound, bypasses quiet hours | 8, sound and vibration  | 4, high    |
+| Urgent | 2, repeats until acknowledged  | 10, sound and vibration | 5, max     |
+
+An urgent Pushover message is sent with a retry of 60 seconds and an expiry of one hour, so it repeats every minute until someone acknowledges it or the hour is up.
 
 #### Trust Score
 
@@ -420,7 +506,7 @@ Neither of these two can sit on an automation that records a violation. Picking 
 | A server update is available   | Plex, Jellyfin or Emby has published a release newer than what that server runs |
 | A Tracearr update is available | Tracearr itself has a newer release                                             |
 
-These three are checked every six hours, and both outbound checks have a switch: see [Update checks](#update-checks). The message can name `{{installedVersion}}` and `{{latestVersion}}`.
+These three are checked every six hours, and both outbound checks have a switch: see [Update checks](#update-checks). The message can name `{{ installedVersion }}` and `{{ latestVersion }}`. The plugin update also carries `{{ downloadUrl }}`, and the server and Tracearr updates carry `{{ releaseUrl }}`.
 
 ### Library
 
@@ -452,7 +538,7 @@ A condition can only read what its trigger supplies. Pick "A server goes down" a
 
 Actions run into the same limit. Stopping a stream, messaging a player and changing a trust score all need somebody to do it to, so they're unavailable on an automation whose triggers don't supply one. A violation is about a person too, which is why a policy automation needs a stream or account trigger; server, update and library triggers are notification-only.
 
-The same goes for a `{{variable}}` in a message body: every trigger you picked has to supply it, since any one of them can be the one that fires.
+The same goes for a `{{ variable }}` in a message title or body: every trigger you picked has to supply it, since any one of them can be the one that fires.
 
 <Callout type="warning">
   A condition can be stricter than its own trigger, but it can't be looser. "A stream sits paused
