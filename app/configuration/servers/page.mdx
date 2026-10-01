@@ -49,7 +49,7 @@ Click **Resume** in the same menu to bring it back. The next poll decides whethe
 While a server is historical:
 
 - **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." Changing either through the API is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
-- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat or Playback Reporting into it are refused with "Resume this server to change its address or key". Resume first, import, then mark it historical again if you want.
+- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat or Playback Reporting into it are refused with "Resume this server to import into it". Resume first, import, then mark it historical again if you want.
 - **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL is refused with "Resume this server to change its address or key" instead of updating the entry as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url). Resume the existing entry first.
 - Automations scoped to it stay as they are, but triggers that need the server live (stream, server and update events) do not fire; the builder says so under the server picker. **Inactive for** skips its accounts.
 
