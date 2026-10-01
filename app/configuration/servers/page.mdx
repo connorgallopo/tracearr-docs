@@ -13,7 +13,7 @@ Connections lists every server Tracearr monitors. Drag a row by its handle to ch
 
 ### Changing the URL or API key
 
-Click the pencil next to a server's name to open **Edit Server**. For Jellyfin and Emby it has **Server URL**, **Public address** and **API Key** alongside the name and colour.
+Click the pencil next to a server's name to open **Edit Server**. For Jellyfin and Emby it has **Server URL**, **Public address** and **API Key** alongside the name and color.
 
 The API Key field is always empty when the dialog opens, and leaving it empty keeps the saved key. If you deleted or regenerated the key on the media server, Tracearr keeps sending the old one and the server rejects it, so paste the new key in and click **Update**. The live connection to the server switches to the new key within 30 seconds.
 
@@ -32,7 +32,7 @@ Plex servers have no API Key field. Plex signs in through plex.tv, and its Serve
 
 ### Re-adding a server with the same URL
 
-**Add Server** with the same server type and the same Server URL doesn't create a second Jellyfin or Emby server. It updates the existing one: the new API key and Server Name are saved, and so is the Public address if you filled it in. The colour, sessions and history stay, since it is still the same server in Tracearr. Users and libraries sync straight after, and the live connection picks up the new key within 30 seconds.
+**Add Server** with the same server type and the same Server URL doesn't create a second Jellyfin or Emby server. It updates the existing one: the new API key and Server Name are saved, and so is the Public address if you filled it in. The color, sessions and history stay, since it is still the same server in Tracearr. Users and libraries sync straight after, and the live connection picks up the new key within 30 seconds.
 
 The URL has to match the one shown under the server's name character for character. `http://192.168.1.100:8096/` does not match a saved `http://192.168.1.100:8096`, and neither does `https` against `http` or a hostname against an IP. Each of those adds a second server instead.
 
@@ -42,15 +42,15 @@ This route only checks that the key has administrator access at that URL. It doe
 
 A server you have retired, or one you are only testing, can stay in Tracearr without being contacted. Open the row's menu (the three dots next to **Sync**) and click **Mark as historical**. Tracearr asks once, then stops polling the server, drops its live connection, cancels its library and user syncs, stops checking it for updates, and ends any stream that was playing on it. Nothing is deleted: its sessions, watch history, users and libraries stay on every page, and posters already cached keep showing. A poster that was never cached shows the placeholder instead of being fetched.
 
-A historical server is listed last, greyed, with a **Historical** badge, and it leaves the unreachable banner, **Dashboard** → **Server Resources** and the connection status list. It stays selectable in the server picker and in page filters so you can read its history. Those lists put it last and mark it **Historical**; this covers the server picker, the **Users** and **Automations** server filters and the library catalog filter.
+A historical server is listed last, grayed, with a **Historical** badge, and it leaves the unreachable banner, the connection status list and **Dashboard** → **Server Resources**, whether one server or all servers are selected. It stays selectable in the server picker and in page filters so you can read its history. Those lists put it last and mark it **Historical**; this covers the server picker, the **Users** and **Automations** server filters and the library catalog filter.
 
 Click **Resume** in the same menu to bring it back. The next poll decides whether it is up; a server that is really gone goes through the normal "server down" path after the usual threshold. Marking a historical server again, or resuming a live one, changes nothing.
 
 While a server is historical:
 
-- **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." A change to either that reaches the server another way is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
+- **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." Changing either through the API is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
 - **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat or Playback Reporting into it are refused with "Resume this server to change its address or key". Resume first, import, then mark it historical again if you want.
-- **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL updates the saved name, API key and public address as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url), but the server stays historical and does not sync until you resume it.
+- **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL is refused with "Resume this server to change its address or key" instead of updating the entry as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url). Resume the existing entry first.
 - Automations scoped to it stay as they are, but triggers that need the server live (stream, server and update events) do not fire; the builder says so under the server picker. **Inactive for** skips its accounts.
 
 ### Removing a server
