@@ -324,10 +324,10 @@ Source: {{ session.sourceDynamicRange }}
 {% endif %}
 ```
 
-renders for a Pushover destination as:
+renders for a movie on a Pushover destination as:
 
 ```
-alex started The Bear S01 · E06
+alex started Dune: Part Two
 Source: Dolby Vision
 ```
 
@@ -350,7 +350,7 @@ Each destination cuts text that runs past its limit and ends it with `…`:
 
 Discord and email keep the fields and card Tracearr builds around your text; only the title and description change. A webhook destination keeps its JSON shape, with your rendered title and message added under `automation`, and applies no length limit.
 
-A variable has to be available from every trigger you picked, since any one of them can be the one that fires. The builder marks a variable a trigger can't supply and Save stays disabled until it is fixed. These are the variables each trigger supplies:
+A variable has to be available from every trigger you picked, since any one of them can be the one that fires. The builder marks a variable a trigger can't supply, and until it is fixed, Save takes you to the first problem instead of saving. These are the variables each trigger supplies:
 
 | Trigger                                                           | Variables                                                                                                                                                                                                                                |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -368,7 +368,7 @@ A variable has to be available from every trigger you picked, since any one of t
 | Media is upgraded                                                 | The media variables above, and `media.from.*` and `media.to.*` for `resolution`, `dynamicRange`, `videoCodec`, `audioCodec`, `audioChannels` and `fileSize`                                                                              |
 | A newsletter is sent, or fails                                    | `newsletter.name`, `newsletter.outcome`, `newsletter.recipientCount`, `newsletter.error`                                                                                                                                                 |
 
-`session.name` is the show and episode for an episode (for example "The Bear S01 · E06") and the title for anything else. `media.name` does the same for library items.
+`session.name` is the show name and episode code for an episode (the code reads like S01 · E06) and the title for anything else. `media.name` names library items the same way.
 
 ##### Priority
 
@@ -534,7 +534,7 @@ These two are about the install rather than a person or a session, so they suppl
 
 The triggers you pick decide what the rest of the builder will offer you.
 
-A condition can only read what its trigger supplies. Pick "A server goes down" and the field list has the server in it and nothing about a person, because there's no session and no account to ask about. Pick two triggers and you get the fields both of them supply. A condition that stops being available turns amber and names the trigger that orphaned it, and Save stays disabled until you fix it.
+A condition can only read what its trigger supplies. Pick "A server goes down" and the field list has the server in it and nothing about a person, because there's no session and no account to ask about. Pick two triggers and you get the fields both of them supply. A condition that stops being available turns amber and names the trigger that orphaned it, and until you fix it, Save takes you to the first problem instead of saving.
 
 Actions run into the same limit. Stopping a stream, messaging a player and changing a trust score all need somebody to do it to, so they're unavailable on an automation whose triggers don't supply one. A violation is about a person too, which is why a policy automation needs a stream or account trigger; server, update and library triggers are notification-only.
 
