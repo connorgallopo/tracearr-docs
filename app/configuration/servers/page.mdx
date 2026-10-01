@@ -38,6 +38,25 @@ The URL has to match the one shown under the server's name character for charact
 
 This route only checks that the key has administrator access at that URL. It doesn't compare server IDs, so use **Edit Server** when you can.
 
+### Marking a server historical
+
+A server you have retired, or one you are only testing, can stay in Tracearr without being contacted. Open the row's menu (the three dots next to **Sync**) and click **Mark as historical**. Tracearr asks once, then stops polling the server, drops its live connection, cancels its library and user syncs, stops checking it for updates, and ends any stream that was playing on it. Nothing is deleted: its sessions, watch history, users and libraries stay on every page, and posters already cached keep showing. A poster that was never cached shows the placeholder instead of being fetched.
+
+A historical server is listed last, greyed, with a **Historical** badge, and it leaves the unreachable banner, **Dashboard** → **Server Resources** and the connection status list. It stays selectable in the server picker and in page filters so you can read its history. Those lists put it last and mark it **Historical**; this covers the server picker, the **Users** and **Automations** server filters and the library catalog filter.
+
+Click **Resume** in the same menu to bring it back. The next poll decides whether it is up; a server that is really gone goes through the normal "server down" path after the usual threshold. Marking a historical server again, or resuming a live one, changes nothing.
+
+While a server is historical:
+
+- **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." A change to either that reaches the server another way is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
+- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat or Playback Reporting into it are refused with "Resume this server to change its address or key". Resume first, import, then mark it historical again if you want.
+- **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL updates the saved name, API key and public address as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url), but the server stays historical and does not sync until you resume it.
+- Automations scoped to it stay as they are, but triggers that need the server live (stream, server and update events) do not fire; the builder says so under the server picker. **Inactive for** skips its accounts.
+
+### Removing a server
+
+**Remove** on a row deletes the server and everything Tracearr recorded for it: sessions, watch history, users and libraries. The dialog says so and it can't be undone. Mark the server historical instead when you want to keep that history.
+
 ### Server location
 
 A play from your home network has a private IP, which no geolocation database can place, so Tracearr labels it **Local Network** and leaves it off the stream map. Giving the server a location puts those plays on the map at that spot. It's optional, and nothing is looked up online: the location is whatever you set here.
@@ -75,7 +94,7 @@ The new token goes to the account and to every Plex server connected through it.
 
 ### Unlinking an account
 
-The unlink button stays disabled while any server is connected through the account; its tooltip reads "Delete connected servers first to unlink this account". Your only **Login Enabled** account can't be unlinked while you have no Tracearr password either. Set a password first, or link another account that can sign in.
+The unlink button stays disabled while a live server is connected through the account; its tooltip reads "Delete the live servers connected through this account, or mark them historical, first". Historical servers no longer block it: unlinking leaves them in place without an account link, and reauthorizing the account later picks them up again by their machine identifier. Your only **Login Enabled** account can't be unlinked while you have no Tracearr password either. Set a password first, or link another account that can sign in.
 
 ## Poster source
 
