@@ -117,18 +117,18 @@ Restoring a backup requires the database user to have **superuser** privileges. 
 
 ## Backup Directory
 
-Backups are stored in `/data/backup` inside the container by default. To persist backups on the host, mount this path as a bind mount in your Docker Compose file:
+Backups are stored in `/data/backup` inside the container by default. The compose example mounts the named volume `tracearr_backups` there, so backups survive a container recreate with no extra setup, and `docker cp tracearr:/data/backup ./tracearr-backups` copies them to the host.
+
+To have the files written to a host directory instead, for example so an existing backup tool picks them up, replace the named volume with a host path:
 
 ```yaml
 volumes:
   - /path/to/backups:/data/backup
 ```
 
-This is the recommended approach for most users — it keeps backups accessible on the host without changing any Tracearr configuration.
-
 ### Permissions
 
-Tracearr runs as **UID 1001** inside the container. If you use a Docker bind mount for the backup volume, ensure the host directory is owned by this user:
+Tracearr runs as **UID 1001** inside the container and does not read `PUID`, `PGID` or `UMASK`. A named volume is created with the right owner. A host path is not, so the directory has to be owned by this user:
 
 ```bash
 sudo chown -R 1001 /path/to/backups

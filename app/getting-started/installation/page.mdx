@@ -125,6 +125,8 @@ With bind mounts, the directory lives on your host filesystem, and ownership dep
 
 Named volumes sidestep this entirely. Docker manages the volume's filesystem directly, so ownership and permissions are set correctly when the container first creates them — no manual setup needed.
 
+The two volumes on the `tracearr` service follow the same rule. If you replace `tracearr_backups` or `tracearr_images` with a host path, that directory has to be owned by UID 1001, the user the server runs as. `PUID` and `PGID` are not read. See [Backup Directory](/configuration/backup#permissions) and [Poster Cache](/configuration/environment#poster-cache).
+
 There's also a performance angle. Named volumes use Docker's storage driver, which on Linux typically means native filesystem access. Bind mounts through FUSE-based filesystems (common on NAS platforms) add an abstraction layer that introduces latency — not ideal for a database doing thousands of small reads and writes per second.
 
 ### Backing up your database

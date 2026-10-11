@@ -246,7 +246,21 @@ volume, so there is nothing to configure. The standard Docker image expects a na
 `/data/tracearr/image-cache`, which the compose example creates as `tracearr_images`. Without one
 the cache lives on the container's writable layer and is thrown away every time the container is
 recreated, so every poster is downloaded again on the next pass. On a large library that is hours
-of requests to your media server. Settings → General warns when it detects this.
+of requests to your media server. Settings → General warns when it detects this, and from 2.8.0 the
+warning clears on the first restart with a volume in place.
+
+A host path works at that mount point too, but only if the server can write to it. The standard
+image runs as UID 1001 and does not read `PUID`, `PGID` or `UMASK`, so a host directory owned by
+root or by a NAS user is usually not writable by it:
+
+```bash
+sudo chown -R 1001 /path/to/image-cache
+```
+
+A named volume needs none of this, because Docker creates it with the ownership the image sets.
+When a write is refused, 2.8.0 and later log `[ImageProxy] Cannot write to the poster cache at ...`
+once, with the error code and the UID the server runs as. Posters still load, but each one is
+fetched from the media server on every request until the directory is writable.
 
 ## Backup Directory
 
