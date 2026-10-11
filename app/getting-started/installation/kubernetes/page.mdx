@@ -129,18 +129,19 @@ externalRedis:
 
 ### Tracearr
 
-| Value                              | Default          | Description                      |
-| ---------------------------------- | ---------------- | -------------------------------- |
-| `tracearr.image.tag`               | Chart appVersion | Image tag                        |
-| `tracearr.replicaCount`            | `1`              | Must be 1 (singleton poller)     |
-| `tracearr.env.TZ`                  | `UTC`            | Timezone                         |
-| `tracearr.env.LOG_LEVEL`           | `info`           | `debug`, `info`, `warn`, `error` |
-| `tracearr.env.CORS_ORIGIN`         | `*`              | Set to your domain in production |
-| `tracearr.resources.limits.memory` | `1Gi`            | App memory limit                 |
-| `tracearr.backups.enabled`         | `true`           | PVC for database backups         |
-| `tracearr.backups.size`            | `10Gi`           | Backup volume size               |
-| `tracearr.imageCache.enabled`      | `true`           | PVC for media artwork cache      |
-| `tracearr.imageCache.size`         | `5Gi`            | Image cache volume size          |
+| Value                              | Default          | Description                                                                |
+| ---------------------------------- | ---------------- | -------------------------------------------------------------------------- |
+| `tracearr.image.tag`               | Chart appVersion | Image tag                                                                  |
+| `tracearr.replicaCount`            | `1`              | Must be 1 (singleton poller)                                               |
+| `tracearr.env.TZ`                  | `UTC`            | Timezone                                                                   |
+| `tracearr.env.LOG_LEVEL`           | `info`           | `debug`, `info`, `warn`, `error`                                           |
+| `tracearr.env.CORS_ORIGIN`         | `*`              | Other origins that may use a session; `*` only allows requests without one |
+| `tracearr.env.TRUST_PROXY`         | unset            | `true` for one proxy hop, `2` for two chained proxies, or proxy IPs/CIDRs  |
+| `tracearr.resources.limits.memory` | `1Gi`            | App memory limit                                                           |
+| `tracearr.backups.enabled`         | `true`           | PVC for database backups                                                   |
+| `tracearr.backups.size`            | `10Gi`           | Backup volume size                                                         |
+| `tracearr.imageCache.enabled`      | `true`           | PVC for media artwork cache                                                |
+| `tracearr.imageCache.size`         | `5Gi`            | Image cache volume size                                                    |
 
 ### Secrets
 

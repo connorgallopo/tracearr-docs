@@ -20,9 +20,9 @@ TimescaleDB and Redis are persisted in a volume, so your database and configurat
 
 ## Authentication Changes
 
-The latest release replaces Tracearr's authentication system. The upgrade itself requires nothing from you: no new environment variables are needed, and database migrations run automatically when the new version starts. What changes:
+1.5.0 replaced Tracearr's authentication system. The upgrade itself requires nothing from you: no new environment variables are needed, and database migrations run automatically when the new version starts. What changes:
 
-1. **Jellyfin login is removed.** Signing in to Tracearr with Jellyfin credentials is no longer supported. Jellyfin and Emby servers are still fully supported for monitoring; only the login method is gone. If your install only ever logged in via Jellyfin, recover with either:
+1. **Jellyfin login was removed in 1.5.0.** From 1.5.0 to 2.7.x nobody could sign in to Tracearr with Jellyfin credentials; 2.8.0 brings it back through member sign-in (see below). If your install only ever logged in via Jellyfin, recover with either:
    - the admin CLI: `docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password` (works even when the account has no existing password), or
    - **Sign in with Plex**, when a Plex account is linked.
 
@@ -33,10 +33,19 @@ The latest release replaces Tracearr's authentication system. The upgrade itself
 3. **Mobile devices paired after upgrading use a 30-day rolling session.** Any use within 30 days extends it; a device idle for more than 30 days pairs again. Devices paired before the upgrade keep working on their existing tokens until they are re-paired; nothing expires them at 30 days.
 
 <Callout type="info" title="Reverse proxies">
-  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set
-  `CORS_ORIGIN` to the public URL) for cookie login to work. See [Reverse
+  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` with `TRUST_PROXY`
+  set (or list the public URL in `CORS_ORIGIN`) for cookie login to work. See [Reverse
   Proxy](/configuration/environment#reverse-proxy).
 </Callout>
+
+### 2.8.0: member sign-in
+
+The people you share a server with can sign in with their Plex, Jellyfin or Emby account; see [Member sign-in](/configuration/member-sign-in). The upgrade itself asks nothing of you: no new environment variables, and the migration runs on start. What changes for existing installs:
+
+1. **Everyone except the owner is a member.** Admin accounts become members. **Settings** → **Access** → **Guest access** is now **Sign-in**, with a switch for each sign-in method, and member sign-in starts off. Allow Guest Access is gone.
+2. **Jellyfin sign-in is back, and Emby sign-in is new.** It is for admins and members, and the owner's own account works too, on a server with member sign-in on.
+3. **`TRUST_PROXY=true` trusts one proxy hop.** The client address is the one your proxy appended to `X-Forwarded-For`, and `X-Forwarded-Host` is honored only when proxies are trusted. Two chained proxies need `TRUST_PROXY=2`, or a list of proxy IPs or CIDR ranges. A proxy that rewrites `Host` now needs `TRUST_PROXY` set so its `X-Forwarded-Host` is honored; listing the public URL in `CORS_ORIGIN` instead fixes password sign-in but not SSO. The value is checked on start: `true`, `false`, digits, or IPs and CIDR ranges; a value like `yes` that used to be ignored now stops the server with an error naming `TRUST_PROXY`.
+4. **Only Tracearr's own address and the origins listed in `CORS_ORIGIN` can use a signed-in session.** Before 2.8.0 an unset `CORS_ORIGIN` let any origin make requests with your session. The web app on Tracearr's own address needs nothing in `CORS_ORIGIN`. A page on another origin, such as another port or subdomain, now gets "This request did not come from Tracearr" on writes until its origin is listed. `*` only allows requests without a session, such as the public API with an API key.
 
 ## Docker Compose
 

@@ -14,6 +14,7 @@ import { Tabs } from 'nextra/components';
 - [Can I import data from Tautulli or Jellystat?](#can-i-import-data-from-tautulli-or-jellystat)
 - [Does Tracearr need a mail provider?](#does-tracearr-need-a-mail-provider)
 - [Is a contact email the same as a login email?](#is-a-contact-email-the-same-as-a-login-email)
+- [Can the people I share my server with sign in?](#can-the-people-i-share-my-server-with-sign-in)
 
 **Installation**
 
@@ -78,6 +79,12 @@ No. Tracearr speaks SMTP and nothing else, so any relay works, including one run
 ### Is a contact email the same as a login email?
 
 No, they are two different fields on two different things. A Tracearr account's email is part of signing in and is what the [`set-email`](/configuration/recovery#set-email) recovery command changes. A contact email is an address the owner types for a person so newsletters have somewhere to go. It grants no login, and it is never used to match a synced media server account to a Tracearr account.
+
+---
+
+### Can the people I share my server with sign in?
+
+Yes, since 2.8.0, with the Plex, Jellyfin or Emby account they already have on your server. It is off until you turn on **Let admins and members sign in** under **Settings** → **Access** → **Sign-in** and switch on the servers they may use, or set a person to **Allow** on their user page. A member sees their own plays; other people's activity shows only as anonymous counts, and only if you turn on **Show members anonymous server activity**. See [Member sign-in](/configuration/member-sign-in).
 
 ---
 
@@ -253,7 +260,7 @@ You can reset your password using the built-in CLI script. No access to the web 
 
 This resets the password for your Tracearr user account, not your media server accounts.
 
-It works for any user, including accounts that only ever signed in with Plex: if the account has no local password yet, the reset creates one. As a security measure, resetting a password also signs out all of that user's existing sessions.
+It resets the owner's password, and works even when the owner only ever signed in with Plex: if there is no local password yet, the reset creates one. To reset an admin's password, run `cli.js reset-password <username>` instead; members sign in with their media server account, not a password. As a security measure, resetting a password also signs out all of that user's existing sessions.
 
 <Tabs items={['Docker', 'Proxmox LXC']} defaultIndex={0}>
 <Tabs.Tab>

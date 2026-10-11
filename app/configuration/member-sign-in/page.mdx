@@ -1,0 +1,94 @@
+---
+title: Member Sign-in
+description: Let the people you share a server with sign in to Tracearr with their Plex, Jellyfin or Emby account. Covers the sign-in switches, per-person access, what members see, and the owner's Personal view.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Member sign-in
+
+Since 2.8.0 the people you share a server with can sign in to Tracearr with the account they already use on that server. A member sees their own activity, and never another person's name, titles or locations. It is off until the owner turns it on.
+
+Tracearr has three roles. The **owner** set the instance up and can always sign in. **Admins** see everything the owner sees except the settings that belong to the owner. **Members** see only their own plays. Admins and members both go through the switches below; the per-person setting and the global switch never apply to the owner.
+
+## Turning it on
+
+Go to **Settings** → **Access** → **Sign-in**. The **Sign-in methods** card has one switch per way in, and a row per server under the last one.
+
+| Switch                             | Who it covers                                                                                                                                                                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Username and password**          | The owner always, and admins with a Tracearr password when they are allowed to sign in.                                                                                                                                              |
+| **Single sign-on**                 | The owner, and admins and members who are allowed to sign in and have a live account on a server open to them, through your identity provider. Only shown when [OIDC is configured](/configuration/environment#oidc-single-sign-on). |
+| **Owner's Plex account**           | Lets the owner sign in with their own Plex account.                                                                                                                                                                                  |
+| **Let admins and members sign in** | The default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page.                                                                                                              |
+
+Under **Let admins and members sign in**, every live server has its own switch. These say where people can use their Plex, Jellyfin or Emby account to sign in. A server marked historical is not listed. Switching a server off signs out the people who could only get in through it; anyone set to Allow with an account there keeps their session.
+
+Tracearr refuses to switch off the last of password, Plex and single sign-on that the owner can still use, even if the owner can also sign in through a Jellyfin or Emby server. The refusal shows under the switch and the switch snaps back.
+
+## Who gets in
+
+On each person's page (**Manage** → **Users**, then the person) the owner has a **Sign-in access** card with a **Sign-in** setting:
+
+- **Default** follows **Let admins and members sign in**. The card says whether that switch is on or off right now.
+- **Allow** lets the person in even while the global switch is off, and through a server whose own switch is off.
+- **Block** keeps the person out even while the global switch is on.
+
+Everyone starts on Default. Setting a person to Block, or to Default while the global switch is off, signs them out of Tracearr; so does changing an admin to a member. A disabled or pending account cannot sign in whatever the setting says.
+
+The same card has the person's **Role** (Admin or Member), a count of their **Sign-ins**, and their **Last sign-in**.
+
+Through a media server, a person on Default needs that server's switch on as well. A person on Allow does not: Tracearr still has to know them on that server, and the server still has to accept their password, but the server's switch is skipped. The login page lists servers whose switch is on. An allowed person on a switched-off server opens `/login?all`, which also lists every live server that someone set to Allow has an account on. A switched-off server nobody is allowed on is never listed, and Tracearr refuses attempts through it before contacting the media server.
+
+## How members sign in
+
+When password sign-in is on and a Jellyfin or Emby server is open to sign-in, the login page splits into two tabs, **Tracearr account** and **Media server**; otherwise whichever form applies shows alone. The Media server form lists the Jellyfin and Emby servers people can sign in through. Plex uses the **Sign in with Plex** button, and the owner's own Jellyfin or Emby account works through the Media server form too, on a server open to member sign-in.
+
+**Plex.** A member clicks **Sign in with Plex** and authorizes in the plex.tv popup, the same button the owner uses. Tracearr matches the Plex account against the accounts it has synced from your Plex servers, so a person who is not on one of them is turned away. The button shows when the owner's Plex switch is on and the owner has a Plex account linked, or when a Plex server is open to member sign-in.
+
+**Jellyfin.** The member picks the server. When Quick Connect is enabled on that Jellyfin server, Tracearr shows a code: they open Jellyfin, go to **Quick Connect**, enter the code, and Tracearr signs them in once Jellyfin approves it. The code is good for 10 minutes. **Use password instead** switches to the username and password form for that server.
+
+**Emby.** The member picks the server and enters their Emby username and password.
+
+**Single sign-on.** A person who signs in through your identity provider is linked to a Tracearr identity by the email on the IdP profile, matched against the email of a synced server account or of a Tracearr account, and failing that by `preferred_username` against a synced account's username. The match has to be unique; two people with the same address are not linked. The link is kept, so the next sign-in goes straight through. The owner is linked by their Tracearr email, never by username. An admin or member also needs a live account on a server they could sign in through: that server's switch on, or the person set to Allow. On the first sign-in, when the match came from a server account, that account's server is the one that has to be open. An admin with no media server account can sign in with a password but not through SSO.
+
+After three failed Jellyfin or Emby password attempts for the same username on the same server within 15 minutes, Tracearr refuses further attempts for that username until the window passes. Tracearr never shows the member the media server's own error.
+
+### Two refusals
+
+**Sign-in is not available for this account.** Tracearr does not know the person: no synced account matches, the account was removed from the server, the server is historical, or that way in is switched off. The same text covers a wrong password, so it tells someone guessing nothing.
+
+**You are not permitted to sign in. Please contact the server owner.** The media server, the identity provider or a Tracearr password accepted the person, and the sign-in rule above keeps them out: they are on Block, on Default while the global switch is off, on Default through a server whose own switch is off, or their account is disabled or pending. The owner turns on the switch that is off or sets them to Allow.
+
+<Callout type="info" title="Jellyfin and the client address">
+  On password sign-in, Tracearr forwards the browser's address to Jellyfin and Emby in
+  `X-Forwarded-For` so the server's remote access policy judges the member, not Tracearr. Quick
+  Connect requests carry no forwarded address. Jellyfin only honors that header when Tracearr's
+  address is in its **Known proxies** list under **Dashboard** → **Networking**; otherwise the
+  policy sees Tracearr's address. Behind a reverse proxy, set `TRUST_PROXY=true` (one hop; `2` for
+  two chained proxies) so the address Tracearr forwards is the browser's and not the proxy's.
+</Callout>
+
+## What a member sees
+
+A member lands on a dashboard about themselves: what is playing on their account right now, their last 30 days against the 30 before, the titles they watched most, how they watch, all-time moments, and their own Seerr requests. The sidebar has **Dashboard**, **Map** and **History**, **Activity**, and the media pages **Overview**, **Browse** and **Genres**, plus **Requests** when Seerr is linked. Every one of them is scoped to the member's own accounts, merged across servers if you merged them.
+
+The library **Overview** for a member is what's new on the server and Most Popular, without play or viewer counts. The Overview has a **Not watched by you** button that opens Browse on the titles the member has not watched, and the **Watched** filter in Browse counts only the member's own plays. **Genres** counts the member's own plays.
+
+A member never sees Violations, Devices, Bandwidth, the Users list, Automations, the library quality, storage and watch pages, or Settings. They never see a trust score, another person's name, titles or locations, or a link to anyone's user page.
+
+### Show members anonymous server activity
+
+The second card on the Sign-in page is **Show members anonymous server activity**, off by default. With it on, members get counts and nothing else: how many other streams are playing, how many other people watched a title, the popularity sorts in Browse, and whether anyone else has watched a title they requested. Names, titles and locations stay hidden either way.
+
+## For the owner
+
+The dashboard carries a **Server** | **Personal** toggle. Server is the dashboard you had. Personal is the member page about your own accounts. The choice is remembered in the browser, and `/?view=me` or `/?view=admin` links to either.
+
+The owner's **View as** on a person's page opens Tracearr the way that admin or member sees it, for up to an hour. A banner reads "Viewing as (name). Changes are turned off." and every write is refused until you click **Stop**. Nothing of the person's is used to sign in, so it works whether or not they could sign in themselves, unless the account is disabled or pending.
+
+Admins get the dashboard toggle too; the Sign-in access card and View as are the owner's alone.
+
+## Upgrading from an older version
+
+Everyone except the owner is a member after the upgrade, on Default, and member sign-in starts off. See [Upgrading](/upgrading#authentication-changes).

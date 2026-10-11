@@ -11,17 +11,19 @@ If you're locked out of your Tracearr instance, you can recover access with the 
 
 ## Common Lockout Scenarios
 
-**You upgraded and used to sign in with Jellyfin credentials.** Signing in to Tracearr with Jellyfin credentials was removed. Jellyfin and Emby servers are still fully supported for monitoring; only the login method is gone. Run [`reset-password`](#reset-password) to set a password for your account, then sign in with it. If your account has a linked Plex account, **Sign in with Plex** also works with no CLI needed.
+**You are the owner and used to sign in with Jellyfin credentials.** The owner signs in with a Tracearr password, their Plex account or SSO. Run [`reset-password`](#reset-password) to set a password for your account, then sign in with it. If your account has a linked Plex account and **Owner's Plex account** is on under **Settings** → **Access** → **Sign-in**, **Sign in with Plex** also works with no CLI needed. Since 2.8.0 the owner can also sign in with their own Jellyfin or Emby account, through a server that has member sign-in on; see [Member sign-in](/configuration/member-sign-in).
 
 **You forgot your password.** Run [`reset-password`](#reset-password). It works even when the account only ever signed in with Plex and has no password at all.
 
-**Local login is disabled and SSO is broken.** If a misconfigured OIDC provider (or a disabled local login setting) leaves the login page unusable, run [`enable-local-login`](#enable-local-login), then sign in with username and password.
+**Username and password is switched off and SSO is broken.** If a misconfigured OIDC provider, or the **Username and password** switch under **Settings** → **Access** → **Sign-in**, leaves the login page unusable, run [`enable-local-login`](#enable-local-login), then sign in with username and password.
+
+**An admin or member cannot sign in.** That is not a lockout and needs no CLI. Their sign-in follows **Let admins and members sign in**, the switch for the server they sign in through, and their own **Sign-in** setting on their user page; see [Who gets in](/configuration/member-sign-in#who-gets-in).
 
 **You're not sure which account is which.** Run [`list-users`](#list-users) to see every user with their email, role, and available login methods.
 
 <Callout type="info">
-  If your account has a linked Plex account, **Sign in with Plex** keeps working through all of
-  these scenarios. Try it before reaching for the CLI.
+  If your account has a linked Plex account and **Owner's Plex account** is on, **Sign in with
+  Plex** keeps working through all of these scenarios. Try it before reaching for the CLI.
 </Callout>
 
 ## Running the CLI
@@ -100,7 +102,7 @@ Lists every user with their username, email, role, and login methods (for exampl
 docker exec tracearr node apps/server/dist/scripts/cli.js enable-local-login
 ```
 
-Re-enables local username/password login. Use this when an OIDC misconfiguration or a disabled local login setting has made the login page unusable. Combine with [`reset-password`](#reset-password) if you also need a working password.
+Turns the **Username and password** switch under **Settings** → **Access** → **Sign-in** back on; it changes nothing else. Use this when an OIDC misconfiguration or that switch has made the login page unusable. Combine with [`reset-password`](#reset-password) if you also need a working password.
 
 ## Related
 

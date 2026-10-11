@@ -1,6 +1,7 @@
 export default {
   index: 'Overview',
   servers: 'Media Servers',
+  'member-sign-in': 'Member Sign-in',
   environment: 'Environment Variables',
   automations: 'Automations',
   realtime: 'Real-Time Updates',

@@ -21,29 +21,29 @@ Tracearr uses environment variables for core configuration.
 
 ## Optional Variables
 
-| Variable                       | Description                                                 | Default                     |
-| ------------------------------ | ----------------------------------------------------------- | --------------------------- |
-| `PORT`                         | Port the server binds to inside the container               | `3000`                      |
-| `NODE_ENV`                     | Environment mode                                            | `production`                |
-| `LOG_LEVEL`                    | Logging verbosity                                           | `info`                      |
-| `BETTER_AUTH_SECRET`           | Session signing/encryption key                              | derived from `JWT_SECRET`   |
-| `TZ`                           | Timezone                                                    | `UTC`                       |
-| `CORS_ORIGIN`                  | Allowed CORS origin for API requests                        | reflects the request origin |
-| `TRUST_PROXY`                  | Trust `X-Forwarded-*` headers from a reverse proxy          | `false`                     |
-| `OIDC_ISSUER_URL`              | OIDC issuer base URL                                        | none                        |
-| `OIDC_CLIENT_ID`               | OIDC client ID                                              | none                        |
-| `OIDC_CLIENT_SECRET`           | OIDC client secret                                          | none                        |
-| `OIDC_PROVIDER_NAME`           | Label for the SSO login button                              | `SSO`                       |
-| `REDIS_PREFIX`                 | Redis key prefix for namespacing                            | no prefix                   |
-| `CLAIM_CODE`                   | Claim code for first time setup                             | none                        |
-| `BASE_PATH`                    | Base path when served under a subpath                       | none                        |
-| `DNS_CACHE_MAX_TTL`            | DNS cache maximum TTL in seconds                            | disabled                    |
-| `GZIP_ENABLED`                 | Enable server-side gzip compression                         | `false`                     |
-| `IMAGE_CACHE_DIR`              | Where the poster cache is written                           | `/data/tracearr/image-cache` |
-| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent | `10`                        |
-| `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                 | none                        |
-| `BACKUP_DIR`                   | Directory for storing database backups                      | `/data/backup`              |
-| `ENCRYPTION_KEY`               | Key for destination secrets and email link signatures       | derived from `JWT_SECRET`   |
+| Variable                       | Description                                                                                                                     | Default                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `PORT`                         | Port the server binds to inside the container                                                                                   | `3000`                       |
+| `NODE_ENV`                     | Environment mode                                                                                                                | `production`                 |
+| `LOG_LEVEL`                    | Logging verbosity                                                                                                               | `info`                       |
+| `BETTER_AUTH_SECRET`           | Session signing/encryption key                                                                                                  | derived from `JWT_SECRET`    |
+| `TZ`                           | Timezone                                                                                                                        | `UTC`                        |
+| `CORS_ORIGIN`                  | Other origins that may use a signed-in session; `*` only allows requests without one                                            | none, Tracearr's own origin  |
+| `TRUST_PROXY`                  | `true` trusts one proxy hop, a number is a hop count, or a comma-separated list of proxy IPs/CIDRs; anything else stops startup | `false`                      |
+| `OIDC_ISSUER_URL`              | OIDC issuer base URL                                                                                                            | none                         |
+| `OIDC_CLIENT_ID`               | OIDC client ID                                                                                                                  | none                         |
+| `OIDC_CLIENT_SECRET`           | OIDC client secret                                                                                                              | none                         |
+| `OIDC_PROVIDER_NAME`           | Label for the SSO login button                                                                                                  | `SSO`                        |
+| `REDIS_PREFIX`                 | Redis key prefix for namespacing                                                                                                | no prefix                    |
+| `CLAIM_CODE`                   | Claim code for first time setup                                                                                                 | none                         |
+| `BASE_PATH`                    | Base path when served under a subpath                                                                                           | none                         |
+| `DNS_CACHE_MAX_TTL`            | DNS cache maximum TTL in seconds                                                                                                | disabled                     |
+| `GZIP_ENABLED`                 | Enable server-side gzip compression                                                                                             | `false`                      |
+| `IMAGE_CACHE_DIR`              | Where the poster cache is written                                                                                               | `/data/tracearr/image-cache` |
+| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent                                                                     | `10`                         |
+| `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                                                                                     | none                         |
+| `BACKUP_DIR`                   | Directory for storing database backups                                                                                          | `/data/backup`               |
+| `ENCRYPTION_KEY`               | Key for destination secrets and email link signatures                                                                           | derived from `JWT_SECRET`    |
 
 <Callout type="info" title="PORT in the Docker Compose files">
   In the compose files, `PORT` sets the host side of the port mapping, `"${PORT:-3000}:3000"`. The
@@ -130,18 +130,23 @@ OIDC_CLIENT_SECRET=<from your identity provider>
 OIDC_PROVIDER_NAME=Authentik  # optional, defaults to "SSO"
 ```
 
-When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`.
+When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`, and the **Single sign-on** switch appears under **Settings** → **Access** → **Sign-in**. On a fresh install the first person to sign in through the provider becomes the owner. Afterwards the button also signs in admins and members who are allowed to and have a live account on a server open to them, matched to a Tracearr identity by the IdP profile's email or `preferred_username`; see [Member sign-in](/configuration/member-sign-in#how-members-sign-in).
 
 ## Reverse Proxy
 
-Behind an HTTPS reverse proxy, logins work as long as the proxy preserves the `Host` header, forwards `X-Forwarded-Host`, or `CORS_ORIGIN` is set to the public URL. Forward `X-Forwarded-Proto` so session cookies carry the `Secure` attribute over HTTPS.
+Behind an HTTPS reverse proxy, logins work as long as the proxy preserves the `Host` header, forwards `X-Forwarded-Host` with `TRUST_PROXY` set, or `CORS_ORIGIN` lists the public URL. The last one covers password sign-in but not SSO, which needs the public host from `Host` or a trusted `X-Forwarded-Host`. Forward `X-Forwarded-Proto` so session cookies carry the `Secure` attribute over HTTPS.
 
 ```bash
-CORS_ORIGIN=https://tracearr.example.com
 TRUST_PROXY=true
 ```
 
-When `CORS_ORIGIN` is unset, the API reflects the request origin. Set `TRUST_PROXY=true` so Tracearr resolves the real client IP from `X-Forwarded-*` headers; this makes sign-in rate limits count per client instead of per proxy.
+`TRUST_PROXY=true` trusts one proxy hop, the usual single reverse proxy: the client address is the one your proxy appended to `X-Forwarded-For`, anything a client wrote to the left of it is ignored, and `X-Forwarded-Host` is honored. Two chained proxies, such as Cloudflare in front of your own, need `TRUST_PROXY=2`; a comma-separated list of proxy IPs or CIDR ranges works too. The value is read without regard to case; `false` or `0` trusts nothing, and anything that is not `true`, `false`, digits, or a list of IPs and CIDR ranges stops the server on start with `TRUST_PROXY: "yes" is not an IP address or CIDR range. Use true, a hop count, or a comma-separated list of proxy IPs/CIDRs.` The resolved address is what sign-in rate limits count, what sessions record, and what Tracearr forwards to Jellyfin when a member signs in through it. Without it, `X-Forwarded-Host` is ignored, since anyone could claim any host with it. The live-update socket follows the same host and origin rules as the API.
+
+The web app is served from Tracearr's own address and needs nothing in `CORS_ORIGIN`. A request that carries the session cookie is accepted only from that origin (either scheme) or from an origin listed in `CORS_ORIGIN`; a write from any other page is refused with "This request did not come from Tracearr." List other addresses that need a signed-in session, comma-separated, and set `CORS_ORIGIN=*` only to let any page call the public API with an API key: a wildcard never grants a session.
+
+```bash
+CORS_ORIGIN=https://dash.example.com,https://tracearr.example.com
+```
 
 Three API paths answer without a login by design, and an authenticating proxy such as Authelia, Authentik or a Cloudflare Access policy must let them through:
 
@@ -154,8 +159,8 @@ Three API paths answer without a login by design, and an authenticating proxy su
 The first is the unsubscribe page every newsletter links to; the second is the browser view of a digest that was sent; the third serves hosted poster images to mail clients. Gating the first two shows members a login page instead of the page they asked for, and gating the third leaves hosted posters blank. The first two carry their own limit of 60 requests a minute.
 
 <Callout type="info">
-  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` (or set
-  `CORS_ORIGIN` to the public URL) for cookie login to work.
+  Reverse proxies that rewrite the `Host` header must forward `X-Forwarded-Host` with `TRUST_PROXY`
+  set (or list the public URL in `CORS_ORIGIN`) for cookie login to work.
 </Callout>
 
 ## Claim Code

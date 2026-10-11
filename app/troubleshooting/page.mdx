@@ -53,7 +53,10 @@ The rest of this section is procedure rather than pointers. [Collecting Logs](/t
 
 - [I forgot my Tracearr password](/faq#how-do-i-reset-my-tracearr-password)
 - [I used to sign in with Jellyfin credentials and now I can't](/configuration/recovery#common-lockout-scenarios)
-- [Local login is disabled and my SSO is broken](/configuration/recovery#enable-local-login)
+- [Username and password is switched off and my SSO is broken](/configuration/recovery#enable-local-login)
+- [A member or admin sees "You are not permitted to sign in"](/configuration/member-sign-in#two-refusals)
+- [A member's server is missing from the login page](/configuration/member-sign-in#who-gets-in)
+- [My admins can't sign in since the upgrade](/upgrading#280-member-sign-in)
 - [I don't know which account is which any more](/configuration/recovery#list-users)
 - [Login works on the local address but not through my reverse proxy](/configuration/environment#reverse-proxy)
 - [Everyone got signed out after an upgrade](/upgrading#authentication-changes)
@@ -216,6 +219,12 @@ ENCRYPTION_KEY is set but is not 64 hex characters; fix or unset it
 ```
 
 The server refuses to start on this. See [Authentication Secrets](/configuration/environment#authentication-secrets).
+
+```
+TRUST_PROXY: "yes" is not an IP address or CIDR range. Use true, a hop count, or a comma-separated list of proxy IPs/CIDRs.
+```
+
+The server refuses to start on this too. `TRUST_PROXY` takes `true`, `false`, a hop count, or a comma-separated list of proxy IPs or CIDR ranges. See [Reverse Proxy](/configuration/environment#reverse-proxy).
 
 ### Logs and the Debug Page
 

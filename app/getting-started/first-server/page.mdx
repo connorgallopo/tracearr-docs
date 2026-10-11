@@ -27,7 +27,7 @@ When you first access Tracearr, you'll be prompted to sign in or create an accou
 
 ### Single Sign-On (OIDC)
 
-If your Tracearr instance is configured with an OIDC identity provider (Authentik, Authelia, Keycloak, and similar), the login page shows an SSO button. Click it to sign in through your provider, then connect servers as described below. See [OIDC Single Sign-On](/configuration/environment#oidc-single-sign-on) for the required environment variables.
+If your Tracearr instance is configured with an OIDC identity provider (Authentik, Authelia, Keycloak, and similar), the login page shows an SSO button. Click it to sign in through your provider, then connect servers as described below. On a fresh install the first account created this way becomes the owner. See [OIDC Single Sign-On](/configuration/environment#oidc-single-sign-on) for the required environment variables.
 
 ### Jellyfin
 
@@ -64,11 +64,13 @@ Tracearr always talks to the server on the Server URL. The public address is onl
   sessions like Plex, install the [Tracearr SSE plugin](/configuration/realtime).
 </Callout>
 
-<Callout type="warning" title="Upgrading from an older version?">
-  Signing in to Tracearr with Jellyfin credentials was removed. You sign in with a local Tracearr
-  account, Plex, or SSO; Jellyfin and Emby servers are still fully supported for monitoring via API
-  key as described above. If your install only ever logged in with Jellyfin credentials, see
-  [Account Recovery](/configuration/recovery) to regain access.
+<Callout type="info" title="Who signs in with what">
+  The owner signs in with a local Tracearr account, Plex, SSO, or their own Jellyfin or Emby account
+  on a server with member sign-in on; Jellyfin and Emby are connected with an API key as described
+  above. The people you share a server with can sign in with their own Plex, Jellyfin or Emby
+  account once you allow it; see [Member sign-in](/configuration/member-sign-in). If your install
+  only ever signed in with Jellyfin credentials before 1.5.0, see [Account
+  Recovery](/configuration/recovery) to regain access to the owner account.
 </Callout>
 
 ## Adding More Servers
