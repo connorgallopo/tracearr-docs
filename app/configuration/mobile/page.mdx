@@ -91,43 +91,52 @@ Devices paired after the authentication upgrade use a **30-day rolling session**
 
 ## Push Notifications
 
-The mobile app supports push notifications for real-time alerts.
+A push reaches your phone when two things line up: your server sends the event to the **Mobile push** destination, and the phone is set to show it.
 
-### Enabling Notifications
+### What the Server Sends
+
+Mobile push is a built-in [destination](/configuration/destinations). Two things send to it:
+
+- **Violations.** The **Receive violations** switch on the Mobile push destination sends every violation. It is on by default.
+- **Everything else.** Stream starts and stops, new devices, trust score changes and server alerts are sent by [automations](/configuration/automations). An automation reaches your phone when its **Send Notification** action lists Mobile push.
+
+A new install comes with automations for new devices, server down and server up. Stream started, stream stopped and trust score changes send nothing until you add an automation for them.
+
+### On Your Phone
 
 1. In the app, go to **Settings** → **Notifications**
-2. Toggle **Enable Push Notifications**
-3. Grant notification permissions when prompted by your device
+2. Leave **Enable Push Notifications** on
+3. Allow notifications when your phone asks. If you declined, the screen shows a warning with an **Open Settings** button
 
-### Notification Events
-
-You can enable or disable notifications for each event type:
+Each event has its own switch:
 
 | Event                   | Description                     |
 | ----------------------- | ------------------------------- |
-| **Violation Detected**  | A sharing rule was triggered    |
+| **Violation Detected**  | A rule was triggered            |
 | **Stream Started**      | Someone started watching        |
 | **Stream Stopped**      | Playback ended                  |
-| **Concurrent Streams**  | User exceeded stream limit      |
 | **New Device**          | New device detected for a user  |
-| **Trust Score Changed** | User's trust score degraded     |
+| **Trust Score Changed** | User's trust score changed      |
 | **Server Down**         | Media server became unreachable |
 | **Server Up**           | Media server is back online     |
 
+Under each switch the app says what sends that event: "Sent by 2 automations", "Every violation is sent to Mobile push", or "No automation sends this to Mobile push". A switch only filters what the server already sends, so turning on an event that nothing sends has no effect.
+
+A newly paired device starts with every switch on. A device that opened this screen on an earlier version keeps what it had, where Stream Started, Stream Stopped and Trust Score Changed began off.
+
 ### Violation Filters
 
-When violation notifications are enabled, you can filter by:
-
-- **Rule Type** — Impossible Travel, Simultaneous Locations, Device Velocity, Concurrent Streams, Geo Restriction
-- **Minimum Severity** — All, Warning & High only, or High only
+When violation notifications are on, **Minimum Severity** limits them to All, Warning and High, or High only.
 
 ### Quiet Hours
 
-Pause non-critical notifications during sleeping hours:
+Quiet hours hold back non-critical notifications between two times of day, in your phone's timezone.
 
-1. Enable **Quiet Hours**
-2. Set your start and end times (e.g., 11 PM to 8 AM)
-3. Optionally enable **Override for Critical** to still receive high-severity violation alerts
+1. Turn on **Enable Quiet Hours**
+2. Tap the start or end time to change it. They begin at 11 PM and 8 AM
+3. Leave **Override for Critical** on to still get high-severity violations and server down alerts
+
+The timezone is the one your phone had the last time you opened this screen.
 
 ### Rate Limiting
 
@@ -164,7 +173,7 @@ iOS only updates the widget in the background when:
 - **Low Power Mode** is off. It turns Background App Refresh off while it's on.
 - Tracearr hasn't been swiped away in the app switcher. iOS doesn't launch an app the user force-quit until it's opened again or the phone restarts.
 
-The app can't read the Background App Refresh setting yet, so it can't warn you when it's off.
+When Background App Refresh is off, the app says so under **Settings** → **Notifications**.
 
 ### Apple's Limits
 
@@ -217,10 +226,11 @@ Click **Disable Mobile Access** to turn off the feature entirely. All devices wi
 
 ### Not Receiving Push Notifications
 
-1. Check that notifications are enabled in the app settings
-2. Verify your device's notification permissions for Tracearr
-3. Use **Send Test Notification** to verify the connection
-4. Check that you haven't hit rate limits
+1. In the app, open **Settings** → **Notifications** and read the line under the event you expected. "No automation sends this to Mobile push" means your server has nothing sending it: add an [automation](/configuration/automations) whose **Send Notification** action lists Mobile push. For violations, turn on **Receive violations** on the Mobile push [destination](/configuration/destinations)
+2. Check the top of the same screen for a warning: notifications turned off in the phone's settings, no push token registered, or the Mobile push destination switched off
+3. Make sure the event's own switch is on
+4. Check quiet hours and the rate limit counters
+5. **Send Test Notification** only checks that your server can reach the phone. It skips automations, the event switches and quiet hours, so a test that arrives doesn't mean an event will
 
 ### Widget Isn't Updating
 
