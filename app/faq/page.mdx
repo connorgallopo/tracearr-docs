@@ -101,7 +101,7 @@ The web app cannot change a username. The [`set-username`](/configuration/recove
 
 ### How do I merge two users into one person?
 
-On **Manage** → **Users**, select the two people and click **Merge users**. Only the owner has the button. The dialog shows which person is kept and which is folded in and then deleted, and **Swap which one is kept** changes that. A person who can sign in to Tracearr, such as the owner or an admin, is always the one kept, and two people who can both sign in cannot be merged into each other.
+On **Manage** → **Users**, select the two people and click **Merge users**. Only the owner has the button. The dialog shows which person is kept and which is folded in and then deleted, and **Swap which one is kept** changes that. The owner, an admin, or anyone with a Tracearr password or SSO login is always the one kept, and two such people cannot be merged into each other. Signing in with Plex, Jellyfin or Emby does not count toward this.
 
 The folded-in person's server accounts and sessions move to the kept person, and you can split an account back out from the kept person's page later. If both people have an account on the same server, those two accounts become one, and splitting does not separate them again.
 
