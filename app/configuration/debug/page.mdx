@@ -82,7 +82,9 @@ The panel is gated on the running image tag containing `supervised`, not on what
 
 ## Snapshot Management
 
-View and clean up library snapshots. Useful for removing suspicious or corrupted snapshot data that may affect Library Growth charts.
+Library snapshots are the daily per-library records behind the Storage Trend and Quality Evolution charts. Click **Load** to list the 100 most recent. **Suspicious only** narrows the list to snapshots that recorded a total size of 0 for a library holding movies, episodes, or more than 100 items. Remove rows with **Delete Selected**, or every suspicious snapshot with **Delete All Suspicious**. A delete refreshes the daily aggregate that Storage Trend reads.
+
+The list never reaches older history, so this panel can't clean up a long stretch of wrong dates. [Storage Trend still shows media I deleted](/faq#storage-trend-still-shows-media-i-deleted) covers that case, and why a deleted snapshot of removed media can't be rebuilt.
 
 ## Maintenance Actions
 

@@ -45,6 +45,7 @@ import { Tabs } from 'nextra/components';
 - [My Tautulli history imported before Tracearr 1.3.9 shows no progress](#my-tautulli-history-imported-before-tracearr-139-shows-no-progress)
 - [Users show "Never" for last activity](#users-show-never-for-last-activity-even-though-they-have-watch-history)
 - [My Library Growth charts are empty](#my-library-growth-charts-are-empty-or-missing-historical-data)
+- [Storage Trend still shows media I deleted](#storage-trend-still-shows-media-i-deleted)
 - [My analytics numbers look wrong or charts show gaps](#my-analytics-numbers-look-wrong-or-charts-show-gaps)
 - [A job says "already running" but I don't see any progress](#a-job-says-already-running-but-i-dont-see-any-progress)
 
@@ -373,6 +374,25 @@ Run **Backfill User Dates** in Settings → Jobs. This scans session history to 
 ### My Library Growth charts are empty or missing historical data
 
 Run **Backfill Library Snapshots** in Settings → Jobs. This generates historical data points from your library items.
+
+---
+
+### Storage Trend still shows media I deleted
+
+The Storage Trend and Quality Evolution charts read stored daily snapshots of each library, not the library as it is now. A snapshot records one library's item count and total size for one day, and once a day is recorded Tracearr does not go back and change it. Deleted media shows up as a drop on the day a library sync noticed it was gone. Every day before that still counts it, because it was on the server then.
+
+Snapshots are written two ways. Each library sync records today's. When a sync finds no history, a gap, or an item older than the earliest day on record, Tracearr queues **Backfill Library Snapshots**, which reconstructs the missing days from each item's added date as the media server reports it. So a server that reports the wrong added date produces wrong history. An item it says was added in 2015 is counted in every day from 2015 on, and the chart starts in 2015, even after the item is deleted.
+
+Running the backfill again does not correct this. It only writes days that have no snapshot yet, and days already on record keep their values.
+
+Deleted media can't be rebuilt. The backfill only reads items that are still in the library, with the files they have now. A deleted title, or the file an upgrade replaced, leaves it nothing to look back at, so that item's share of past days exists only in the snapshots already stored. Delete those snapshots and the history goes with them. A rebuild draws the curve as if the library had always held exactly what it holds today.
+
+If you want the bad stretch gone anyway:
+
+- **Snapshot Management** on the [debug page](/configuration/debug#snapshot-management) loads the 100 most recent snapshots. It handles a bad day or two from recent syncs, but it can't reach years-old rows.
+- **Clear Library Cache** in the debug page's [Danger Zone](/configuration/debug#danger-zone) deletes every library item and every snapshot. The next library sync reads your libraries again and queues the backfill, which rebuilds the history from the added dates your server reports now. This is the only way to remove a long stretch of bad history, and it loses the record of everything deleted or upgraded before it. It also resets when Tracearr first saw each title, so the next [newsletter](/configuration/email/newsletters) lists your whole library as new.
+
+Fix the added dates on the media server first. A rebuild from dates that are still wrong reproduces the same history.
 
 ---
 
