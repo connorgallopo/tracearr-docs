@@ -13,9 +13,23 @@ After installing Tracearr, you'll connect your first media server during the ini
 
 When you first access Tracearr, you'll be prompted to sign in or create an account.
 
+### The owner account
+
+The first account created on a fresh install becomes the owner, and there is only ever one. Once it exists the login page stops offering sign-up and there is no way to create another Tracearr account. Everyone else comes in through their own Plex, Jellyfin or Emby account; see [Member sign-in](/configuration/member-sign-in).
+
+Create the owner as yourself, from your own media server account or with its details. Tracearr records plays against people, and each person is one identity that holds their accounts on your servers. Your own Plex, Jellyfin or Emby account is one of those accounts, and it should belong to the owner instead of showing up as a second person.
+
+How your own account joins the owner depends on how you set it up:
+
+- **Sign up with Plex** creates the owner from your Plex account and attaches your account on the server you pick right away.
+- **Create Account** asks for a display name, username, email and password. When Tracearr syncs a Plex server's accounts, an account whose email matches an existing person's email joins that person. Give the owner the same email as your Plex account and your Plex account becomes part of the owner. Matching is by email only. A matching username links nothing.
+- Jellyfin and Emby do not send Tracearr any email addresses, so a Jellyfin or Emby account never joins the owner on its own, whatever you type here. Your own account shows up on **Manage** → **Users** as a separate member.
+
+When the owner and your own server account end up as two people, plays on that account are recorded under the member, not the owner, and signing in with it through Jellyfin or Emby follows the member rules instead of signing you in as the owner. Renaming does not join them. A person's display name can be changed from their page, the username cannot be changed in the web app, and a synced account never joins a person by username. Two people who are both listed on **Manage** → **Users** can be [merged](/faq#how-do-i-merge-two-users-into-one-person).
+
 ### Plex (Recommended)
 
-1. Click **Sign in with Plex**
+1. Click **Sign up with Plex**
 2. A popup opens — sign in with your Plex account
 3. Tracearr discovers your Plex servers automatically
 4. Select the server you want to monitor
@@ -31,7 +45,7 @@ If your Tracearr instance is configured with an OIDC identity provider (Authenti
 
 ### Jellyfin
 
-1. Click **Create Account** and set up a local Tracearr account
+1. Click **Create Account** and set up a local Tracearr account for yourself (read [The owner account](#the-owner-account) first)
 2. After account creation, go to **Settings** → **Servers** → **Connections**
 3. Click **Add Server** and select **Jellyfin**
 4. Enter your server details:
@@ -43,7 +57,7 @@ If your Tracearr instance is configured with an OIDC identity provider (Authenti
 
 ### Emby
 
-1. Click **Create Account** and set up a local Tracearr account
+1. Click **Create Account** and set up a local Tracearr account for yourself (read [The owner account](#the-owner-account) first)
 2. After account creation, go to **Settings** → **Servers** → **Connections**
 3. Click **Add Server** and select **Emby**
 4. Enter your server details:
@@ -66,11 +80,12 @@ Tracearr always talks to the server on the Server URL. The public address is onl
 
 <Callout type="info" title="Who signs in with what">
   The owner signs in with a local Tracearr account, Plex, SSO, or their own Jellyfin or Emby account
-  on a server with member sign-in on; Jellyfin and Emby are connected with an API key as described
-  above. The people you share a server with can sign in with their own Plex, Jellyfin or Emby
-  account once you allow it; see [Member sign-in](/configuration/member-sign-in). If your install
-  only ever signed in with Jellyfin credentials before 1.5.0, see [Account
-  Recovery](/configuration/recovery) to regain access to the owner account.
+  on a server with member sign-in on, once that account belongs to the owner; Jellyfin and Emby are
+  connected with an API key as described above. The people you share a server with can sign in with
+  their own Plex, Jellyfin or Emby account once you allow it; see [Member
+  sign-in](/configuration/member-sign-in). If your install only ever signed in with Jellyfin
+  credentials before 1.5.0, see [Account Recovery](/configuration/recovery) to regain access to the
+  owner account.
 </Callout>
 
 ## Adding More Servers

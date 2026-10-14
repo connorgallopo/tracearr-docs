@@ -58,6 +58,7 @@ The rest of this section is procedure rather than pointers. [Collecting Logs](/t
 - [A member's server is missing from the login page](/configuration/member-sign-in#who-gets-in)
 - [My admins can't sign in since the upgrade](/upgrading#280-member-sign-in)
 - [I don't know which account is which any more](/configuration/recovery#list-users)
+- [My own media server account shows up as a separate person from the owner](/getting-started/first-server#the-owner-account)
 - [Login works on the local address but not through my reverse proxy](/configuration/environment#reverse-proxy)
 - [Everyone got signed out after an upgrade](/upgrading#authentication-changes)
 - [The setup page is asking me for a claim code](/configuration/environment#claim-code)
@@ -262,6 +263,12 @@ That's a lot of codes in one minute
 ```
 
 All five come from pasting a share code. See [Codes That Won't Read](/configuration/automations#codes-that-wont-read).
+
+```
+Another owner or admin already signs in with this username
+```
+
+You tried to make someone an admin whose username matches the owner's or another admin's, ignoring case. If that person is you, your server account and the owner are two separate people; see [The owner account](/getting-started/first-server#the-owner-account).
 
 ```
 already running

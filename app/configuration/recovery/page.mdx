@@ -78,7 +78,7 @@ docker exec -it tracearr node apps/server/dist/scripts/cli.js reset-password ali
 docker exec -it tracearr node apps/server/dist/scripts/cli.js set-username <current-username> <new-username>
 ```
 
-Renames a user's login username. Usernames are stored lowercase; the command fails cleanly if the new name is already taken by another login-enabled account.
+Renames a user's login username. Usernames are stored lowercase; the command fails cleanly if the new name is already taken by another login-enabled account. Renaming does not link the account to a media server account: a synced account joins an existing person by email, never by username.
 
 ### set-email
 
