@@ -30,7 +30,7 @@ Tracearr refuses to switch off the last of password, Plex and single sign-on tha
 
 ## Who gets in
 
-On each person's page (**Manage** → **Users**, then the person) the owner has a **Sign-in access** card with a **Sign-in** setting:
+On each person's page (**Users** in the sidebar, then the person's **Access** tab) the owner has a **Sign-in access** card with a **Sign-in** setting:
 
 - **Default** follows **Let admins and members sign in**. The card says whether that switch is on or off right now.
 - **Allow** lets the person in even while the global switch is off, and through a server whose own switch is off.
@@ -73,11 +73,11 @@ After three failed Jellyfin or Emby password attempts for the same username on t
 
 ## What a member sees
 
-A member lands on a dashboard about themselves: what is playing on their account right now, their last 30 days against the 30 before, the titles they watched most, how they watch, all-time moments, and their own Seerr requests. The sidebar has **Dashboard**, **Map** and **History**, **Activity**, and the media pages **Overview**, **Browse** and **Genres**, plus **Requests** when Seerr is linked. Every one of them is scoped to the member's own accounts, merged across servers if you merged them.
+A member lands on a dashboard about themselves: what is playing on their account right now, their last 30 days against the 30 before, the titles they watched most, how they watch, all-time moments, and their own Seerr requests. The sidebar has **Dashboard**, **Map**, **History**, **Stats**, **Library** and **Browse**, plus **Requests** when Seerr is linked. **Stats** shows only its **Activity** tab, and **Library** shows only **Overview** and **Genres**. Every one of them is scoped to the member's own accounts, merged across servers if you merged them.
 
-The library **Overview** for a member is what's new on the server and Most Popular, without play or viewer counts. The Overview has a **Not watched by you** button that opens Browse on the titles the member has not watched, and the **Watched** filter in Browse counts only the member's own plays. **Genres** counts the member's own plays.
+The library **Overview** for a member is what's new on the server and Most Popular, without play or viewer counts. The Overview has a **Not watched by you** button that opens Browse on the titles the member has not watched, and the **Watched** filter in Browse counts only the member's own plays. **Genres** counts the member's own plays over the date range the member picks.
 
-A member never sees Violations, Devices, Bandwidth, the Users list, Automations, the library quality, storage and watch pages, or Settings. They never see a trust score, another person's name, titles or locations, or a link to anyone's user page.
+A member never sees Violations, People, Devices, Bandwidth, the Users list, Automations, the Quality, Storage and Watch tabs of Library, or Settings. They never see a trust score, another person's name, titles or locations, or a link to anyone's user page.
 
 ### Show members anonymous server activity
 

@@ -43,7 +43,7 @@ The API knows the two kinds as `policy` and `notification`, and those are the wo
 
 ## Building an Automation
 
-Go to **Manage → Automations** in the sidebar and click **New automation**. You get a gallery of ready-made automations, a box to paste a share code into, and **Start from scratch**, which opens the builder.
+Go to **Automations** in the sidebar and click **New automation**. You get a gallery of ready-made automations, a box to paste a share code into, and **Start from scratch**, which opens the builder.
 
 The builder is one column, and it reads as a sentence in three parts:
 
@@ -615,7 +615,7 @@ Runs are pruned on a schedule so the history doesn't grow without bound.
 
 ## Violations
 
-A violation is a policy run that ran. The **Violations** page, the violation detail page, and every link and bookmark you already have keep working exactly as before: same list, same acknowledge and dismiss buttons, same condition evidence.
+A violation is a policy run that ran. Violations are the **Violations** tab under **Automations**, beside **Rules**, with a count of the ones waiting on you. The tab keeps its `/violations` address, so the violation detail page and every link and bookmark you already have keep working exactly as before: same list, same acknowledge and dismiss buttons, same condition evidence.
 
 What changed is what sits behind it. Notification runs and no-match runs are not violations and never appear there; they live on the automation's Activity list.
 
