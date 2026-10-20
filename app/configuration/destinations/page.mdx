@@ -1,6 +1,6 @@
 ---
 title: Notification Destinations
-description: Add the places Tracearr sends notifications to. The kinds are Discord, ntfy, Gotify, Apprise, Pushover, a JSON webhook, email, mobile push and browser toasts.
+description: Add the places Tracearr sends notifications to. The kinds are Discord, ntfy, Gotify, Apprise, Pushover, Telegram, a JSON webhook, email, mobile push and browser toasts.
 ---
 
 import { Callout } from 'nextra/components';
@@ -13,21 +13,30 @@ Destinations live under **Settings** → **Notifications** → **Destinations**.
 
 ## The kinds
 
-| Kind           | What you fill in                                                                                                   |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Discord        | Webhook URL                                                                                                        |
-| Webhook (JSON) | URL                                                                                                                |
-| ntfy           | Server URL, Topic (starts as `tracearr`), and an Auth token that is optional for public topics                     |
-| Gotify         | Server URL. Tracearr posts to it as given, so the token goes in it: `https://gotify.example.com/message?token=...` |
-| Apprise        | API URL                                                                                                            |
-| Pushover       | User key and API token                                                                                             |
-| Email          | An SMTP server. The fields are on the [Email & Newsletters](/configuration/email) page                             |
-| Mobile push    | Nothing. It is built in, and each paired device filters in its own notification settings                           |
-| Browser toasts | Nothing. It is built in, and toasts appear in the browser you are looking at                                       |
+| Kind           | What you fill in                                                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Discord        | Webhook URL                                                                                                                             |
+| Webhook (JSON) | URL                                                                                                                                     |
+| ntfy           | Server URL, Topic (starts as `tracearr`), and an Auth token that is optional for public topics                                          |
+| Gotify         | Server URL. Tracearr posts to it as given, so the token goes in it: `https://gotify.example.com/message?token=...`                      |
+| Apprise        | API URL                                                                                                                                 |
+| Pushover       | User key and API token                                                                                                                  |
+| Telegram       | Bot token from @BotFather, Chat ID (a numeric id, negative for groups and channels, or `@channelname`), and a Topic ID for forum groups |
+| Email          | An SMTP server. The fields are on the [Email & Newsletters](/configuration/email) page                                                  |
+| Mobile push    | Nothing. It is built in, and each paired device filters in its own notification settings                                                |
+| Browser toasts | Nothing. It is built in, and toasts appear in the browser you are looking at                                                            |
+
+Telegram messages are plain text with the title in bold. The bot must be a member of the group or an admin of the channel.
 
 You can add more than one of the same kind. Two Discord webhooks pointing at different rooms is a normal setup.
 
 Every destination carries a name of up to 100 characters, which is what the automation editor lists, and an Enabled switch. A destination that is switched off receives nothing.
+
+## Links and posters
+
+On media added and upgraded, ntfy, Gotify and Pushover open the Tracearr media page when an external URL is set under **Settings**, otherwise the item on the media server. Telegram shows every link as a button. Apprise carries none.
+
+Telegram sends the poster with the message on media added and upgraded, and the text is cut to Telegram's 1024 character caption limit when it does.
 
 ## Receive violations
 
