@@ -103,6 +103,19 @@ Platform differences worth knowing:
 - **IDs differ by server.** Library event IDs match what each server's own REST API reports: the 32-character GUID form on Jellyfin, the numeric internal ID on Emby. Emby playback events keep the GUID `itemId` they have always had.
 - **Emby also raises folder events.** A new movie's directory arrives as `itemType: "Folder"` alongside the movie itself, and deleting a directory fires one removed event for the folder, not one per child. Don't assume added/removed pairs match one-to-one on Emby; treat a removal as a cue to re-query the library.
 
+## Download events
+
+| Event                     | Fields                                                                                                                                                    | When                                                                                                                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `library.item.downloaded` | `userId`, `itemId`, `itemName`, `app`, `device`                                                                                                           | A user downloaded an item; `itemId` is absent on Emby, and `itemName` is the whole activity entry name ("alice is downloading Heat"), not the title |
+| `download.transcoded`     | `phase`, `userId`, `deviceId`, `itemId`, `bitrate`, `width`, `height`, `videoCodec`, `audioCodec`, `container`, `bytesTranscoded`, `completionPercentage` | Jellyfin only: a converted download started or ended on a device                                                                                    |
+
+`phase` (`started` or `ended`) tells the two `download.transcoded` events apart. Null fields are omitted from the JSON, and `itemId` is absent when the plugin cannot read the job.
+
+`library.item.downloaded` is a nudge. Tracearr reads the download itself from the server's activity log, so the event only makes it look immediately instead of at the next 30 second check. Plugins older than 0.6.0 don't send it, and downloads are still picked up by that check.
+
+`download.transcoded` needs plugin 0.6.0. It is sent when a client pulls a transcoded copy of an item (a download at lower quality) and again when the pull ends. Without it, Tracearr falls back to the Jellyfin session list, which names the user and device but not the item.
+
 ## Scheduled Task Events
 
 | Event            | Fields                               | When                                                                          |

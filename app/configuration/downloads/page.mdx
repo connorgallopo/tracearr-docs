@@ -1,0 +1,59 @@
+---
+title: Downloads
+description: How Tracearr records downloads from Plex, Jellyfin and Emby, what each server reports, and where to see who downloaded what.
+---
+
+import { Callout } from 'nextra/components';
+
+# Downloads
+
+Tracearr records when someone downloads an item from your server, not only when they stream it. A person pulling files through a server's download button or an app's offline download shows up next to their streams, with the file's quality and size.
+
+## What counts as a download
+
+A download is one item downloaded by one person. Download managers and resumed transfers send many requests for the same file, so requests for the same person and item within an hour collapse into a single download. Counts, the Downloads tab and automation conditions all count these collapsed downloads.
+
+## What each server reports
+
+| Server   | What Tracearr sees                                                                              | Detail                                                                                                                                                                                    |
+| -------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plex     | Original downloads and app downloads, including reduced-quality ones                            | Delivered size and bitrate for app downloads. Only recorded while Tracearr is connected to the server.                                                                                    |
+| Jellyfin | The download endpoint, with app and device.                                                     | Converted downloads (a download at lower quality) are recorded as "Converted download" rows with the resolution and bitrate that was delivered. The item name needs the SSE plugin 0.6.0. |
+| Emby     | The download endpoint, matched to an item by title only. App downloads are read from sync jobs. | App downloads carry the exact delivered resolution and size.                                                                                                                              |
+
+Jellyfin and Emby are read from the server's activity log every 30 seconds. With [SSE plugin](/sse-plugin) 0.6.0 the download is picked up immediately.
+
+## What is recorded
+
+- The source file's quality and size.
+- The delivered quality and size, when the download was converted.
+- The app and device, matched to the same device Tracearr uses for streams where it can.
+- On Jellyfin and Emby, the IP address and its location.
+
+Plex does not report a client IP for a download, so there is no location on Plex downloads. Plex also does not report the delivered resolution, so a converted Plex download shows its bitrate as the quality.
+
+## Gaps
+
+<Callout type="warning">
+  Plex announces a download only while the transfer is running. If Tracearr is disconnected from the
+  server at that moment, the download is not recorded and cannot be recovered afterward.
+</Callout>
+
+- **Emby web downloads match by title.** The activity log has no item ID, so Tracearr matches the title against the server's library. If no item or several items match, the download keeps its title but isn't linked to a library item.
+- **Emby's own Downloads page is incomplete.** It lists only app downloads, and users can delete their history there. Tracearr keeps its own record, so a download stays in Tracearr after the user removes it from Emby.
+- **A converted download on Jellyfin without the plugin has no title.** The session list names the person and the device but not the item, so the row reads "Converted download" until the plugin supplies the item.
+- **A Plex app download already running when Tracearr connected shows the source file size.** Tracearr never saw the conversion, so it records the size of the file on the server rather than what the app received.
+- **Stream endpoints aren't downloads.** A client that reads the file through a stream URL leaves no download record on any server, and API-key requests with no user are not recorded.
+
+## Where it shows
+
+- **Stats**: a Downloads tab after Bandwidth, visible to staff, with downloads, data downloaded, people downloading and the most downloaded title for the selected time range.
+- **User page**: a Downloads tab between Violations and Access, covering all of that person's accounts. It is hidden when they have no downloads.
+- **Media page**: a Downloads panel beside Requests listing who downloaded the title, when, from which device, and the size.
+- **Devices**: a user's device list counts downloads next to streams.
+
+## Alerting on downloads
+
+An automation can fire when an account downloads media and compare the **Downloads in Window** or **Download Bytes in Window** field against a limit. The ready-made **Download burst** automation does this: it alerts when one person downloads more than a set number of items in 24 hours, five by default. See [Automations](/configuration/automations#accounts) for the trigger and fields.
+
+Downloads recorded when Tracearr first starts reading a server, and those found after Tracearr was down, are stored without firing it.
