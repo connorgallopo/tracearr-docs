@@ -346,6 +346,7 @@ Each destination cuts text that runs past its limit and ends it with `…`:
 | Pushover     | 250 characters           | 1024 characters                                       |
 | Email        | 200 characters, one line | 2000 characters                                       |
 | Mobile push  | 200 characters           | 1024 characters, within the 4096-byte push size       |
+| Telegram     | 256 bytes                | 3839 bytes                                            |
 | In-app toast | 200 characters           | 2000 characters                                       |
 
 Discord and email keep the fields and card Tracearr builds around your text; only the title and description change. A webhook destination keeps its JSON shape, with your rendered title and message added under `automation`, and applies no length limit.
@@ -372,15 +373,15 @@ A variable has to be available from every trigger you picked, since any one of t
 
 ##### Priority
 
-The Priority select on a send action sets how urgent the notification is. Automatic, the default, keeps the priority each destination already uses for that event. Any other choice replaces it for Pushover, Gotify and ntfy; no other destination reads it.
+The Priority select on a send action sets how urgent the notification is. Automatic, the default, takes the level from the event's severity, low, normal or high, and sends it through the same table as the explicit levels. Any other choice replaces it for Pushover, Gotify, ntfy and Telegram; no other destination reads it.
 
-| Level  | Pushover                       | Gotify                  | ntfy       |
-| ------ | ------------------------------ | ----------------------- | ---------- |
-| Lowest | -2, no notification            | 0, no notification      | 1, min     |
-| Low    | -1, popup without sound        | 2, icon only            | 2, low     |
-| Normal | 0, sound, quiet hours apply    | 5, icon and sound       | 3, default |
-| High   | 1, sound, bypasses quiet hours | 8, sound and vibration  | 4, high    |
-| Urgent | 2, repeats until acknowledged  | 10, sound and vibration | 5, max     |
+| Level  | Pushover                       | Gotify                  | ntfy       | Telegram |
+| ------ | ------------------------------ | ----------------------- | ---------- | -------- |
+| Lowest | -2, no notification            | 0, no notification      | 1, min     | silent   |
+| Low    | -1, popup without sound        | 2, icon only            | 2, low     | silent   |
+| Normal | 0, sound, quiet hours apply    | 5, icon and sound       | 3, default | normal   |
+| High   | 1, sound, bypasses quiet hours | 8, sound and vibration  | 4, high    | normal   |
+| Urgent | 2, repeats until acknowledged  | 10, sound and vibration | 5, max     | normal   |
 
 An urgent Pushover message is sent with a retry of 60 seconds and an expiry of one hour, so it repeats every minute until someone acknowledges it or the hour is up.
 
