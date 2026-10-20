@@ -97,16 +97,18 @@ Here are all the fields you can use in conditions, grouped by category.
 
 #### Session Behavior
 
-| Field                    | Description                                                           | Example Values    |
-| ------------------------ | --------------------------------------------------------------------- | ----------------- |
-| Concurrent Streams       | Number of active streams from the same user                           | 1, 2, 3...        |
-| Active Session Distance  | Distance in kilometers between simultaneous sessions                  | 100, 500, 1000... |
-| Travel Speed             | Calculated speed between consecutive sessions (km/h)                  | 500, 1000...      |
-| Unique IPs in Window     | Number of different IP addresses used within a time period            | 3, 5, 10...       |
-| Unique Devices in Window | Number of different devices used within a time period                 | 2, 3, 5...        |
-| Inactive Days            | Days since the user last streamed                                     | 30, 90, 180...    |
-| Current Pause Duration   | How long the session has been continuously paused (minutes)           | 5, 15, 30...      |
-| Total Pause Duration     | Total accumulated pause time across all pause/resume cycles (minutes) | 15, 30, 60...     |
+| Field                    | Description                                                               | Example Values    |
+| ------------------------ | ------------------------------------------------------------------------- | ----------------- |
+| Concurrent Streams       | Number of active streams from the same user                               | 1, 2, 3...        |
+| Active Session Distance  | Distance in kilometers between simultaneous sessions                      | 100, 500, 1000... |
+| Travel Speed             | Calculated speed between consecutive sessions (km/h)                      | 500, 1000...      |
+| Unique IPs in Window     | Number of different IP addresses used within a time period                | 3, 5, 10...       |
+| Unique Devices in Window | Number of different devices used within a time period                     | 2, 3, 5...        |
+| Downloads in Window      | How many items the person downloaded in the window, across their accounts | 3, 5, 20...       |
+| Download Bytes in Window | Gigabytes the person downloaded in the window, across their accounts      | 10, 50, 200...    |
+| Inactive Days            | Days since the user last streamed                                         | 30, 90, 180...    |
+| Current Pause Duration   | How long the session has been continuously paused (minutes)               | 5, 15, 30...      |
+| Total Pause Duration     | Total accumulated pause time across all pause/resume cycles (minutes)     | 15, 30, 60...     |
 
 <Callout type="info">
   Fields with "in Window" let you specify a time window (in hours) to check. For example, "more than
@@ -344,9 +346,9 @@ Each destination cuts text that runs past its limit and ends it with `…`:
 | Gotify       | 200 characters           | 2000 characters                                       |
 | Apprise      | 200 characters           | 2000 characters                                       |
 | Pushover     | 250 characters           | 1024 characters                                       |
+| Telegram     | 256 bytes                | 3839 bytes                                            |
 | Email        | 200 characters, one line | 2000 characters                                       |
 | Mobile push  | 200 characters           | 1024 characters, within the 4096-byte push size       |
-| Telegram     | 256 bytes                | 3839 bytes                                            |
 | In-app toast | 200 characters           | 2000 characters                                       |
 
 Discord and email keep the fields and card Tracearr builds around your text; only the title and description change. A webhook destination keeps its JSON shape, with your rendered title and message added under `automation`, and applies no length limit.
@@ -361,6 +363,7 @@ A variable has to be available from every trigger you picked, since any one of t
 | An account goes quiet                                             | `user.username`, `user.identityName`, `server.name`, `server.type`, `days`                                                                                                                                                               |
 | An account plays from a new device                                | `user.username`, `user.identityName`, `session.mediaTitle`, `session.mediaType`, `server.name`, `server.type`, `device.name`, `device.platform`, `device.product`, `device.location`                                                     |
 | An account's trust score changes                                  | `user.username`, `user.identityName`, `server.name`, `server.type`, `trust.previous`, `trust.new`, `trust.reason`                                                                                                                        |
+| An account downloads media                                        | `user.username`, `user.identityName`, `server.name`, `server.type`, `download.title`, `download.app`, `download.device`, `download.last24h`                                                                                              |
 | A server goes down or comes back up                               | `server.name`, `server.type`                                                                                                                                                                                                             |
 | A plugin update is available                                      | `server.name`, `server.type`, `installedVersion`, `latestVersion`, `downloadUrl`                                                                                                                                                         |
 | A server update is available                                      | `server.name`, `server.type`, `installedVersion`, `latestVersion`, `releaseUrl`                                                                                                                                                          |
@@ -480,17 +483,20 @@ A stream that stops because its server was deleted mid-play doesn't fire the sto
 
 ### Accounts
 
-| Trigger                            | Fires when                                                                 |
-| ---------------------------------- | -------------------------------------------------------------------------- |
-| An account goes quiet              | An account has watched nothing for the days you set                        |
-| An account plays from a new device | An account starts a stream on a device it has never streamed from before   |
-| An account's trust score changes   | A trust score is written to a different value, by an automation or by hand |
+| Trigger                            | Fires when                                                                                         |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| An account goes quiet              | An account has watched nothing for the days you set                                                |
+| An account plays from a new device | An account starts a stream on a device it has never streamed from before                           |
+| An account's trust score changes   | A trust score is written to a different value, by an automation or by hand                         |
+| An account downloads media         | An account downloads an item through the server's download endpoint; one item counts once per hour |
 
 The days live on the trigger, and Tracearr sweeps for quiet accounts hourly.
 
 A device is new per account, so the same phone announces itself again the first time a different account plays on it, and the message can name `{{device.name}}`, `{{device.platform}}`, `{{device.product}}` and `{{device.location}}`. A trust change carries `{{trust.previous}}`, `{{trust.new}}` and `{{trust.reason}}`, and an automation that watches for one can't also change a trust score, which is what stops a score from walking itself down.
 
-Neither of these two can sit on an automation that records a violation. Picking up a new phone or having a score adjusted isn't something a person did wrong, so both only ever send.
+A download trigger carries `{{download.title}}`, `{{download.app}}`, `{{download.device}}` and `{{download.last24h}}`. See [Downloads](/configuration/downloads) for what counts.
+
+The new-device and trust triggers can't sit on an automation that records a violation. Picking up a new phone or having a score adjusted isn't something a person did wrong, so both only ever send. A download trigger can record a violation. Once it has recorded a violation for an account, it fires again for that account only after the violation is acknowledged. An automation that has both the inactivity trigger and the download trigger keeps one violation slot per account, so a download violation blocks a later inactivity one.
 
 ### Servers
 
@@ -667,13 +673,13 @@ Use the trash button on the automation's row, or select several rows and choose 
 
 ## Ready-Made Automations
 
-**New automation** opens a gallery of automations that are already built. Twenty-two ship with Tracearr, in four groups:
+**New automation** opens a gallery of automations that are already built. Twenty-three ship with Tracearr, in four groups:
 
 | Group            | What's in it                                                                                                                                                                                                                                            |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Notifications    | Tell a destination something happened: a stream started or stopped, a stream is transcoding, a stream sat paused too long, media was added or upgraded, an account played from a new device, an account's trust score changed, a newsletter send failed |
 | Server health    | A server went down or came back, and the three update triggers                                                                                                                                                                                          |
-| Limits and rules | The six sharing-detection policies (too many streams, impossible travel, two places at once, many IPs in a window, blocked countries, inactive account), plus one for stopping 4K transcodes                                                            |
+| Limits and rules | The six sharing-detection policies (too many streams, impossible travel, two places at once, many IPs in a window, blocked countries, inactive account), plus one for stopping 4K transcodes and one for download bursts                                |
 | Housekeeping     | Stop paused streams                                                                                                                                                                                                                                     |
 
 There's a search box over the cards. Each card shows the automation's sentence in plain words and whether it records **A violation** or **An alert**.

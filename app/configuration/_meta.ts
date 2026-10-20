@@ -8,6 +8,7 @@ export default {
   requests: 'Seerr Requests',
   tailscale: 'Tailscale VPN',
   destinations: 'Notification Destinations',
+  downloads: 'Downloads',
   email: 'Email & Newsletters',
   backup: 'Backup & Restore',
   recovery: 'Account Recovery',
