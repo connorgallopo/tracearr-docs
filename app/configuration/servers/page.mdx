@@ -5,7 +5,7 @@ description: Change a Jellyfin or Emby server's URL or API key, give a server a 
 
 # Media Servers
 
-**Settings** → **Servers** has three sections: **Connections**, **Plex accounts** and **Poster source**. Only the owner can change anything in them. Adding your first server is covered in [Connect a Server](/getting-started/first-server).
+**Settings** → **Servers** has three sections: **Connections**, **Plex accounts** and **Posters**. Only the owner can change anything in them. Adding your first server is covered in [Connect a Server](/getting-started/first-server).
 
 ## Connections
 
@@ -96,7 +96,7 @@ The new token goes to the account and to every Plex server connected through it.
 
 The unlink button stays disabled while a live server is connected through the account; its tooltip reads "Delete the live servers connected through this account, or mark them historical, first". Historical servers no longer block it: unlinking leaves them in place without an account link, and reauthorizing the account later picks them up again by their machine identifier. Your only **Login Enabled** account can't be unlinked while you have no Tracearr password either. Set a password first, or link another account that can sign in.
 
-## Poster source
+## Posters
 
 When the same title is on more than one server, each copy has its own poster. **Preferred Poster Source** picks which one Tracearr shows on **Library** → **Overview**, **Browse** and **Library** → **Storage**.
 
@@ -104,3 +104,7 @@ When the same title is on more than one server, each copy has its own poster. **
 - Picking a server shows that server's copy. Titles that server doesn't have fall back to the most recently added copy.
 
 The setting saves as soon as you change it. It stays disabled until at least one server is connected.
+
+**Cache posters after library syncs** is on by default. After each library sync Tracearr fetches the posters for new and changed titles, and every few days it walks the whole library, so Library pages load from the cache instead of your media server. Turning it off stops a running pass within one batch of 50 titles; posters are then cached the first time a page shows them. Turning it back on takes effect at the next library sync.
+
+The poster cache card below it shows the cache size on disk, the estimate for your library, the free disk left, and the last sweep. See [Poster Cache](/configuration/environment#poster-cache) for the volume and disk settings behind it.

@@ -21,29 +21,30 @@ Tracearr uses environment variables for core configuration.
 
 ## Optional Variables
 
-| Variable                       | Description                                                                                                                     | Default                      |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| `PORT`                         | Port the server binds to inside the container                                                                                   | `3000`                       |
-| `NODE_ENV`                     | Environment mode                                                                                                                | `production`                 |
-| `LOG_LEVEL`                    | Logging verbosity                                                                                                               | `info`                       |
-| `BETTER_AUTH_SECRET`           | Session signing/encryption key                                                                                                  | derived from `JWT_SECRET`    |
-| `TZ`                           | Timezone                                                                                                                        | `UTC`                        |
-| `CORS_ORIGIN`                  | Other origins that may use a signed-in session; `*` only allows requests without one                                            | none, Tracearr's own origin  |
-| `TRUST_PROXY`                  | `true` trusts one proxy hop, a number is a hop count, or a comma-separated list of proxy IPs/CIDRs; anything else stops startup | `false`                      |
-| `OIDC_ISSUER_URL`              | OIDC issuer base URL                                                                                                            | none                         |
-| `OIDC_CLIENT_ID`               | OIDC client ID                                                                                                                  | none                         |
-| `OIDC_CLIENT_SECRET`           | OIDC client secret                                                                                                              | none                         |
-| `OIDC_PROVIDER_NAME`           | Label for the SSO login button                                                                                                  | `SSO`                        |
-| `REDIS_PREFIX`                 | Redis key prefix for namespacing                                                                                                | no prefix                    |
-| `CLAIM_CODE`                   | Claim code for first time setup                                                                                                 | none                         |
-| `BASE_PATH`                    | Base path when served under a subpath                                                                                           | none                         |
-| `DNS_CACHE_MAX_TTL`            | DNS cache maximum TTL in seconds                                                                                                | disabled                     |
-| `GZIP_ENABLED`                 | Enable server-side gzip compression                                                                                             | `false`                      |
-| `IMAGE_CACHE_DIR`              | Where the poster cache is written                                                                                               | `/data/tracearr/image-cache` |
-| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent                                                                     | `10`                         |
-| `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                                                                                     | none                         |
-| `BACKUP_DIR`                   | Directory for storing database backups                                                                                          | `/data/backup`               |
-| `ENCRYPTION_KEY`               | Key for destination secrets and email link signatures                                                                           | derived from `JWT_SECRET`    |
+| Variable                       | Description                                                                                                                                  | Default                      |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `PORT`                         | Port the server binds to inside the container                                                                                                | `3000`                       |
+| `NODE_ENV`                     | Environment mode                                                                                                                             | `production`                 |
+| `LOG_LEVEL`                    | Logging verbosity                                                                                                                            | `info`                       |
+| `BETTER_AUTH_SECRET`           | Session signing/encryption key                                                                                                               | derived from `JWT_SECRET`    |
+| `TZ`                           | Timezone                                                                                                                                     | `UTC`                        |
+| `CORS_ORIGIN`                  | Other origins that may use a signed-in session; `*` only allows requests without one                                                         | none, Tracearr's own origin  |
+| `TRUST_PROXY`                  | `true` trusts one proxy hop, a number is a hop count, or a comma-separated list of proxy IPs/CIDRs; anything else stops startup              | `false`                      |
+| `OIDC_ISSUER_URL`              | OIDC issuer base URL                                                                                                                         | none                         |
+| `OIDC_CLIENT_ID`               | OIDC client ID                                                                                                                               | none                         |
+| `OIDC_CLIENT_SECRET`           | OIDC client secret                                                                                                                           | none                         |
+| `OIDC_PROVIDER_NAME`           | Label for the SSO login button                                                                                                               | `SSO`                        |
+| `REDIS_PREFIX`                 | Redis key prefix for namespacing                                                                                                             | no prefix                    |
+| `CLAIM_CODE`                   | Claim code for first time setup                                                                                                              | none                         |
+| `BASE_PATH`                    | Base path when served under a subpath                                                                                                        | none                         |
+| `DNS_CACHE_MAX_TTL`            | DNS cache maximum TTL in seconds                                                                                                             | disabled                     |
+| `GZIP_ENABLED`                 | Enable server-side gzip compression                                                                                                          | `false`                      |
+| `SHUTDOWN_GRACE_MS`            | Time running background jobs get to save their place on shutdown, in ms. The default fits Docker's default stop, so it does not need setting | `8000`                       |
+| `IMAGE_CACHE_DIR`              | Where the poster cache is written                                                                                                            | `/data/tracearr/image-cache` |
+| `IMAGE_CACHE_MIN_FREE_PERCENT` | Free disk the poster cache leaves on its volume, in percent                                                                                  | `10`                         |
+| `IMAGE_CACHE_MAX_MB`           | Hard ceiling on the poster cache size in MB                                                                                                  | none                         |
+| `BACKUP_DIR`                   | Directory for storing database backups                                                                                                       | `/data/backup`               |
+| `ENCRYPTION_KEY`               | Key for destination secrets and email link signatures                                                                                        | derived from `JWT_SECRET`    |
 
 <Callout type="info" title="PORT in the Docker Compose files">
   In the compose files, `PORT` sets the host side of the port mapping, `"${PORT:-3000}:3000"`. The
@@ -238,16 +239,16 @@ GZIP_ENABLED=true
 Tracearr keeps one 360×540 copy of every poster under `IMAGE_CACHE_DIR` and keeps it until the
 poster changes or its item leaves the library. Nothing is evicted to make room. When free disk on
 that volume would fall under `IMAGE_CACHE_MIN_FREE_PERCENT` the cache stops growing, the precache
-pass reports disk-limited in Settings → General, and posters that are not cached are fetched from
-the media server on request. A library of 100k posters needs about 2 GB.
+pass reports disk-limited in Settings → Servers → Posters, and posters that are not cached are
+fetched from the media server on request. A library of 100k posters needs about 2 GB.
 
 That path has to be on a mounted volume. The supervised image puts it inside the `tracearr_data`
 volume, so there is nothing to configure. The standard Docker image expects a named volume at
 `/data/tracearr/image-cache`, which the compose example creates as `tracearr_images`. Without one
 the cache lives on the container's writable layer and is thrown away every time the container is
 recreated, so every poster is downloaded again on the next pass. On a large library that is hours
-of requests to your media server. Settings → General warns when it detects this, and from 2.8.0 the
-warning clears on the first restart with a volume in place.
+of requests to your media server. Settings → Servers → Posters warns when it detects this, and from
+2.8.0 the warning clears on the first restart with a volume in place.
 
 A host path works at that mount point too, but only if the server can write to it. The standard
 image runs as UID 1001 and does not read `PUID`, `PGID` or `UMASK`, so a host directory owned by
