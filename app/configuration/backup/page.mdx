@@ -126,6 +126,8 @@ volumes:
   - /path/to/backups:/data/backup
 ```
 
+The backup directory is supported on a named volume or a host path on a local disk. To keep copies on a NAS or another machine, point your sync or backup tool at that directory and let it move the files off the host.
+
 ### Permissions
 
 Tracearr runs as **UID 1001** inside the container and does not read `PUID`, `PGID` or `UMASK`. A named volume is created with the right owner. A host path is not, so the directory has to be owned by this user:
