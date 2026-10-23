@@ -125,6 +125,23 @@ externalRedis:
 
 ---
 
+## Argo CD and other GitOps tools
+
+Argo CD renders the chart with `helm template`, which has no cluster access. The chart's secret-preserving check runs through Helm's `lookup` function, which returns nothing in that mode, so with the default `secrets.autoGenerate: true` every render produces new `JWT_SECRET` and `COOKIE_SECRET` values. The Secret stays OutOfSync, and each sync rotates both secrets and signs every user out.
+
+Point the chart at a Secret you manage instead:
+
+```yaml
+secrets:
+  existingSecret: tracearr-secrets # needs JWT_SECRET, COOKIE_SECRET and DB_PASSWORD keys
+```
+
+Setting `secrets.jwtSecret` and `secrets.cookieSecret` explicitly also works, but that puts them in the values file in Git.
+
+`helm.sh/resource-policy: keep` on the generated Secret is a Helm annotation and Argo CD ignores it. If you switch an existing Argo CD install to `existingSecret`, copy the generated values into the new Secret before syncing, because the sync prunes the old one.
+
+---
+
 ## Configuration Reference
 
 ### Tracearr
