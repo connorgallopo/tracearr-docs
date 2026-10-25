@@ -332,16 +332,22 @@ If the panel is empty, the server you're looking at is missing its respective re
 
 ### Pages are slow to load on Unraid
 
-If Tracearr feels sluggish — especially pages with lots of history — the most likely cause is where your database is stored.
+If Tracearr feels sluggish, especially on pages with lots of history, the most likely cause is where your database is stored.
 
-Paths under `/mnt/user` go through Unraid's FUSE filesystem layer (shfs), which adds significant overhead to every database read and write. This affects all applications that use a database, not just Tracearr. On a typical Unraid setup, database operations through `/mnt/user` can be **50–100x slower** than direct disk access, even on NVMe drives.
+Paths under `/mnt/user` go through Unraid's FUSE filesystem layer (shfs), which adds overhead to every database read and write, even on NVMe drives. This affects every application that keeps a database there, not only Tracearr. A path that names the pool directly, such as `/mnt/cache/...`, skips that layer.
 
-**Fix:** Move your PostgreSQL data to a path that bypasses the array:
+The supervised image from Community Apps checks this each time it starts. When the database, Redis or app data sits on a user share, the owner sees a banner, and **Show me how to fix it** lists the template field to change and the exact path to set, built from your own pool's name.
 
-- `/mnt/cache/appdata/tracearr/postgres` — if you have a cache pool (most common)
-- `/mnt/appdata/tracearr/postgres` — if you've set up a dedicated appdata share on cache
+**Fix:** In Unraid, open **Docker**, click the Tracearr icon and choose **Edit**. Change **PostgreSQL Data** to the same folder on its pool, `/mnt/<pool>/appdata/tracearr/postgres`, where `<pool>` is your pool's name (`cache` on most setups). Click **Apply**.
 
-If you're using the **supervised image** from Community Apps, edit the container and change the **PostgreSQL Data** path. If you're using **Docker Compose** with named volumes, this doesn't apply — Docker manages the volume storage directly.
+Only switch once every file in that folder is on the pool. The supervised image creates a new, empty database when the PostgreSQL Data folder has no `PG_VERSION` file, so pointing it at a pool folder that's missing files starts Tracearr from scratch. If part of appdata is still on the array:
+
+1. Stop the Tracearr container.
+2. In **Shares**, open `appdata`. Set **Primary storage** to your pool, **Secondary storage** to **Array**, and **Mover action** to **Array → pool**.
+3. In **Main**, click **Move** and wait for it to finish.
+4. Start Tracearr. Once every file is on the pool, the in-app notice shows the exact path to set.
+
+If you're using **Docker Compose** with named volumes, this doesn't apply. Docker manages the volume storage directly.
 
 ---
 
