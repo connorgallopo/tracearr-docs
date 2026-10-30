@@ -56,7 +56,7 @@ Tracearr refuses the link when:
 
 ### Single Sign-On (OIDC)
 
-If your Tracearr instance is configured with an OIDC identity provider (Authentik, Authelia, Keycloak, and similar), the login page shows an SSO button. Click it to sign in through your provider, then connect servers as described below. On a fresh install the first account created this way becomes the owner. See [OIDC Single Sign-On](/configuration/environment#oidc-single-sign-on) for the required environment variables.
+If your Tracearr instance is configured with an OIDC identity provider (Authentik, Authelia, Keycloak, and similar), the login page shows an SSO button. Click it to sign in through your provider, then connect servers as described below. On a fresh install the first account created this way becomes the owner. An owner created with **Create Account** or Plex signs in through SSO only when the email on the IdP profile matches the owner's own Tracearr email: the one entered at **Create Account**, or the Plex account's email after a Plex sign-in. Your server accounts' emails and the contact email are not checked. Use the same email in both places, or change the owner's with [`set-email`](/configuration/recovery#set-email). See [OIDC Single Sign-On](/configuration/environment#oidc-single-sign-on) for the required environment variables.
 
 ### Jellyfin
 

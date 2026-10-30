@@ -131,7 +131,7 @@ OIDC_CLIENT_SECRET=<from your identity provider>
 OIDC_PROVIDER_NAME=Authentik  # optional, defaults to "SSO"
 ```
 
-When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`, and the **Single sign-on** switch appears under **Settings** → **Access** → **Sign-in**. On a fresh install the first person to sign in through the provider becomes the owner. Afterwards the button also signs in admins and members who are allowed to and have a live account on a server open to them, matched to a Tracearr identity by the IdP profile's email or `preferred_username`; see [Member sign-in](/configuration/member-sign-in#how-members-sign-in).
+When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`, and the **Single sign-on** switch appears under **Settings** → **Access** → **Sign-in**. On a fresh install the first person to sign in through the provider becomes the owner. An owner who already exists is matched only by the owner's own Tracearr email, so it has to equal the email on the IdP profile; [`set-email`](/configuration/recovery#set-email) changes it. Afterwards the button also signs in admins and members who are allowed to and have a live account on a server open to them, matched to a Tracearr identity by the IdP profile's email or `preferred_username`; see [Member sign-in](/configuration/member-sign-in#how-members-sign-in).
 
 ## Reverse Proxy
 
