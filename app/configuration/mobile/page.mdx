@@ -147,6 +147,16 @@ To prevent notification spam, the app enforces rate limits:
 
 You can see your current rate limit status in the notification settings.
 
+### Images in Notifications
+
+Stream notifications show the poster, violations show the user's avatar, and server alerts show the Tracearr logo. Your phone downloads the image itself, so it needs:
+
+- an **External URL** under **Settings** that starts with `https://`. Tracearr leaves the image off when there's no External URL or it uses `http://`
+- that URL to be reachable from the phone wherever it is, not only on your home network
+- `/api/v1/images/` let through without a login, if an auth proxy like Authelia or Authentik sits in front of Tracearr
+
+A push still arrives without an image when any of these is missing.
+
 ## Home Screen Widget
 
 The **Now Playing** widget shows active streams and transcodes across your servers, and how many servers are down. On iOS it comes in small, medium and large Home Screen sizes and three Lock Screen sizes. On Android it is a resizable widget, 4 by 2 cells by default.
