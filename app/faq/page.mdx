@@ -41,6 +41,7 @@ import { Tabs } from 'nextra/components';
 
 **Data & Maintenance Jobs**
 
+- [Why does one History row have several segments?](#why-does-one-history-row-have-several-segments)
 - [I see inconsistent device names](#i-see-inconsistent-device-names-like-androidtv-android-tv-and-nvidia-shield)
 - [I see both "US" and "United States" in my country data](#i-see-both-us-and-united-states-in-my-country-data)
 - [I set a server location but past local plays still show as Local Network](#i-set-a-server-location-but-past-local-plays-still-show-as-local-network)
@@ -368,6 +369,16 @@ Newsletter item links come from the server's **Public address**, which is a sepa
 ## Data & Maintenance Jobs
 
 Tracearr includes maintenance jobs in **Settings → Jobs** to fix common data issues.
+
+### Why does one History row have several segments?
+
+When someone starts a title again within 24 hours of stopping it, hadn't finished it, and picks up at the same point or later, Tracearr treats it as a resume. The new session joins the earlier play as a segment instead of becoming its own row, so a play you're looking for may be inside an earlier row.
+
+To see the segments, click the row in **History**. In Session Details, the **Playback** card has an **N segments ›** badge on its header. Click it for each segment's start, stop and watch time, and **‹ Summary** to go back. A play with one segment has no badge.
+
+Since 3.1.5, the row is dated by its latest segment and shows a layers icon with the segment count under the time. Before that, it sat at the time of the first segment with nothing in the table to mark it.
+
+---
 
 ### I see inconsistent device names like "AndroidTV", "Android TV", and "NVIDIA Shield"
 
