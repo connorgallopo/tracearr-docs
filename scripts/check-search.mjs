@@ -20,6 +20,12 @@ const expectations = {
   webhook: ['/sse-plugin/comparison'],
   'trust score': ['/templates/trust-score-changed'],
   import: ['/getting-started/import'],
+  'locked out': ['/configuration/recovery'],
+  'sign in': ['/configuration/member-sign-in'],
+  'plex to jellyfin': ['/faq', '/configuration/member-sign-in'],
+  'quick connect': ['/configuration/member-sign-in'],
+  sso: ['/configuration/environment', '/configuration/member-sign-in'],
+  authentik: ['/configuration/environment'],
 };
 
 // pagefind.js resolves everything relative to its own file URL, and Node's

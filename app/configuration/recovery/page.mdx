@@ -11,7 +11,7 @@ If you're locked out of your Tracearr instance, you can recover access with the 
 
 ## Common Lockout Scenarios
 
-**You are the owner and used to sign in with Jellyfin credentials.** The owner signs in with a Tracearr password, their Plex account or SSO. Run [`reset-password`](#reset-password) to set a password for your account, then sign in with it. If your account has a linked Plex account and **Owner's Plex account** is on under **Settings** → **Access** → **Sign-in**, **Sign in with Plex** also works with no CLI needed. Since 2.8.0 the owner can also sign in with their own Jellyfin or Emby account, through a server that has member sign-in on; see [Member sign-in](/configuration/member-sign-in).
+**You are the owner and used to sign in with Jellyfin credentials.** The owner signs in with a Tracearr password, their Plex account or SSO. Run [`reset-password`](#reset-password) to set a password for your account, then sign in with it. If your account has a linked Plex account and **Plex account** is on under **Settings** → **Access** → **Sign-in**, **Sign in with Plex** also works with no CLI needed. Since 2.8.0 the owner can also sign in with their own Jellyfin or Emby account, through a server that has member sign-in on; see [Member sign-in](/configuration/member-sign-in).
 
 **You forgot your password.** Run [`reset-password`](#reset-password). It works even when the account only ever signed in with Plex and has no password at all.
 
@@ -22,8 +22,8 @@ If you're locked out of your Tracearr instance, you can recover access with the 
 **You're not sure which account is which.** Run [`list-users`](#list-users) to see every user with their email, role, and available login methods.
 
 <Callout type="info">
-  If your account has a linked Plex account and **Owner's Plex account** is on, **Sign in with
-  Plex** keeps working through all of these scenarios. Try it before reaching for the CLI.
+  If your account has a linked Plex account and **Plex account** is on, **Sign in with Plex** keeps
+  working through all of these scenarios. Try it before reaching for the CLI.
 </Callout>
 
 ## Running the CLI

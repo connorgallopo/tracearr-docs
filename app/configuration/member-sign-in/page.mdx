@@ -15,18 +15,43 @@ There is one owner, the account created at [first-run setup](/getting-started/fi
 
 ## Turning it on
 
-Go to **Settings** → **Access** → **Sign-in**. The **Sign-in methods** card has one switch per way in, and a row per server under the last one.
+Go to **Settings** → **Access** → **Sign-in**. The page has two cards of switches.
 
-| Switch                             | Who it covers                                                                                                                                                                                                                        |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Username and password**          | The owner always, and admins with a Tracearr password when they are allowed to sign in.                                                                                                                                              |
-| **Single sign-on**                 | The owner, and admins and members who are allowed to sign in and have a live account on a server open to them, through your identity provider. Only shown when [OIDC is configured](/configuration/environment#oidc-single-sign-on). |
-| **Owner's Plex account**           | Lets the owner sign in with their own Plex account.                                                                                                                                                                                  |
-| **Let admins and members sign in** | The default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page.                                                                                                              |
+**How you sign in** lists the owner's own ways in, and only the ones the owner account holds:
 
-Under **Let admins and members sign in**, every live server has its own switch. These say where people can use their Plex, Jellyfin or Emby account to sign in. A server marked historical is not listed. Switching a server off signs out the people who could only get in through it; anyone set to Allow with an account there keeps their session.
+| Switch                    | Shown when                                                           | Who it covers                                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Username and password** | The owner has a Tracearr password                                    | The owner, and admins with a Tracearr password when they are allowed to sign in.                                                                       |
+| **Single sign-on**        | [OIDC is configured](/configuration/environment#oidc-single-sign-on) | The owner, and admins and members who are allowed to sign in and have a live account on a server open to them, through your identity provider.         |
+| **Plex account**          | The owner has a Plex account linked                                  | The owner's own Plex account. It keeps working after the Plex server is marked historical, because it checks the account with plex.tv, not the server. |
 
-Tracearr refuses to switch off the last of password, Plex and single sign-on that the owner can still use, even if the owner can also sign in through a Jellyfin or Emby server. The refusal shows under the switch and the switch snaps back.
+**Admins and members** has **Let admins and members sign in**, the default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page. Under it, **Through these servers** has a switch for every live server. These say where people can use their Plex, Jellyfin or Emby account to sign in. A server marked historical is not listed. Switching a server off signs out the people who could only get in through it; anyone set to Allow with an account there keeps their session. **Set individually** lists the people whose user page says Allow or Block, and can add one.
+
+Tracearr refuses to switch off the last of password, Plex and single sign-on that the owner can still use, even if the owner can also sign in through a Jellyfin or Emby server. That switch reads "Your only way in, so it stays on." and cannot be clicked.
+
+### Moving from Plex to Jellyfin or Emby
+
+An owner who moved to Jellyfin or Emby and marked the Plex server historical often finds **Plex account** stuck on as the only way in. Signing in with Jellyfin or Emby does not count, because it goes through member sign-in on that server: it stops working if the server's switch is turned off or the server is marked historical, and Tracearr can't check that the server is up.
+
+To turn Plex sign-in off, give the owner a Tracearr password first:
+
+<Steps>
+
+### Set a password
+
+Run [`reset-password`](/configuration/recovery#reset-password) with no username. It creates a password for an owner who never had one, and signs out the owner's current sessions.
+
+### Sign in again
+
+Sign in with the new password, or with your Jellyfin or Emby account if that server's switch is on.
+
+### Turn Plex off
+
+**Username and password** now shows under **How you sign in**, so **Plex account** can be switched off.
+
+</Steps>
+
+Keep the Jellyfin or Emby server's switch on to go on signing in through it.
 
 ## Who gets in
 
@@ -46,15 +71,27 @@ Through a media server, a person on Default needs that server's switch on as wel
 
 When password sign-in is on and a Jellyfin or Emby server is open to sign-in, the login page splits into two tabs, **Tracearr account** and **Media server**; otherwise whichever form applies shows alone. The Media server form lists the Jellyfin and Emby servers people can sign in through. Plex uses the **Sign in with Plex** button, and the owner's own Jellyfin or Emby account works through the Media server form too, on a server open to member sign-in.
 
-**Plex.** A member clicks **Sign in with Plex** and authorizes in the plex.tv popup, the same button the owner uses. Tracearr matches the Plex account against the accounts it has synced from your Plex servers, so a person who is not on one of them is turned away. The button shows when the owner's Plex switch is on and the owner has a Plex account linked, or when a Plex server is open to member sign-in.
+### Plex
 
-**Jellyfin.** The member picks the server. When Quick Connect is enabled on that Jellyfin server, Tracearr shows a code: they open Jellyfin, go to **Quick Connect**, enter the code, and Tracearr signs them in once Jellyfin approves it. The code is good for 10 minutes. **Use password instead** switches to the username and password form for that server.
+A member clicks **Sign in with Plex** and authorizes in the plex.tv popup, the same button the owner uses. Tracearr matches the Plex account against the accounts it has synced from your Plex servers, so a person who is not on one of them is turned away. The button shows when the owner's Plex switch is on and the owner has a Plex account linked, or when a Plex server is open to member sign-in.
 
-**Emby.** The member picks the server and enters their Emby username and password.
+<div data-pagefind-weight="10">
 
-**Single sign-on.** A person who signs in through your identity provider is linked to a Tracearr identity by the email on the IdP profile, matched against the email of a synced server account or of a Tracearr account, and failing that by `preferred_username` against a synced account's username. The match has to be unique; two people with the same address are not linked. The link is kept, so the next sign-in goes straight through. The owner is the exception: only the owner's own Tracearr email counts, never a server account's email, the contact email or a username. That is the email entered at **Create Account**, or the Plex account's email once the owner signs in with Plex. If it differs from the email on your IdP profile, SSO answers "Sign-in is not available for this account." Change it with [`set-email`](/configuration/recovery#set-email). An admin or member also needs a live account on a server they could sign in through: that server's switch on, or the person set to Allow. On the first sign-in, when the match came from a server account, that account's server is the one that has to be open. An admin with no media server account can sign in with a password but not through SSO.
+### Jellyfin and Quick Connect
+
+</div>
+
+The member picks the server. When Quick Connect is enabled on that Jellyfin server, Tracearr shows a code: they open Jellyfin, go to **Quick Connect**, enter the code, and Tracearr signs them in once Jellyfin approves it. The code is good for 10 minutes. **Use password instead** switches to the username and password form for that server.
+
+### Emby
+
+The member picks the server and enters their Emby username and password.
 
 After three failed Jellyfin or Emby password attempts for the same username on the same server within 15 minutes, Tracearr refuses further attempts for that username until the window passes. Tracearr never shows the member the media server's own error.
+
+### Single sign-on (SSO)
+
+A person who signs in through your identity provider is linked to a Tracearr identity by the email on the IdP profile, matched against the email of a synced server account or of a Tracearr account, and failing that by `preferred_username` against a synced account's username. The match has to be unique; two people with the same address are not linked. The link is kept, so the next sign-in goes straight through. The owner is the exception: only the owner's own Tracearr email counts, never a server account's email, the contact email or a username. That is the email entered at **Create Account**, or the Plex account's email once the owner signs in with Plex. If it differs from the email on your IdP profile, SSO answers "Sign-in is not available for this account." Change it with [`set-email`](/configuration/recovery#set-email). An admin or member also needs a live account on a server they could sign in through: that server's switch on, or the person set to Allow. On the first sign-in, when the match came from a server account, that account's server is the one that has to be open. An admin with no media server account can sign in with a password but not through SSO.
 
 ### Two refusals
 
@@ -81,7 +118,7 @@ A member never sees Violations, People, Devices, Bandwidth, the Users list, Auto
 
 ### Show members anonymous server activity
 
-The second card on the Sign-in page is **Show members anonymous server activity**, off by default. With it on, members get counts and nothing else: how many other streams are playing, how many other people watched a title, the popularity sorts in Browse, and whether anyone else has watched a title they requested. Names, titles and locations stay hidden either way.
+The last card on the Sign-in page is **Show members anonymous server activity**, off by default. With it on, members get counts and nothing else: how many other streams are playing, how many other people watched a title, the popularity sorts in Browse, and whether anyone else has watched a title they requested. Names, titles and locations stay hidden either way.
 
 ## For the owner
 

@@ -92,6 +92,12 @@ Yes, since 2.8.0, with the Plex, Jellyfin or Emby account they already have on y
 
 ---
 
+### I moved from Plex to Jellyfin. How do I turn off Plex sign-in?
+
+Set a Tracearr password with [`reset-password`](/configuration/recovery#reset-password), then switch off **Plex account** under **Settings** → **Access** → **Sign-in**. Until the owner has a password or SSO, Plex stays on as the only way in, even after the Plex server is marked historical: signing in with Jellyfin goes through member sign-in on that server and does not count. See [Moving from Plex to Jellyfin or Emby](/configuration/member-sign-in#moving-from-plex-to-jellyfin-or-emby).
+
+---
+
 ### Can I change the owner or add another Tracearr account?
 
 No. The owner is the account created at first-run setup. Tracearr never creates a second Tracearr account, and nobody can be given the owner role later. Everyone else is a person synced from your media servers, who can sign in with their own Plex, Jellyfin or Emby account once you allow it. If the owner was set up apart from your own media server account, [The owner account](/getting-started/first-server#the-owner-account) explains what that means.
