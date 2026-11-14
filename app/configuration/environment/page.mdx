@@ -133,6 +133,8 @@ OIDC_PROVIDER_NAME=Authentik  # optional, defaults to "SSO"
 
 When configured, the login page shows an SSO button labeled with `OIDC_PROVIDER_NAME`, and the **Single sign-on** switch appears under **Settings** → **Access** → **Sign-in**. On a fresh install the first person to sign in through the provider becomes the owner. An owner who already exists is matched only by the owner's own Tracearr email, so it has to equal the email on the IdP profile; [`set-email`](/configuration/recovery#set-email) changes it. Afterwards the button also signs in admins and members who are allowed to and have a live account on a server open to them, matched to a Tracearr identity by the IdP profile's email or `preferred_username`; see [Member sign-in](/configuration/member-sign-in#how-members-sign-in).
 
+Signing out of Tracearr returns to the Tracearr login page. It does not send the browser to the provider's logout page, so the provider's own session stays signed in.
+
 ## Reverse Proxy
 
 Behind an HTTPS reverse proxy, logins work as long as the proxy preserves the `Host` header, forwards `X-Forwarded-Host` with `TRUST_PROXY` set, or `CORS_ORIGIN` lists the public URL. The last one covers password sign-in but not SSO, which needs the public host from `Host` or a trusted `X-Forwarded-Host`. Forward `X-Forwarded-Proto` so session cookies carry the `Secure` attribute over HTTPS.
