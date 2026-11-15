@@ -1,21 +1,26 @@
 ---
 title: Import Watch History - Tautulli & Playback Reporting
-description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, or Jellystat. Step-by-step guide for migrating Plex, Jellyfin, and Emby session data.
+description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, Jellystat, or tofa's own history. Step-by-step guide for migrating Plex, Jellyfin, Emby and tofa session data.
 ---
 
 import { Callout } from 'nextra/components';
 
 # Import Watch History
 
-Tracearr can import your existing watch history from **Tautulli** (for Plex), the **Playback Reporting plugin**, or **Jellystat** (the last two for Jellyfin/Emby). This lets you keep your historical data when migrating to Tracearr.
+Tracearr can import your existing watch history from **Tautulli** (for Plex), the **Playback Reporting plugin** or **Jellystat** (both for Jellyfin/Emby), and from the history a **tofa** server keeps itself. This lets you keep your historical data when migrating to Tracearr.
 
-Access the import feature at **Settings** → **Import**.
+Access the import feature at **Settings** → **Import**. The same choices appear as the last step of first-run setup and of **Add Server**, once the server is connected.
 
-<Callout type="warning" title="Sync Your Server First">
-  Before importing, make sure you've synced your media server in **Settings → Servers**. Tracearr
-  matches imported sessions to existing users by their media server user ID. Sessions for users that
-  don't exist in Tracearr will be skipped.
+<Callout type="info" title="A new server's first sync">
+  Tracearr matches imported sessions to users and library items it has synced from the server. An
+  import started while a server's first library sync is still queued or running shows "Queued.
+  Starts on its own when the first library sync finishes" and waits for it; you can leave the page.
+  After 24 hours it starts anyway. Sessions for users that don't exist in Tracearr are skipped.
 </Callout>
+
+## When an import fails
+
+An import that fails tries again on its own, 3 attempts in all, and its card reads "Retrying (attempt 2 of 3)" after the reason. Some failures can't be fixed by trying again, such as an API key the server rejects, an answer Tracearr can't read, or a server [marked historical](/configuration/servers#marking-a-server-historical). Those fail at once and the card shows why. Once an import has failed, its button reads **Start again**.
 
 ## Import from Tautulli
 
@@ -245,6 +250,22 @@ This is a one-time migration path. Once your data is in Tracearr, you can uninst
   plugin to Jellystat. Movies typically import cleanly, but TV episodes may show incomplete data.
   This is a limitation of the plugin's data format, not Tracearr.
 </Callout>
+
+## Import from tofa
+
+tofa keeps its own watch history, so there's nothing to export and no other tool to install. Tracearr reads it through the server's existing connection.
+
+A tofa server added to Tracearr queues this import for itself, and it starts when the server's first library sync finishes. You only need to run it by hand to import again.
+
+1. In Tracearr, go to **Settings** → **Import**, then the **tofa** tab if you also have other kinds of server
+2. Select your **Target Server**
+3. Click **Import tofa history**
+
+Records may be skipped for these reasons:
+
+- **User not found**: The tofa user doesn't exist in Tracearr. Sync your server first to add all users.
+- **Duplicate session**: Tracearr recorded the session itself, or an earlier import already brought it in.
+- **In-progress session**: A session still playing has no end yet and is skipped.
 
 ## After Importing
 
