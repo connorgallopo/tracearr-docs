@@ -1,6 +1,6 @@
 ---
 title: Seerr Requests
-description: Link Seerr, Overseerr or Jellyseerr to a Tracearr server to see who requested each title, when it landed, and whether the requester ever watched it.
+description: Link Seerr, Overseerr or Jellyseerr to a Tracearr server, or use a tofa server's own requests, to see who requested each title, when it landed, and whether the requester ever watched it.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -13,7 +13,9 @@ Tracearr can link one **Seerr** instance to each media server. Overseerr and Jel
 - **User detail** gets a Requests card with a summary (requests, approval rate, never watched, median wait) and the person's request history, each row marked with whether they have watched what they asked for.
 - **Requests** in the sidebar covers the servers you have picked: how many requests landed and got watched, what landed and was never played, and who follows through. See [The Requests page](#the-requests-page).
 
-Tracearr only reads from Seerr. It never approves, declines or creates requests.
+A tofa server has requests built in, so it needs no Seerr; see [tofa requests](#tofa-requests).
+
+Tracearr only reads from Seerr and tofa. It never approves, declines or creates requests.
 
 ## Link a server
 
@@ -40,20 +42,29 @@ A Seerr instance is bound to exactly one media server in its own settings. Trace
 <Callout type="info">
   Saving starts a full sync of the request history. On a Seerr with a few hundred requests that
   takes seconds; the row shows the request count once it lands. After that Tracearr checks Seerr
-  every 15 minutes and does a full pass nightly. **Sync now** in the row's Seerr menu forces a full
-  pass.
+  every 15 minutes and does a full pass nightly. **Sync requests now** in the row's menu forces a
+  full pass.
 </Callout>
 
 The API key is encrypted in the database the same way notification destination secrets are, under `ENCRYPTION_KEY` or, when that is not set, a key derived from `JWT_SECRET`. If that secret changes, the row shows **Needs API key** and sync pauses until you enter the key again.
 
+## tofa requests
+
+A tofa server keeps its own requests, and Tracearr reads them through the server's existing connection. Nothing needs linking: the server's row in **Settings → Servers → Connections** shows a Requests line from the moment the server is added, with the time of the last sync and the request count. The row's menu has no Seerr items for it, and a tofa server can't be linked to Seerr.
+
+tofa lists every request in one answer and keeps no record of one it deleted, so each sync, every 15 minutes and nightly, reads them all and marks any that are gone as removed.
+
+When requests are turned off in tofa, the row shows **Sync failed** with "Requests are turned off on this tofa server", and syncing stops picking up new ones until they are turned back on. While no server takes requests, **Requests** leaves the sidebar.
+
 ## How requests are matched
 
-Each Seerr request carries the requester's plex.tv account id (Plex) or their Jellyfin or Emby user id, and the title's TMDB and TVDB ids. Tracearr matches:
+Each Seerr request carries the requester's plex.tv account id (Plex) or their Jellyfin or Emby user id, and the title's TMDB and TVDB ids. A tofa request carries the requester's tofa user id and the same two ids. Tracearr matches:
 
 | Seerr field                          | Tracearr side                                 |
 | ------------------------------------ | --------------------------------------------- |
 | Requester's Plex account id          | The user's account on the linked Plex server  |
 | Requester's Jellyfin or Emby user id | The user's account on the linked server       |
+| Requester's tofa user id             | The user's account on that tofa server        |
 | TMDB id (movies), TVDB id (shows)    | The library title, across every copy you have |
 | Plex rating key or Jellyfin item id  | Fallback when the provider ids do not match   |
 
@@ -81,7 +92,7 @@ The badge has two colours. Green, "Watched by the requester", means the person w
 
 ## The Requests page
 
-**Requests** appears in the sidebar once at least one server has Seerr linked. It follows the server picker at the top of the app, so picking one server narrows every number on it. With nothing linked the page says "No Seerr linked" and offers **Link Seerr**.
+**Requests** appears in the sidebar once at least one server has Seerr linked or is a tofa server taking requests. It follows the server picker at the top of the app, so picking one server narrows every number on it. With nothing linked the page says "No Seerr linked" and offers **Link Seerr**.
 
 Three cards run across the top:
 
@@ -101,7 +112,7 @@ The funnel and the Requesters table judge a request by everything that landed fo
 
 ## Unlinking
 
-**Unlink** in the row's Seerr menu deletes the mirrored request history for that server. **Disable sync** in the same menu keeps the history and stops syncing; the row reads Paused until you enable it again.
+**Unlink Seerr** in the server row's menu deletes the mirrored request history for that server. **Pause request sync** in the same menu keeps the history and stops syncing; the row reads Paused until you choose **Resume request sync**. A tofa server's requests can be paused the same way but not unlinked; they go when the server is removed.
 
 <Callout type="info">
   Linking Seerr does not add anything to automations or notifications. Request events as automation
