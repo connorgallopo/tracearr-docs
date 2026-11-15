@@ -58,7 +58,7 @@ import { Tabs } from 'nextra/components';
 
 ### What media servers does Tracearr support?
 
-Tracearr supports **Plex**, **Jellyfin**, and **Emby**. You can monitor multiple servers of different types from a single Tracearr instance.
+Tracearr supports **Plex**, **Jellyfin**, **Emby** and **tofa** (0.13.3 or newer). You can monitor multiple servers of different types from a single Tracearr instance.
 
 ---
 
@@ -218,13 +218,13 @@ This forces the container to use IPv4 only, which resolves the issue in most cas
 
 1. Verify the server connection is active in **Settings** → **Servers**
 2. Check that your API key or token is still valid. A replaced Jellyfin or Emby key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
-3. Start a playback session — Plex sessions appear instantly, while Jellyfin and Emby sessions appear within a poll cycle
+3. Start a playback session. Plex and tofa sessions appear at once, while Jellyfin and Emby sessions appear within a poll cycle
 
 ---
 
 ### Jellyfin or Emby sessions are slow to appear
 
-Plex pushes sessions to Tracearr instantly over SSE. Jellyfin and Emby are polled on an interval by default, so their sessions can take a poll cycle to show up.
+Plex pushes sessions to Tracearr instantly over SSE, and tofa over its own socket. Jellyfin and Emby are polled on an interval by default, so their sessions can take a poll cycle to show up.
 
 Install the [Tracearr SSE plugin](/configuration/realtime) on your Jellyfin or Emby server for instant, push-based sessions. See the [Real-Time Updates](/configuration/realtime) guide for setup.
 
@@ -331,6 +331,7 @@ See [Account Recovery](/configuration/recovery) for all commands and lockout sce
 What the Server Resources panel needs depends on the server:
 
 - **Plex** requires **Plex Pass**: resource monitoring is a Plex Pass API feature, and Tracearr currently does not detect whether your account has it.
+- **tofa** reports CPU and memory itself, with no plugin.
 - **Jellyfin and Emby** don't expose CPU or memory through their APIs at all. Installing the [SSE plugin](/sse-plugin) (v0.4 or newer) fills the panel with a live sample every 6 seconds. Host-level values require the media server to run on Linux, including in a container.
 
 If the panel is empty, the server you're looking at is missing its respective requirement above.

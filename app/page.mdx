@@ -1,6 +1,6 @@
 ---
 title: Tracearr Documentation
-description: Complete documentation for Tracearr, the modern monitoring platform for Plex, Jellyfin, and Emby media servers. Installation guides, configuration, and troubleshooting.
+description: Complete documentation for Tracearr, the modern monitoring platform for Plex, Jellyfin, Emby and tofa media servers. Installation guides, configuration, and troubleshooting.
 ---
 
 import { Callout } from 'nextra/components';
@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 # Tracearr
 
-**Real-time monitoring for Plex, Jellyfin, and Emby. One dashboard for all your servers.**
+**Real-time monitoring for Plex, Jellyfin, Emby and tofa. One dashboard for all your servers.**
 
 Tracearr is a free, open-source monitoring platform that gives you complete visibility into your media servers. Track streams in real-time, analyze playback patterns, and detect account sharing, all from a single interface.
 
@@ -25,13 +25,14 @@ Tracearr is a free, open-source monitoring platform that gives you complete visi
 
 If you run multiple media servers, you've probably dealt with this: Tautulli only works with Plex. Jellystat only works with Jellyfin and Emby. Multiple servers means multiple dashboards.
 
-**Tracearr handles all three.** One install, one interface.
+**Tracearr covers all three, plus tofa.** One install, one interface.
 
 |                           | Tautulli | Jellystat | Tracearr |
 | ------------------------- | :------: | :-------: | :------: |
 | Plex support              |    ✓     |           |    ✓     |
 | Jellyfin support          |          |     ✓     |    ✓     |
 | Emby support              |          |     ✓     |    ✓     |
+| tofa support              |          |           |    ✓     |
 | Multi-server dashboard    |          |           |    ✓     |
 | Account sharing detection |          |           |    ✓     |
 | Impossible travel alerts  |          |           |    ✓     |
@@ -45,9 +46,9 @@ If you run multiple media servers, you've probably dealt with this: Tautulli onl
 
 - **Live Session Tracking**: See every active stream instantly with WebSocket updates
 - **Instant Jellyfin & Emby**: Push-based session updates with the optional [SSE plugin](/sse-plugin)
-- **Multi-Server Dashboard**: Plex, Jellyfin, and Emby unified in one view
+- **Multi-Server Dashboard**: Plex, Jellyfin, Emby and tofa unified in one view
 - **Interactive World Map**: Visualize where streams originate globally
-- **Server Resources**: CPU and memory charts per server. Plex reports its own numbers; Jellyfin and Emby need the [SSE plugin](/sse-plugin)
+- **Server Resources**: CPU and memory charts per server. Plex and tofa report their own numbers; Jellyfin and Emby need the [SSE plugin](/sse-plugin)
 
 ### Account Sharing Detection
 
