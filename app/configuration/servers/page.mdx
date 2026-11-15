@@ -1,6 +1,6 @@
 ---
 title: Media Servers
-description: Change a Jellyfin or Emby server's URL or API key, give a server a location for its local plays, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
+description: Change a Jellyfin, Emby or tofa server's URL or API key, give a server a location for its local plays, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
 ---
 
 # Media Servers
@@ -11,9 +11,20 @@ description: Change a Jellyfin or Emby server's URL or API key, give a server a 
 
 Connections lists every server Tracearr monitors. Drag a row by its handle to change the order.
 
+Each row shows the server's URL, its version and the date it was added. Badges beside the name show its state:
+
+- **Real-time** or **Polling**, for whether sessions arrive as they happen. See [Real-Time Updates](/configuration/realtime).
+- **Update 1.2.3 available** (with the version) when the server runs an older release than its makers publish.
+- **Can't stop streams** when the API key can read activity but not stop a stream. Clicking it opens **Edit Server** so you can paste a key that can.
+- **Historical**, see [Marking a server historical](#marking-a-server-historical).
+
+Below that, a **Requests** line shows the server's [request history](/configuration/requests), and a **Your account** line shows [your own account](/getting-started/first-server#linking-your-own-jellyfin-or-emby-account) on that server.
+
+On the right, **Sync** syncs the server's users and libraries now. Everything else is in the menu next to it (the three dots): **Edit**, **Open server**, the Seerr actions, unlinking your own account, **Mark as historical** or **Resume**, and **Remove**.
+
 ### Changing the URL or API key
 
-Click the pencil next to a server's name to open **Edit Server**. For Jellyfin and Emby it has **Server URL**, **Public address** and **API Key** alongside the name and color.
+Click **Edit** in the row's menu to open **Edit Server**. For Jellyfin and Emby it has **Server URL**, **Public address** and **API Key** alongside the name and color. tofa has **Server URL** and **API Key**; its links open in tofa's web app, so it has no public address.
 
 The API Key field is always empty when the dialog opens, and leaving it empty keeps the saved key. If you deleted or regenerated the key on the media server, Tracearr keeps sending the old one and the server rejects it, so paste the new key in and click **Update**. The live connection to the server switches to the new key within 30 seconds.
 
@@ -40,7 +51,7 @@ This route only checks that the key has administrator access at that URL. It doe
 
 ### Marking a server historical
 
-A server you have retired, or one you are only testing, can stay in Tracearr without being contacted. Open the row's menu (the three dots next to **Sync**) and click **Mark as historical**. Tracearr asks once, then stops polling the server, drops its live connection, cancels its library and user syncs, stops checking it for updates, and ends any stream that was playing on it. Nothing is deleted: its sessions, watch history, users and libraries stay on every page, and posters already cached keep showing. A poster that was never cached shows the placeholder instead of being fetched.
+A server you have retired, or one you are only testing, can stay in Tracearr without being contacted. Open the row's menu and click **Mark as historical**. Tracearr asks once, then stops polling the server, drops its live connection, cancels its library and user syncs, stops checking it for updates, and ends any stream that was playing on it. Nothing is deleted: its sessions, watch history, users and libraries stay on every page, and posters already cached keep showing. A poster that was never cached shows the placeholder instead of being fetched.
 
 A historical server is listed last, grayed, with a **Historical** badge, and it leaves the unreachable banner, the connection status list and **Dashboard** → **Server Resources**, whether one server or all servers are selected. It stays selectable in the server picker and in page filters so you can read its history. Those lists put it last and mark it **Historical**; this covers the server picker, the **Users** and **Automations** server filters and the library catalog filter.
 
@@ -49,13 +60,13 @@ Click **Resume** in the same menu to bring it back. The next poll decides whethe
 While a server is historical:
 
 - **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." Changing either through the API is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
-- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat or Playback Reporting into it are refused with "Resume this server to import into it". Resume first, import, then mark it historical again if you want.
+- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat, Playback Reporting or tofa into it are refused with "Resume this server to import into it". Resume first, import, then mark it historical again if you want.
 - **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL is refused with "Resume this server to change its address or key" instead of updating the entry as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url). Resume the existing entry first.
 - Automations scoped to it stay as they are, but triggers that need the server live (stream, server and update events) do not fire; the builder says so under the server picker. **Inactive for** skips its accounts.
 
 ### Removing a server
 
-**Remove** on a row deletes the server and everything Tracearr recorded for it: sessions, watch history, users and libraries. The dialog says so and it can't be undone. Mark the server historical instead when you want to keep that history.
+**Remove** in the row's menu deletes the server and everything Tracearr recorded for it: sessions, watch history, users and libraries. The dialog says so and it can't be undone. Mark the server historical instead when you want to keep that history.
 
 ### Server location
 
