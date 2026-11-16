@@ -18,6 +18,11 @@ TimescaleDB and Redis are persisted in a volume, so your database and configurat
   [FAQ](/faq#jellyfin-12-tracearr-cant-connect-after-upgrading-jellyfin) for details.
 </Callout>
 
+<Callout type="warning" title="3.2.0: back up first">
+  [Take a backup](/configuration/backup) before upgrading to 3.2.0. Request ids are stored
+  differently from this release on, so going back to an older version needs that backup.
+</Callout>
+
 ## Authentication Changes
 
 1.5.0 replaced Tracearr's authentication system. The upgrade itself requires nothing from you: no new environment variables are needed, and database migrations run automatically when the new version starts. What changes:
