@@ -7,6 +7,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { Globe } from 'lucide-react';
 import { SiGithub, SiDiscord } from 'react-icons/si';
 import { ogImage } from './shared-metadata';
+import './fonts/inter/inter.css';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -139,7 +140,16 @@ const structuredData = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <Head>
+      {/* Colors from the Tracearr repo's docs/style-guide.md (Cyan preset), converted from OKLCH. The light
+          primary is muted to 50% / 33% because Nextra derives its tints by adding to the lightness. */}
+      <Head
+        color={{
+          hue: 188,
+          saturation: { dark: 82, light: 50 },
+          lightness: { dark: 48, light: 33 },
+        }}
+        backgroundColor={{ dark: '#050b0c', light: '#f3f8f9' }}
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
