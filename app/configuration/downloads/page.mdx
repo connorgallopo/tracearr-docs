@@ -1,6 +1,6 @@
 ---
 title: Downloads
-description: How Tracearr records downloads from Plex, Jellyfin and Emby, what each server reports, and where to see who downloaded what.
+description: How Tracearr records downloads from Plex, Jellyfin, Emby, tofa and Silo, what each server reports, and where to see who downloaded what.
 ---
 
 import { Callout } from 'nextra/components';
@@ -20,15 +20,17 @@ A download is one item downloaded by one person. Download managers and resumed t
 | Plex     | Original downloads and app downloads, including reduced-quality ones                            | Delivered size and bitrate for app downloads. Only recorded while Tracearr is connected to the server.                                                                                    |
 | Jellyfin | The download endpoint, with app and device.                                                     | Converted downloads (a download at lower quality) are recorded as "Converted download" rows with the resolution and bitrate that was delivered. The item name needs the SSE plugin 0.6.0. |
 | Emby     | The download endpoint, matched to an item by title only. App downloads are read from sync jobs. | App downloads carry the exact delivered resolution and size.                                                                                                                              |
+| tofa     | Every offline download tofa lists, with the device and the profile that downloaded it.          | The title and device. Tracearr records no size, bitrate, resolution or codec for a tofa download.                                                                                         |
+| Silo     | Every download Silo lists, with the device and the profile that downloaded it.                  | The file size and the target bitrate. Tracearr records no resolution or codec for a Silo download.                                                                                        |
 
-Jellyfin and Emby are read from the server's activity log every 30 seconds. With [SSE plugin](/sse-plugin) 0.6.0 the download is picked up immediately.
+Jellyfin and Emby are read from the server's activity log every 30 seconds. With [SSE plugin](/sse-plugin) 0.6.0 the download is picked up immediately. tofa's and Silo's download lists are read on the same 30-second check, and Silo's right away when its socket reports a change to it.
 
 ## What is recorded
 
 - The source file's quality and size.
 - The delivered quality and size, when the download was converted.
 - The app and device, matched to the same device Tracearr uses for streams where it can.
-- On Jellyfin and Emby, the IP address and its location.
+- On Jellyfin and Emby, the IP address and its location. On Silo, the same when Silo reports the address.
 
 Plex does not report a client IP for a download, so there is no location on Plex downloads. Plex also does not report the delivered resolution, so a converted Plex download shows its bitrate as the quality.
 

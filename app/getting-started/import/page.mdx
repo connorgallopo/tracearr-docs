@@ -1,13 +1,13 @@
 ---
 title: Import Watch History - Tautulli & Playback Reporting
-description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, Jellystat, or tofa's own history. Step-by-step guide for migrating Plex, Jellyfin, Emby and tofa session data.
+description: Import your existing watch history into Tracearr from Tautulli, the Playback Reporting plugin, Jellystat, or tofa's and Silo's own history. Step-by-step guide for migrating Plex, Jellyfin, Emby, tofa and Silo session data.
 ---
 
 import { Callout } from 'nextra/components';
 
 # Import Watch History
 
-Tracearr can import your existing watch history from **Tautulli** (for Plex), the **Playback Reporting plugin** or **Jellystat** (both for Jellyfin/Emby), and from the history a **tofa** server keeps itself. This lets you keep your historical data when migrating to Tracearr.
+Tracearr can import your existing watch history from **Tautulli** (for Plex), the **Playback Reporting plugin** or **Jellystat** (both for Jellyfin/Emby), and from the history a **tofa** or **Silo** server keeps itself. This lets you keep your historical data when migrating to Tracearr.
 
 Access the import feature at **Settings** → **Import**. The same choices appear as the last step of first-run setup and of **Add Server**, once the server is connected.
 
@@ -266,6 +266,23 @@ Records may be skipped for these reasons:
 - **User not found**: The tofa user doesn't exist in Tracearr. Sync your server first to add all users.
 - **Duplicate session**: Tracearr recorded the session itself, or an earlier import already brought it in.
 - **In-progress session**: A session still playing has no end yet and is skipped.
+
+## Import from Silo
+
+Silo keeps its own playback history, so there's nothing to export and no other tool to install. Tracearr reads it through the server's existing connection.
+
+A Silo server added to Tracearr queues this import for itself, and it starts when the server's first library sync finishes. You only need to run it by hand to import again.
+
+1. In Tracearr, go to **Settings** → **Import**, then the **Silo** tab if you also have other kinds of server
+2. Select your **Target Server**
+3. Click **Import Silo history**
+
+The import syncs the server's users first. Silo's history lists only finished plays, so nothing still playing is read. The first run reads all of it. A later run starts an hour before the newest play of the last run that had no errors and no unknown users, and adds only what Tracearr doesn't have.
+
+Records may be skipped for these reasons:
+
+- **User not found**: The Silo user doesn't exist in Tracearr. Sync your server first to add all users.
+- **Duplicate session**: Tracearr recorded the session itself, or an earlier import already brought it in.
 
 ## After Importing
 

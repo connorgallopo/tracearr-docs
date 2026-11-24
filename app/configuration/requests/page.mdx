@@ -1,6 +1,6 @@
 ---
 title: Seerr Requests
-description: Link Seerr, Overseerr or Jellyseerr to a Tracearr server, or use a tofa server's own requests, to see who requested each title, when it landed, and whether the requester ever watched it.
+description: Link Seerr, Overseerr or Jellyseerr to a Tracearr server, or use a tofa or Silo server's own requests, to see who requested each title, when it landed, and whether the requester ever watched it.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -13,9 +13,9 @@ Tracearr can link one **Seerr** instance to each media server. Overseerr and Jel
 - **User detail** gets a Requests card with a summary (requests, approval rate, never watched, median wait) and the person's request history, each row marked with whether they have watched what they asked for.
 - **Requests** in the sidebar covers the servers you have picked: how many requests landed and got watched, what landed and was never played, and who follows through. See [The Requests page](#the-requests-page).
 
-A tofa server has requests built in, so it needs no Seerr; see [tofa requests](#tofa-requests).
+tofa and Silo servers have requests built in, so they need no Seerr; see [tofa requests](#tofa-requests) and [Silo requests](#silo-requests).
 
-Tracearr only reads from Seerr and tofa. It never approves, declines or creates requests.
+Tracearr only reads from Seerr, tofa and Silo. It never approves, declines or creates requests.
 
 ## Link a server
 
@@ -54,21 +54,32 @@ A tofa server keeps its own requests, and Tracearr reads them through the server
 
 tofa lists every request in one answer and keeps no record of one it deleted, so each sync, every 15 minutes and nightly, reads them all and marks any that are gone as removed.
 
-When requests are turned off in tofa, the row shows **Sync failed** with "Requests are turned off on this tofa server", and syncing stops picking up new ones until they are turned back on. While no server takes requests, **Requests** leaves the sidebar.
+When requests are turned off in tofa, the row shows **Sync failed** with "Requests are turned off on this server", and syncing stops picking up new ones until they are turned back on. While no server takes requests, **Requests** leaves the sidebar.
+
+## Silo requests
+
+A Silo server's requests work the same way as tofa's. Tracearr reads them through the server's existing connection, the server's row shows a Requests line from the moment it is added, and a Silo server can't be linked to Seerr.
+
+Each sync, every 15 minutes and nightly, reads every request Silo lists. Silo keeps a request someone cancelled, but Tracearr marks it as removed, along with any request Silo no longer lists. A request Silo made from a watchlist carries the watchlist flag.
+
+When requests are turned off in Silo, the row shows **Sync failed** with "Requests are turned off on this server". Requests already in Tracearr stay, and the next sync after they are turned back on picks up new ones.
 
 ## How requests are matched
 
-Each Seerr request carries the requester's plex.tv account id (Plex) or their Jellyfin or Emby user id, and the title's TMDB and TVDB ids. A tofa request carries the requester's tofa user id and the same two ids. Tracearr matches:
+Each Seerr request carries the requester's plex.tv account id (Plex) or their Jellyfin or Emby user id, and the title's TMDB and TVDB ids. A tofa request carries the requester's tofa user id and the same two ids, and a Silo request the requester's Silo user id and the same two ids. Tracearr matches:
 
 | Seerr field                          | Tracearr side                                 |
 | ------------------------------------ | --------------------------------------------- |
 | Requester's Plex account id          | The user's account on the linked Plex server  |
 | Requester's Jellyfin or Emby user id | The user's account on the linked server       |
 | Requester's tofa user id             | The user's account on that tofa server        |
+| Requester's Silo user id             | The user's account on that Silo server        |
 | TMDB id (movies), TVDB id (shows)    | The library title, across every copy you have |
 | Plex rating key or Jellyfin item id  | Fallback when the provider ids do not match   |
 
 No matching by username or email, and Seerr email addresses are never stored.
+
+A Silo request also names the profile that asked. A profile other than the account's main one shows on the requester's avatar, as in History; see [What are profiles?](/faq#what-are-profiles).
 
 The server row shows the request count. It does not show how many titles or users went unmatched. A title stays unmatched when it never arrived in the library or was removed later; the request still appears on the requester's user page with the title Seerr knows it by. A user stays unmatched when the requester has no account on the linked server, which is normal for Seerr local accounts. Those requests show the Seerr username in grey, or "Not on this server" when Seerr gave none.
 
@@ -92,7 +103,7 @@ The badge has two colours. Green, "Watched by the requester", means the person w
 
 ## The Requests page
 
-**Requests** appears in the sidebar once at least one server has Seerr linked or is a tofa server taking requests. It follows the server picker at the top of the app, so picking one server narrows every number on it. With nothing linked the page says "No Seerr linked" and offers **Link Seerr**.
+**Requests** appears in the sidebar once at least one server has Seerr linked or is a tofa or Silo server taking requests. It follows the server picker at the top of the app, so picking one server narrows every number on it. With nothing linked the page says "No Seerr linked" and offers **Link Seerr**.
 
 Three cards run across the top:
 
@@ -112,7 +123,7 @@ The funnel and the Requesters table judge a request by everything that landed fo
 
 ## Unlinking
 
-**Unlink Seerr** in the server row's menu deletes the mirrored request history for that server. **Pause request sync** in the same menu keeps the history and stops syncing; the row reads Paused until you choose **Resume request sync**. A tofa server's requests can be paused the same way but not unlinked; they go when the server is removed.
+**Unlink Seerr** in the server row's menu deletes the mirrored request history for that server. **Pause request sync** in the same menu keeps the history and stops syncing; the row reads Paused until you choose **Resume request sync**. A tofa or Silo server's requests can be paused the same way but not unlinked; they go when the server is removed.
 
 <Callout type="info">
   Linking Seerr does not add anything to automations or notifications. Request events as automation

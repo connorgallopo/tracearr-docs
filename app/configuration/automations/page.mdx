@@ -439,8 +439,8 @@ Displays a message on the user's media player. Useful for warnings before taking
 | Target  | Which session(s) to message — same options as Terminate Stream (defaults to triggering session) |
 
 <Callout type="info">
-  This action only works with Jellyfin and Emby. Plex doesn't support sending messages to clients
-  except when terminating a stream.
+  This action works with Jellyfin, Emby and Silo. A Silo player without a live connection to Silo
+  misses the message. Plex and tofa only show a message when a stream is terminated.
 </Callout>
 
 #### If… Otherwise…
@@ -507,11 +507,11 @@ The new-device and trust triggers can't sit on an automation that records a viol
 
 ### Updates
 
-| Trigger                        | Fires when                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------- |
-| A plugin update is available   | The Tracearr plugin on one of your servers has a newer release                  |
-| A server update is available   | Plex, Jellyfin or Emby has published a release newer than what that server runs |
-| A Tracearr update is available | Tracearr itself has a newer release                                             |
+| Trigger                        | Fires when                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| A plugin update is available   | The Tracearr plugin on one of your servers has a newer release                        |
+| A server update is available   | Plex, Jellyfin, Emby or tofa has published a release newer than what that server runs |
+| A Tracearr update is available | Tracearr itself has a newer release                                                   |
 
 These three are checked every six hours, and both outbound checks have a switch: see [Update checks](#update-checks). The message can name `{{ installedVersion }}` and `{{ latestVersion }}`. The plugin update also carries `{{ downloadUrl }}`, and the server and Tracearr updates carry `{{ releaseUrl }}`.
 
@@ -780,12 +780,12 @@ Tracearr looks for new releases every six hours: its own, the Tracearr plugin on
 
 **Settings → General → Update checks** has a switch for each of the two outbound checks:
 
-| Switch          | What it checks                                                                               |
-| --------------- | -------------------------------------------------------------------------------------------- |
-| Realtime plugin | New releases of the Tracearr plugin your Jellyfin and Emby servers stream events through     |
-| Media servers   | What each Plex, Jellyfin and Emby server runs, against the newest release its makers publish |
+| Switch          | What it checks                                                                                     |
+| --------------- | -------------------------------------------------------------------------------------------------- |
+| Realtime plugin | New releases of the Tracearr plugin your Jellyfin and Emby servers stream events through           |
+| Media servers   | What each Plex, Jellyfin, Emby and tofa server runs, against the newest release its makers publish |
 
-Both are on by default. The media server check reads the installed version from the server itself and the latest from plex.tv, the Jellyfin GitHub releases API, or Emby's release feed; **Settings → Servers** shows both versions once it has them. A version it can't parse is skipped; nothing is guessed.
+Both are on by default. The media server check reads the installed version from the server itself and the latest from plex.tv, the Jellyfin GitHub releases API, or Emby's release feed, and a tofa server reports its own update state; **Settings → Servers** shows both versions once it has them. A version it can't parse is skipped; nothing is guessed. A Silo server reports a build id instead of a release number, so it is never checked and **A server update is available** never fires for it.
 
 ## Classic Rules
 
