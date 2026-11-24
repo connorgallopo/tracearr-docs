@@ -1,6 +1,6 @@
 ---
 title: Media Servers
-description: Change a Jellyfin, Emby or tofa server's URL or API key, give a server a location for its local plays, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
+description: Change a Jellyfin, Emby, tofa or Silo server's URL or API key, give a server a location for its local plays, link and reauthorize Plex accounts, and choose which server's posters Tracearr shows.
 ---
 
 # Media Servers
@@ -14,7 +14,7 @@ Connections lists every server Tracearr monitors. Drag a row by its handle to ch
 Each row shows the server's URL, its version and the date it was added. Badges beside the name show its state:
 
 - **Real-time** or **Polling**, for whether sessions arrive as they happen. See [Real-Time Updates](/configuration/realtime).
-- **Update 1.2.3 available** (with the version) when the server runs an older release than its makers publish.
+- **Update 1.2.3 available** (with the version) when the server runs an older release than its makers publish. A Silo server shows its build id as its version and never gets this badge, since Tracearr doesn't check Silo for updates.
 - **Can't stop streams** when the API key can read activity but not stop a stream. Clicking it opens **Edit Server** so you can paste a key that can.
 - **Historical**, see [Marking a server historical](#marking-a-server-historical).
 
@@ -25,6 +25,8 @@ On the right, **Sync** syncs the server's users and libraries now. Everything el
 ### Changing the URL or API key
 
 Click **Edit** in the row's menu to open **Edit Server**. For Jellyfin and Emby it has **Server URL**, **Public address** and **API Key** alongside the name and color. tofa has **Server URL** and **API Key**; its links open in tofa's web app, so it has no public address.
+
+Silo has **Server URL**, **Public address** and **API Key**, and its key is replaced with a code by default. **Get a new key with a code** shows a code to approve in Silo while signed in as an admin, the same as when [adding the server](/getting-started/first-server#silo). Once it is approved the dialog reads "Tracearr now uses a new key." and Tracearr deletes the key it used before. When it can't, the dialog adds "If Silo still lists an older Tracearr key under Settings, API Keys, revoke it there." **Use an API key instead** shows the API Key field described below.
 
 The API Key field is always empty when the dialog opens, and leaving it empty keeps the saved key. If you deleted or regenerated the key on the media server, Tracearr keeps sending the old one and the server rejects it, so paste the new key in and click **Update**. The live connection to the server switches to the new key within 30 seconds.
 
@@ -37,7 +39,7 @@ A refused change shows a **Failed to update server** message with the reason:
 | That address or API key reaches a different server. A server can only be pointed at itself.                                                                   | The server at the new URL, or the one the new key belongs to, has a different ID from the one saved for this entry.                                                                                                                                                |
 | Could not read which server answers at that address.                                                                                                          | The key passed the admin check but Tracearr didn't get a server ID back.                                                                                                                                                                                           |
 | Tracearr has no record of which server this is and cannot reach it with the saved address and key, so it cannot confirm the change points at the same server. | No ID was ever saved for this server, and the old URL and key no longer reach it to read one. Tracearr saves the ID on startup and on every sync, so this only happens to a server it hasn't been able to reach since. Re-adding it with the same URL still works. |
-| Jellyfin rejected this API key (it may be invalid or expired).                                                                                                | The key is wrong or was deleted. Emby says the same with its own name.                                                                                                                                                                                             |
+| Jellyfin rejected this API key (it may be invalid or expired).                                                                                                | The key is wrong or was deleted. Emby says the same with its own name, and Silo says "Silo rejected this API key (it may be invalid, revoked or expired)."                                                                                                         |
 
 Plex servers have no API Key field. Plex signs in through plex.tv, and its Server URL is picked from the connections Plex reports. When a Plex token stops working, reauthorize the account under [Plex accounts](#reauthorizing-an-account).
 
@@ -48,6 +50,8 @@ Plex servers have no API Key field. Plex signs in through plex.tv, and its Serve
 The URL has to match the one shown under the server's name character for character. `http://192.168.1.100:8096/` does not match a saved `http://192.168.1.100:8096`, and neither does `https` against `http` or a hostname against an IP. Each of those adds a second server instead.
 
 This route only checks that the key has administrator access at that URL. It doesn't compare server IDs, so use **Edit Server** when you can.
+
+A Silo server is never updated this way. **Add Server** refuses a Silo server that is already connected, at the same URL or at another address that reaches the same server; give it a new key in **Edit Server** instead.
 
 ### Marking a server historical
 
@@ -60,13 +64,15 @@ Click **Resume** in the same menu to bring it back. The next poll decides whethe
 While a server is historical:
 
 - **Edit Server** keeps the name, color and public address editable but disables the URL and API Key fields with "Resume first to change the address or API key." Changing either through the API is refused with "Resume this server to change its address or key". For a historical Plex server the dialog doesn't look up connections from plex.tv.
-- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat, Playback Reporting or tofa into it are refused with "Resume this server to import into it". Resume first, import, then mark it historical again if you want.
+- **Sync** is disabled, and syncing it from the API answers "Resume this server to sync it". Imports from Tautulli, Jellystat, Playback Reporting, tofa or Silo into it are refused with "Resume this server to import into it". Resume first, import, then mark it historical again if you want.
 - **Add Server** for a Plex server that is already listed, historical or not, is refused with "This server is already connected" (or "A server with this URL is already connected"), so resume the existing entry instead. For Jellyfin and Emby, the same URL is refused with "Resume this server to change its address or key" instead of updating the entry as described under [Re-adding a server with the same URL](#re-adding-a-server-with-the-same-url). Resume the existing entry first.
 - Automations scoped to it stay as they are, but triggers that need the server live (stream, server and update events) do not fire; the builder says so under the server picker. **Inactive for** skips its accounts.
 
 ### Removing a server
 
 **Remove** in the row's menu deletes the server and everything Tracearr recorded for it: sessions, watch history, users and libraries. The dialog says so and it can't be undone. Mark the server historical instead when you want to keep that history.
+
+Removing a Silo server leaves the API key Tracearr used in Silo, and the dialog says "Silo keeps the API key Tracearr used. Revoke it in Silo under Settings, API Keys."
 
 ### Server location
 

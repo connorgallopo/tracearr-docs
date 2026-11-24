@@ -7,7 +7,7 @@ import { Callout, Steps, Tabs } from 'nextra/components';
 
 # Real-Time Updates
 
-Plex streams session updates to Tracearr instantly over Server-Sent Events (SSE), and tofa does the same over its own socket, with no plugin. While tofa's socket is down, Tracearr polls it instead. Jellyfin and Emby don't push session updates on their own, so by default Tracearr detects their sessions by polling on an interval, so sessions appear within a poll cycle rather than the moment they start.
+Plex streams session updates to Tracearr instantly over Server-Sent Events (SSE), and tofa and Silo do the same over their own sockets, with no plugin. While a tofa or Silo server's socket is down, Tracearr polls that server instead, and its row in **Settings** → **Servers** shows **Polling** until the socket is back. Jellyfin and Emby don't push session updates on their own, so by default Tracearr detects their sessions by polling on an interval, so sessions appear within a poll cycle rather than the moment they start.
 
 The **Tracearr SSE plugin** closes that gap. Once installed on your Jellyfin or Emby server, sessions push to Tracearr instantly, just like Plex. Without it, Tracearr keeps working through polling.
 

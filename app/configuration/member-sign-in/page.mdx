@@ -1,6 +1,6 @@
 ---
 title: Member Sign-in
-description: Let the people you share a server with sign in to Tracearr with their Plex, Jellyfin, Emby or tofa account. Covers the sign-in switches, per-person access, what members see, and the owner's Personal view.
+description: Let the people you share a server with sign in to Tracearr with their Plex, Jellyfin, Emby, tofa or Silo account. Covers the sign-in switches, per-person access, what members see, and the owner's Personal view.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -26,15 +26,15 @@ Go to **Settings** → **Access** → **Sign-in**. The page has two cards of swi
 | **Plex account**          | The owner has a Plex account linked                                  | The owner's own Plex account. It keeps working after the Plex server is marked historical, because it checks the account with plex.tv, not the server. |
 | **tofa account**          | The owner has a tofa account linked                                  | The owner's own tofa account, while it is on a tofa server that is not historical.                                                                     |
 
-**Admins and members** has **Let admins and members sign in**, the default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page. Under it, **Through these servers** has a switch for every live server. These say where people can use their Plex, Jellyfin, Emby or tofa account to sign in. A server marked historical is not listed. Switching a server off signs out the people who could only get in through it; anyone set to Allow with an account there keeps their session. **Set individually** lists the people whose user page says Allow or Block, and can add one.
+**Admins and members** has **Let admins and members sign in**, the default for everyone except the owner. Turning it off signs out anyone not allowed individually on their user page. Under it, **Through these servers** has a switch for every live server. These say where people can use their Plex, Jellyfin, Emby, tofa or Silo account to sign in. A server marked historical is not listed. Switching a server off signs out the people who could only get in through it; anyone set to Allow with an account there keeps their session. **Set individually** lists the people whose user page says Allow or Block, and can add one.
 
-Tracearr refuses to switch off the last of password, Plex, tofa and single sign-on that the owner can still use, even if the owner can also sign in through a Jellyfin or Emby server. That switch reads "Your only way in, so it stays on." and cannot be clicked.
+Tracearr refuses to switch off the last of password, Plex, tofa and single sign-on that the owner can still use, even if the owner can also sign in through a Jellyfin, Emby or Silo server. That switch reads "Your only way in, so it stays on." and cannot be clicked.
 
 ### Single sign-on only
 
 Since 3.2.0, **Single sign-on only** sits under **Through these servers** when [OIDC is configured](/configuration/environment#oidc-single-sign-on). Turn it on when everyone should sign in through your identity provider:
 
-- Signing in with a Plex, Jellyfin, Emby or tofa account is refused for admins and members, Quick Connect included, and for the owner's own Jellyfin or Emby account. The owner's own Plex and tofa accounts are not affected; those are the **Plex account** and **tofa account** switches under **How you sign in**.
+- Signing in with a Plex, Jellyfin, Emby, tofa or Silo account is refused for admins and members, Quick Connect and Silo codes included, and for the owner's own Jellyfin, Emby or Silo account. The owner's own Plex and tofa accounts are not affected; those are the **Plex account** and **tofa account** switches under **How you sign in**.
 - The server switches and each person's **Sign-in** setting still decide who gets in: an admin or member needs a live account on a switched-on server, or to be set to Allow. Allow skips a server's switch but never single sign-on only.
 - Turning it on signs out everyone who signed in through a media server and has no other way in. An admin with a Tracearr password keeps their session while **Username and password** is on.
 - The login page shows only the single sign-on button. Password, Plex and tofa sign-in for the owner, and password sign-in for admins, still work at `/login?all`, which is the way in when your identity provider is down. With it on, `/login?all` lists no media servers.
@@ -81,7 +81,7 @@ Through a media server, a person on Default needs that server's switch on as wel
 
 ## How members sign in
 
-When password sign-in is on and a Jellyfin or Emby server is open to sign-in, the login page splits into two tabs, **Tracearr account** and **Media server**; otherwise whichever form applies shows alone. The Media server form lists the Jellyfin and Emby servers people can sign in through. Plex and tofa use the **Sign in with Plex** and **Sign in with tofa** buttons, and the owner's own Jellyfin or Emby account works through the Media server form too, on a server open to member sign-in.
+When password sign-in is on and a Jellyfin, Emby or Silo server is open to sign-in, the login page splits into two tabs, **Tracearr account** and **Media server**; otherwise whichever form applies shows alone. The Media server form lists the Jellyfin, Emby and Silo servers people can sign in through. Plex and tofa use the **Sign in with Plex** and **Sign in with tofa** buttons, and the owner's own Jellyfin, Emby or Silo account works through the Media server form too, on a server open to member sign-in.
 
 ### Plex
 
@@ -103,7 +103,13 @@ The member picks the server. When Quick Connect is enabled on that Jellyfin serv
 
 The member picks the server and enters their Emby username and password.
 
-After three failed Jellyfin or Emby password attempts for the same username on the same server within 15 minutes, Tracearr refuses further attempts for that username until the window passes. Tracearr never shows the member the media server's own error.
+### Silo
+
+The member picks the server. When Silo offers code sign-in, Tracearr shows an eight-digit code with an **Open Silo** button and the address to enter it at. The member approves the code in Silo while signed in to their own account, and Tracearr signs in whoever approved it. When the code expires, **Request a new code** shows a new one. **Use password instead** switches to the Silo username and password form, and **Use a code instead** goes back. A server that offers neither shows "Sign-in is not available on this server right now."
+
+Silo builds the link behind **Open Silo** from the address Tracearr reaches it at, its Server URL, which is often a LAN address. When the server has a [Public address](/getting-started/first-server#public-address), Tracearr puts that address in the link and in the "go to" line instead, so members off your network can open it. Tracearr keeps no Silo login after sign-in: the one Silo gives it is logged out before the member reaches Tracearr.
+
+After three failed Jellyfin, Emby or Silo password attempts for the same username on the same server within 15 minutes, Tracearr refuses further attempts for that username until the window passes. Tracearr never shows the member the media server's own error.
 
 ### Single sign-on (SSO)
 
