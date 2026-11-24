@@ -58,7 +58,9 @@ import { Tabs } from 'nextra/components';
 
 ### What media servers does Tracearr support?
 
-Tracearr supports **Plex**, **Jellyfin**, **Emby** and **tofa** (0.13.3 or newer). You can monitor multiple servers of different types from a single Tracearr instance.
+Tracearr supports **Plex**, **Jellyfin**, **Emby**, **tofa** (0.13.3 or newer) and **Silo**. You can monitor multiple servers of different types from a single Tracearr instance.
+
+Silo has no 1.0 release yet and its API still changes, so a Silo update can need a newer Tracearr.
 
 ---
 
@@ -88,7 +90,7 @@ No, they are two different fields on two different things. A Tracearr account's 
 
 ### Can the people I share my server with sign in?
 
-Yes, since 2.8.0, with the Plex, Jellyfin or Emby account they already have on your server. It is off until you turn on **Let admins and members sign in** under **Settings** → **Access** → **Sign-in** and switch on the servers they may use, or set a person to **Allow** on their user page. A member sees their own plays; other people's activity shows only as anonymous counts, and only if you turn on **Show members anonymous server activity**. See [Member sign-in](/configuration/member-sign-in).
+Yes, since 2.8.0, with the Plex, Jellyfin, Emby, tofa or Silo account they already have on your server. It is off until you turn on **Let admins and members sign in** under **Settings** → **Access** → **Sign-in** and switch on the servers they may use, or set a person to **Allow** on their user page. A member sees their own plays; other people's activity shows only as anonymous counts, and only if you turn on **Show members anonymous server activity**. See [Member sign-in](/configuration/member-sign-in).
 
 ---
 
@@ -100,7 +102,7 @@ Set a Tracearr password with [`reset-password`](/configuration/recovery#reset-pa
 
 ### Can I change the owner or add another Tracearr account?
 
-No. The owner is the account created at first-run setup. Tracearr never creates a second Tracearr account, and nobody can be given the owner role later. Everyone else is a person synced from your media servers, who can sign in with their own Plex, Jellyfin or Emby account once you allow it. If the owner was set up apart from your own media server account, [The owner account](/getting-started/first-server#the-owner-account) explains what that means.
+No. The owner is the account created at first-run setup. Tracearr never creates a second Tracearr account, and nobody can be given the owner role later. Everyone else is a person synced from your media servers, who can sign in with their own Plex, Jellyfin, Emby, tofa or Silo account once you allow it. If the owner was set up apart from your own media server account, [The owner account](/getting-started/first-server#the-owner-account) explains what that means.
 
 The web app cannot change a username. The [`set-username`](/configuration/recovery#set-username) recovery command can, but a new username does not link the owner to any media server account.
 
@@ -114,7 +116,20 @@ The folded-in person's server accounts and sessions move to the kept person, and
 
 Tracearr also suggests merges on that page for people whose server accounts share an email address or a username.
 
-The owner is not listed on **Users**, so your own Jellyfin or Emby account is not merged there. Link it from its server instead; see [Linking your own Jellyfin or Emby account](/getting-started/first-server#linking-your-own-jellyfin-or-emby-account).
+The owner is not listed on **Users**, so your own Jellyfin, Emby, tofa or Silo account is not merged there. Link it from its server instead; see [Linking your own Jellyfin or Emby account](/getting-started/first-server#linking-your-own-jellyfin-or-emby-account).
+
+---
+
+### What are profiles?
+
+tofa and Silo let one account play under several profiles, the way a household shares one login. Since 3.3.0, Tracearr records the profile behind each play and download on those servers, imported history included, and behind each Silo request. A profile stays part of its account: it is never a separate person, and automations and trust scores look at the account.
+
+The main profile is the account itself, so it is never labeled. A play from any other profile shows that profile's picture on the bottom-right of the account's avatar in **History**, Now Playing and the Silo request tables, and **Session Details** names it under **Profile**. A profile the server no longer lists reads "(removed)" and its picture is grayed out.
+
+Once an account has a profile besides its main one:
+
+- **History** → **Filters** has a **Profiles** submenu, grouped by account, to narrow the list to some profiles.
+- The person's sessions table gets a **Profile** column and an **All profiles** picker, and once more than one profile has played, a **Profiles** card shows each one's plays and watch time.
 
 ---
 
@@ -146,7 +161,7 @@ If you go that route, you are on your own. We can't help with problems that only
 ### Tracearr can't connect to my media server
 
 1. Verify your server URL is correct and accessible from Tracearr
-2. Check that your API key/token is valid. A replaced Jellyfin or Emby key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
+2. Check that your API key/token is valid. A replaced Jellyfin, Emby or Silo key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
 3. Ensure there are no firewall rules blocking the connection
 4. Check the Tracearr logs for specific error messages
 5. Try [Disabling IPv6 in Docker](#disabling-ipv6-in-docker)
@@ -217,14 +232,14 @@ This forces the container to use IPv4 only, which resolves the issue in most cas
 ### Sessions aren't being tracked
 
 1. Verify the server connection is active in **Settings** → **Servers**
-2. Check that your API key or token is still valid. A replaced Jellyfin or Emby key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
-3. Start a playback session. Plex and tofa sessions appear at once, while Jellyfin and Emby sessions appear within a poll cycle
+2. Check that your API key or token is still valid. A replaced Jellyfin, Emby or Silo key goes in **Edit Server**, see [Changing the URL or API key](/configuration/servers#changing-the-url-or-api-key)
+3. Start a playback session. Plex, tofa and Silo sessions appear at once, while Jellyfin and Emby sessions appear within a poll cycle
 
 ---
 
 ### Jellyfin or Emby sessions are slow to appear
 
-Plex pushes sessions to Tracearr instantly over SSE, and tofa over its own socket. Jellyfin and Emby are polled on an interval by default, so their sessions can take a poll cycle to show up.
+Plex pushes sessions to Tracearr instantly over SSE, and tofa and Silo over their own sockets. Jellyfin and Emby are polled on an interval by default, so their sessions can take a poll cycle to show up.
 
 Install the [Tracearr SSE plugin](/configuration/realtime) on your Jellyfin or Emby server for instant, push-based sessions. See the [Real-Time Updates](/configuration/realtime) guide for setup.
 
@@ -332,6 +347,7 @@ What the Server Resources panel needs depends on the server:
 
 - **Plex** requires **Plex Pass**: resource monitoring is a Plex Pass API feature, and Tracearr currently does not detect whether your account has it.
 - **tofa** reports CPU and memory itself, with no plugin.
+- **Silo** reports CPU and memory itself, with no plugin.
 - **Jellyfin and Emby** don't expose CPU or memory through their APIs at all. Installing the [SSE plugin](/sse-plugin) (v0.4 or newer) fills the panel with a live sample every 6 seconds. Host-level values require the media server to run on Linux, including in a container.
 
 If the panel is empty, the server you're looking at is missing its respective requirement above.
@@ -369,7 +385,7 @@ Three things to check. An address on the suppression list under **Settings** →
 
 ### Members on my Jellyfin server get no links to the items
 
-Newsletter item links come from the server's **Public address**, which is a separate field from the Server URL and is blank until you fill it in. Without it, or with an address a member off your network could not open, the links are left out and the newsletter editor's **Readiness** list names the server. See [Public address](/getting-started/first-server#public-address).
+Newsletter item links come from the server's **Public address**, which is a separate field from the Server URL and is blank until you fill it in. Without it, or with an address a member off your network could not open, the links are left out and the newsletter editor's **Readiness** list names the server. Emby and Silo servers work the same way. See [Public address](/getting-started/first-server#public-address).
 
 ---
 

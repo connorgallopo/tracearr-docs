@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     template: '%s | Tracearr Docs',
   },
   description:
-    'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, and Emby. Installation guides, configuration, and troubleshooting.',
+    'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, Emby, tofa, and Silo. Installation guides, configuration, and troubleshooting.',
   keywords: [
     'Tracearr',
     'Tracearr documentation',
@@ -128,7 +128,7 @@ const structuredData = {
   name: 'Tracearr Documentation',
   url: 'https://docs.tracearr.com',
   description:
-    'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, and Emby media servers.',
+    'Documentation for Tracearr - the modern monitoring platform for Plex, Jellyfin, Emby, tofa, and Silo media servers.',
   publisher: {
     '@type': 'Organization',
     name: 'Tracearr',

@@ -11,7 +11,7 @@ const SPEC_BASE =
   'https://github.com/connorgallopo/tracearr/releases/latest/download';
 
 const description =
-  'Interactive reference for the Tracearr public REST API. Query streams, watch history, users, libraries, and recently added media from your Plex, Jellyfin, or Emby monitoring instance.';
+  'Interactive reference for the Tracearr public REST API. Query streams, watch history, users, libraries, and recently added media from your Plex, Jellyfin, Emby, tofa, or Silo monitoring instance.';
 
 export const metadata: Metadata = {
   title: 'API Reference',

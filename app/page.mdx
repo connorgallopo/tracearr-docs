@@ -1,6 +1,6 @@
 ---
 title: Tracearr Documentation
-description: Complete documentation for Tracearr, the modern monitoring platform for Plex, Jellyfin, Emby and tofa media servers. Installation guides, configuration, and troubleshooting.
+description: Complete documentation for Tracearr, the modern monitoring platform for Plex, Jellyfin, Emby, tofa and Silo media servers. Installation guides, configuration, and troubleshooting.
 ---
 
 import { Callout } from 'nextra/components';
@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 # Tracearr
 
-**Real-time monitoring for Plex, Jellyfin, Emby and tofa. One dashboard for all your servers.**
+**Real-time monitoring for Plex, Jellyfin, Emby, tofa and Silo. One dashboard for all your servers.**
 
 Tracearr is a free, open-source monitoring platform that gives you complete visibility into your media servers. Track streams in real-time, analyze playback patterns, and detect account sharing, all from a single interface.
 
@@ -25,7 +25,7 @@ Tracearr is a free, open-source monitoring platform that gives you complete visi
 
 If you run multiple media servers, you've probably dealt with this: Tautulli only works with Plex. Jellystat only works with Jellyfin and Emby. Multiple servers means multiple dashboards.
 
-**Tracearr covers all three, plus tofa.** One install, one interface.
+**Tracearr covers all three, plus tofa and Silo.** One install, one interface.
 
 |                           | Tautulli | Jellystat | Tracearr |
 | ------------------------- | :------: | :-------: | :------: |
@@ -33,6 +33,7 @@ If you run multiple media servers, you've probably dealt with this: Tautulli onl
 | Jellyfin support          |          |     ✓     |    ✓     |
 | Emby support              |          |     ✓     |    ✓     |
 | tofa support              |          |           |    ✓     |
+| Silo support              |          |           |    ✓     |
 | Multi-server dashboard    |          |           |    ✓     |
 | Account sharing detection |          |           |    ✓     |
 | Impossible travel alerts  |          |           |    ✓     |
@@ -46,9 +47,9 @@ If you run multiple media servers, you've probably dealt with this: Tautulli onl
 
 - **Live Session Tracking**: See every active stream instantly with WebSocket updates
 - **Instant Jellyfin & Emby**: Push-based session updates with the optional [SSE plugin](/sse-plugin)
-- **Multi-Server Dashboard**: Plex, Jellyfin, Emby and tofa unified in one view
+- **Multi-Server Dashboard**: Plex, Jellyfin, Emby, tofa and Silo unified in one view
 - **Interactive World Map**: Visualize where streams originate globally
-- **Server Resources**: CPU and memory charts per server. Plex and tofa report their own numbers; Jellyfin and Emby need the [SSE plugin](/sse-plugin)
+- **Server Resources**: CPU and memory charts per server. Plex, tofa and Silo report their own numbers; Jellyfin and Emby need the [SSE plugin](/sse-plugin)
 
 ### Account Sharing Detection
 
@@ -70,7 +71,7 @@ Tracearr ships more [ready-made automations](/configuration/automations#ready-ma
 - **Media Catalog**: One record per title across every server, matched by IMDb, TMDB, or TVDB ID, or by title and year
 - **Library Analytics**: Genres, quality, storage predictions, duplicate detection, engagement metrics
 - **Music**: Artists in Browse, with albums on each artist's page. Plays count in the Dashboard's numbers and listen time shows beside watch time
-- **Downloads**: [Who downloaded what](/configuration/downloads) from Plex, Jellyfin and Emby, with the quality delivered, plus an automation for download bursts
+- **Downloads**: [Who downloaded what](/configuration/downloads) from Plex, Jellyfin, Emby, tofa and Silo, with the quality delivered, plus an automation for download bursts
 - **Seerr Requests**: [Link Seerr, Overseerr, or Jellyseerr](/configuration/requests) to see who requested a title, when it landed, and whether they watched it
 - **Merged Users**: Merge one person's accounts on different servers into a single user. Tracearr suggests matches, and you can split an account back out
 - **Trust Scores**: Automated scoring based on user behavior

@@ -8,7 +8,7 @@ import { BUILTIN_TOOLTIP, Badge, Gallery, VERIFIED_TOOLTIP } from './gallery';
 export const revalidate = 3600;
 
 const description =
-  'Automation templates for Tracearr, shared as codes you paste into your own install. Notifications, server health, limits and housekeeping for Plex, Jellyfin and Emby.';
+  'Automation templates for Tracearr, shared as codes you paste into your own install. Notifications, server health, limits and housekeeping for Plex, Jellyfin, Emby, tofa and Silo.';
 
 export const metadata: Metadata = {
   title: 'Automation templates',
